@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.linalg import norm
 from scipy.linalg import block_diag
 
 class Projection(object):
@@ -14,32 +15,40 @@ class Projection(object):
 
     def run(self):
 
-        HA_stretch = np.array([
-        1/np.sqrt(3)*np.array([ 1, 1, 1]),
-        1/np.sqrt(2)*np.array([ 1,-1, 0]),
-        1/np.sqrt(6)*np.array([-1,-1, 2]),
-        ]).T
+        HA_stretch = normalize(np.array([
+        [ 1, 1, 1],
+        [ 1,-1, 0],
+        [-1,-1, 2],
+        ]).T)
         
-        stretch = np.array([
-        1/np.sqrt(4)*np.array([ 1, 1, 1, 1]),
-        1/np.sqrt(4)*np.array([ 1, 1,-1,-1]),
-        1/np.sqrt(4)*np.array([ 1,-1, 1,-1]),
-        1/np.sqrt(4)*np.array([ 1,-1,-1, 1])
-        ]).T
+        stretch = normalize(np.array([
+        [ 1, 1, 1, 1],
+        [ 1, 1,-1,-1],
+        [ 1,-1, 1,-1],
+        [ 1,-1,-1, 1]
+        ]).T)
 
-        angles = np.array([
-        0.5/np.sqrt(10)*np.array([ 4, 4,-1,-1,-1,-1,-1,-1,-1,-1]),
-        0.5/np.sqrt(10)*np.array([ 4,-4,-1,-1,-1,-1, 1, 1, 1, 1]),
-          1/np.sqrt(8)* np.array([ 0, 0, 1, 1,-1,-1, 1, 1,-1,-1]),
-          1/np.sqrt(8)* np.array([ 0, 0, 1, 1,-1,-1,-1,-1, 1, 1]),
-          1/np.sqrt(8)* np.array([ 0, 0, 1,-1, 1,-1, 1,-1, 1,-1]),
-          1/np.sqrt(8)* np.array([ 0, 0, 1,-1, 1,-1,-1, 1,-1, 1]),
-          1/np.sqrt(8)* np.array([ 0, 0, 1, 1,-1,-1, 1, 1,-1,-1]),
-          1/np.sqrt(8)* np.array([ 0, 0, 1, 1,-1,-1,-1,-1, 1, 1]),
-        ]).T
+        angles = normalize(np.array([
+        [ 4, 4,-1,-1,-1,-1,-1,-1,-1,-1],
+        [ 4,-4,-1,-1,-1,-1, 1, 1, 1, 1],
+        [ 0, 0, 1, 1,-1,-1, 1, 1,-1,-1],
+        [ 0, 0, 1, 1,-1,-1,-1,-1, 1, 1],
+        [ 0, 0, 1,-1, 1,-1, 1,-1, 1,-1],
+        [ 0, 0, 1,-1, 1,-1,-1, 1,-1, 1],
+        [ 0, 0, 1,-1,-1, 1, 1,-1,-1, 1],
+        [ 0, 0, 1,-1,-1, 1,-1, 1, 1,-1],
+        ]).T)
 
-        Proj = block_diag(HA_stretch,stretch,angles,angles2,oop)
+        Proj = block_diag(HA_stretch,stretch,angles)
 
 
         self.Proj = Proj
 
+def normalize(mat):
+    return 1/norm(mat,axis=0)*mat
+
+if __name__=="__main__":
+    np.set_printoptions(linewidth=400, precision=2,threshold=100000)
+    p = Projection([])
+    p.run()
+    print(p.Proj)
