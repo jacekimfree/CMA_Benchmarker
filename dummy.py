@@ -1,15 +1,15 @@
 # Adds and removes dummy atoms to fc.dat files in specified indicies
-# python dummy.py [indicies] [indicies]
+# python dummy.py filename [indicies] [indicies]
 # use "-" and "+" to specify indicies and "," to separate them
-# e.g. python dummy.py -1,2 +10,11
+# e.g. python dummy.py fc.dat -1,2 +10,11
 # indicies can be in any order and there can be more than one specification
 
 import sys 
 
 import numpy as np
-# np.set_printoptions(precision=4, suppress=True, linewidth=300)
+np.set_printoptions(precision=2, suppress=True, linewidth=300)
 
-with open('fc.dat', 'r+') as f:
+with open(sys.argv[1], 'r+') as f:
     lines = f.readlines()
     ndim = int(lines[0].split()[1])
 
@@ -25,16 +25,19 @@ with open('fc.dat', 'r+') as f:
 
     sub, add = False, False
     sub_ind, add_ind = [],[]
-    for arg in sys.argv[1:]:
+    for arg in sys.argv[2:]:
         if "-" in arg:
             sub = True
-            sub_ind += sorted([int(i) for i in arg[1:].split(",")])
-            print(sub_ind)
+            sub_ind += [int(i) for i in arg[1:].split(",")]
+            # print(sub_ind)
 
         if "+" in arg:
             add = True
-            add_ind += sorted([int(i) for i in arg[1:].split(",")])
-            print(add_ind)
+            add_ind += [int(i) for i in arg[1:].split(",")]
+            # print(add_ind)
+
+    sub_ind = sorted(sub_ind,reverse=True)
+    add_ind = sorted(add_ind)
 
     if sub:
         for i in sub_ind:
