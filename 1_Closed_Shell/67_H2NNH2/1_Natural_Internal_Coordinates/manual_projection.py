@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.linalg import norm
 from scipy.linalg import block_diag
 
 class Projection(object):
@@ -14,27 +15,41 @@ class Projection(object):
 
     def run(self):
 
-        CC_mat = np.eye(1)
+        NN_mat = np.eye(1)
         
+        NH_str = normalize(np.array([
+        [1, 1, 1, 1],
+        [1, 1,-1,-1],
+        [1,-1, 1,-1],
+        [1,-1,-1, 1]
+        ]).T)
+
+        NH_ang = normalize(np.array([
+        [2,-1,-1, 2,-1,-1],
+        [2,-1,-1,-2, 1, 1],
+        [0, 1,-1, 0, 1,-1],
+        [0, 1,-1, 0,-1, 1],
+        ]).T)
         
-        angles_mat = np.array([
-            [0.5,0.5,0.5,0.5],
-            [0.5,-0.5,-0.5,0.5],
-            [0.5,0.5,-0.5,-0.5],
-            [0.5,-0.5,0.5,-0.5]
-        ])
+        oop_mat = normalize(np.array([
+        [1, 1],
+        [1,-1]
+        ]).T)
         
-        oop_mat = np.array([
-            [1/np.sqrt(2),1/np.sqrt(2)],
-            [1/np.sqrt(2),-1/np.sqrt(2)]
-        ])
+        tor_mat = normalize(np.array([
+        [1, 1, 1, 1]
+        ]).T)
         
-        tor_mat = np.array([
-            [1/np.sqrt(2)],
-            [1/np.sqrt(2)]
-        ])
-        
-        Proj = block_diag(CC_mat,angles_mat,angles_mat,tor_mat,oop_mat)
+        Proj = block_diag(NN_mat,NH_str,NH_ang,tor_mat,oop_mat)
         
         
         self.Proj = Proj                     
+
+def normalize(mat):
+    return 1/norm(mat,axis=0)*mat
+
+if __name__=="__main__":
+    np.set_printoptions(linewidth=400, precision=2,threshold=100000)
+    p = Projection([])
+    p.run()
+    print(p.Proj)
