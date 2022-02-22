@@ -258,7 +258,6 @@ class Merger(object):
         def n_largest(n, FC):
             indexes = []
             upper_triang = np.triu(FC,n)
-            print("REEEEEEEEEEEEeeeeeeeeeEEEEEEEEEEE**************")
             for i in range(0,n):
                 fc_cma2 = np.where(upper_triang == upper_triang.max())
                 index = [fc_cma2[0][0], fc_cma2[1][0]]
