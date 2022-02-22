@@ -45,6 +45,7 @@ class Merger(object):
         }
         options_obj = Options(**options_kwargs)
         self.options = options_obj 
+    #function that returns diagonal fc matrix + n-largest off-diagonal elements
     def run(self,opts, Proj):
 
         print("You have imported the merger script!")
@@ -254,12 +255,26 @@ class Merger(object):
         G = np.dot(np.dot(eig_inv, G), eig_inv.T)
         F = np.dot(np.dot(inv(eig_inv).T, F), inv(eig_inv))
         
+        def n_largest(n, FC):
+            indexes = []
+            upper_triang = np.triu(FC,n)
+            print("REEEEEEEEEEEEeeeeeeeeeEEEEEEEEEEE**************")
+            for i in range(0,n):
+                fc_cma2 = np.where(upper_triang == upper_triang.max())
+                index = [fc_cma2[0][0], fc_cma2[1][0]]
+                indexes.append(index)
+                upper_triang[index[0],index[1]] = 0
+            print(indexes)
+            return indexes
+        
         print("Full Force constant matrix in lower level normal mode basis:")
         print(F)
         if options.coords == 'Redundant':
             self.F_redundant = F
+            #self.F_redundant_cma2IDX = n_largest(2, np.abs(copy.copy(self.F_redundant)))
         elif options.coords == 'Custom':
             self.F_custom = F
+            #self.F_custom_cma2IDX = n_largest(2, np.abs(copy.copy(self.F_custom)))
         elif options.coords == 'ZMAT' :
             self.F_zmat = F
         else:
@@ -290,4 +305,36 @@ class Merger(object):
         else:
             pass
         print('merger needs to delete stuff as well')
-        print(dir()) 
+        print(dir())
+        #everything below this line pertains to CMA2 off-diag elements being included in the GF matrix computation, its not an optimal setup, obviously
+        #plz fix it :( 
+        self.cma2_freq = [] 
+        if self.options.n_cma2 > 0:
+            for index in range(0, self.options.n_cma2):
+                if options.coords == 'Redundant':
+                    extras = n_largest(2, np.abs(copy.copy(self.F_redundant)))
+                    F[index] = self.F_redundant[index]     
+                elif options.coords == 'Custom':
+                    extras = n_largest(2, np.abs(copy.copy(self.F_custom)))
+                    F[index] = self.F_custom[index]     
+                elif options.coords == 'ZMAT' :
+                    extras = n_largest(2, np.abs(copy.copy(self.F_zmat)))
+                    F[index] = self.F_zmat[index]     
+                else:
+                    pass
+                print('Time for some off-diags')
+                init_GF = GFMethod(
+                    G,
+                    F,
+                    options.tol,
+                    options.proj_tol,
+                    zmat_obj2,
+                    TED_obj,
+                    False
+                )
+                init_GF.run()
+                print('CMA2 including ' + str(index + 1) + ' off-diagonal elements for ' + str(options.coords) + ' coordinates')
+                print(init_GF.freq) 
+
+        else:
+            print('CMA0 it is') 
