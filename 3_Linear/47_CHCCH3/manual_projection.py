@@ -15,23 +15,28 @@ class Projection(object):
 
     def run(self):
 
-        stretch = np.eye(5)
-
-        angles = normalize(np.array([
-        [ 2,-1,-1],
-        [ 0, 1,-1],
+        HA_str = np.eye(3)
+       
+        CH_str = normalize(np.array([
+        [1, 1, 1],
+        [2,-1,-1],
+        [0, 1,-1],
         ]).T)
 
-        tor = normalize(np.array([
-        [1, 1],
+        CH_ang = normalize(np.array([
+        [1, 1, 1,-1,-1,-1],
+        [2,-1,-1, 0, 0, 0],
+        [0, 1,-1, 0, 0, 0],
+        [0, 0, 0, 2,-1,-1],
+        [0, 0, 0, 0, 1,-1],
         ]).T)
 
-        oop = np.eye(1)
+        lin = normalize(np.array([
+        [2,-1,-1],
+        [0, 1,-1],
+        ]).T)
 
-        #raise RuntimeError
-
-        Proj = block_diag(stretch,angles,tor,oop)
-
+        Proj = block_diag(HA_str,CH_str,CH_ang,lin,lin)
 
         self.Proj = Proj
 
