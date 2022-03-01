@@ -41,6 +41,12 @@ class Projection(object):
         [1,-1,-1, 1,-1, 1, 1,-1],
         ]).T) 
 
+        CC_ang = normalize(np.array([
+        [1, 1,-1,-1],
+        [1,-1, 1,-1],
+        [1,-1,-1, 1],
+        ]).T) 
+
         CH_ang = normalize(np.array([
         [4,-1,-1,-1,-1, 4,-1,-1,-1,-1, 4,-1,-1,-1,-1, 4,-1,-1,-1,-1],
         [4,-1,-1,-1,-1, 4,-1,-1,-1,-1,-4, 1, 1, 1, 1,-4, 1, 1, 1, 1],
@@ -60,16 +66,7 @@ class Projection(object):
         [0, 1,-1,-1, 1, 0,-1, 1, 1,-1, 0,-1, 1, 1,-1, 0, 1,-1,-1, 1],
         ]).T)
 
-        tor = normalize(np.array([
-        [1, 1, 1, 1]
-        ]).T)
-
-        oop = normalize(np.array([
-        [1,-1, 1,-1],
-        [1,-1,-1, 1],
-        ]).T)
-
-        Proj = block_diag(HA_str,CH_str,CH_ang,tor,oop)
+        Proj = block_diag(HA_str,CH_str,CC_ang,CH_ang)
 
         self.Proj = Proj
 
