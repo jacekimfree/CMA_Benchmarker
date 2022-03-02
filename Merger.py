@@ -93,7 +93,8 @@ class Merger(object):
         s_vec = SVectors(
             zmat_obj, options, zmat_obj.variable_dictionary_init
         )
-        print('this is proj, check for this when redundants executed', self.Proj)
+        print('this is proj, check for this when redundants executed')
+        print(self.Proj)
         s_vec.run(zmat_obj.cartesians_init, True, proj=self.Proj)
                 
         TED_obj = TED(s_vec.proj, zmat_obj)

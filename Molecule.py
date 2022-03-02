@@ -52,3 +52,10 @@ class Molecule(object):
         #df_i: dataframe, individual for each child directory
         frame.append(df)
         return frame, df_i 
+
+#     def grab_geometries(self):
+#         try:
+#             with open("zmat", "r") as f:
+#                 output = f.readlines()
+
+
