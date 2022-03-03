@@ -14,6 +14,10 @@ from itertools import product
 
 from Molecule import Molecule
 
+# =======================
+# Database Specifications
+# =======================
+
 # High and low levels of theory, will use all combos
 # Available: "CCSD_T_TZ", "CCSD_T_DZ", "B3LYP_6-31G_2df,p_"
 h_theory = ["CCSD_T_TZ"]
@@ -31,9 +35,59 @@ paths = ['/2_Open_Shell']
 # Number of CMA2 corrections (n=0 -> CMA0)
 n = 0
 
+compute_all = False
+
+# =====================
+# Some useful functions
+# =====================
+
+def freq_diff(F1, F2):
+    return F1 - F2
+
+def averages(F_diff):
+    return np.average(F_diff), np.average(abs(F_diff)) 
+def stdev(F_diff):
+    return np.std(F_diff)
+
 def return_path_base(jobpath):
     name = os.path.basename(os.path.normpath(jobpath)) 
     return name
+
+def highlight_greaterthan(x):
+    print('this is x.Ref__Redundant')
+    print(x.Ref_Redundant) 
+    #return np.where((x.F2diff > 0.5), props, '')
+    if abs(x.Ref_Redundant) > 0.5:
+        print('oi!!!!') 
+        return ['background-color:yellow']
+    else:
+         return ['background-color:white']
+
+def build_dataframe(d,basename):
+    df = pd.DataFrame(data=d)
+    df_i = df.to_csv('out.csv',index=False)
+    # adds a space in between each molecule. 
+    df.loc[df.shape[0]] = [None, None, None, None, None, None, None] 
+    df.loc[df.shape[0]] = [None, None, None, None, None, None, None] 
+    df.loc[df.shape[0]] = [None, None, None, None, None, None, None] 
+
+    #df.loc[df.shape[0]] = [None, None, 'Signed Avg.', averages(F1diff)[0], 'Signed Avg.', averages(F1diff)[0], averages(F1F2diff)[0]]
+    #df.loc[df.shape[0]] = [None, None, 'Average   .', averages(F1diff)[1], 'Average    ', averages(F1diff)[1], averages(F1F2diff)[1]]
+    #df.loc[df.shape[0]] = [None, None, 'Std. Dev  .', stdev(F1diff),    'Std. Dev.  ', stdev(F1diff), stdev(F1F2diff)]
+
+    df.loc[0,('Molecule')] = str(basename) 
+    #df_i: dataframe, individual for each child directory
+    frame.append(df)
+    return frame, df_i 
+
+def return_path_base(jobpath):
+    name = os.path.basename(os.path.normpath(jobpath)) 
+    return name
+
+
+# ====================================
+# Print out information about database
+# ====================================
 
 hq = os.getcwd()
 jobb_list = []
@@ -78,16 +132,23 @@ for i, job in enumerate(jobb_list):
         print("\n\nDirectory: {}".format(paths[path_ind.index(i)]),end="")
         count = 0
     if count % 5 == 0:
-        print("\n{0:24}".format(return_path_base(job)),end="")
+        print("\n{0:20}".format(return_path_base(job)),end="")
         count += 1
     else:
-        print("{0:24}".format(return_path_base(job)),end="")
+        print("{0:20}".format(return_path_base(job)),end="")
         count += 1
 print("\n")
 
-compute_all = False
+# Initialize frames for pandas database
+frame = []
+if n > 0:
+    frame2 = []
 
-#frame = []
+
+# ============
+# Do the thing
+# ============
+
 def execute():
     if compute_all:
         print('this feature is not supported in the beta version.')
@@ -104,6 +165,9 @@ def execute():
  
             # Run CMA for each combination of theory
             for combo in combos:
+
+                # Lets us know we need to save reference data for current theory combo
+                Freq_ref = None   
 
                 # Copy the necessary files with correct names
                 shutil.copyfile(job + combo[1] + "/zmat", job + "zmat")
@@ -155,39 +219,63 @@ def execute():
 
                     # Run CMA
                     output_obj = execMerger.run(execMerger.options, Proj)
-                    
-                    #Freq_reference = execMerger.reference_freq    
-                    #F_nat = execMerger.F_custom 
-                    #Freq_nat = execMerger.Freq_custom 
-                    
-                    #execMolecule = Molecule(natty_obj,redundant_obj,basename)
-                    #execMolecule.run()             
-                    #F_red = execMerger.F_redundant
-                    #Freq_red = execMerger.Freq_redundant 
-                    
-                    #take differences
-                    #F1diff = freq_diff(Freq_reference, Freq_nat)   
-                    #F2diff = freq_diff(Freq_reference, Freq_red)   
-                    #F1F2diff = freq_diff(Freq_nat, Freq_red)   
-                    
-                    #dir_of_file = dirname(os.getcwd())
-                    #basename = return_path_base(dir_of_file) 
-                    #d = {'Molecule': None, 'Ref. Freq': Freq_reference, 'Natty Freq': Freq_nat,'Ref - Nat':F1diff, 'Redundant Freq' : Freq_red, 'Ref - Redundant' :F2diff, 'Nat - Redundant': F1F2diff}        
-                    #frame = build_dataframe(d,basename)
-                     
-                    #print('printing all variables')
-                    #print(dir())
-                    #delete Merger, execMerger so it is forced to reload all CMA stuff
-        
+
+                    # Collect data
+                    if Freq_ref == None:
+                        Freq_ref = execMerger.reference_freq    
+                    if coord == "Nattys":
+                        Freq_nat = execMerger.Freq_custom
+                    if coord == "Redundant":
+                        Freq_red = execMerger.Freq_redundant
+
+                    # Collect data for CMA2
+                    if n > 0:
+                        cma2_data = [] 
+                        cma2_dict = execMerger.cma2_dict
+                        for z in range(0,n):
+                            key = 'cma2_'  + str(execMerger.options.coords) 
+                            cma2_data.append(cma2_dict[key]) 
+                        print('cma2_data') 
+                        print(cma2_data)
+                        print(cma2_data[0])
+
+                        if coord == "Nattys":
+                            cma2_data_nat = cma2_data[0]
+                        if coord == "Redundant":
+                            cma2_data_red = cma2_data[0]
+
+                    # delete objects so they are forced to reload
                     del execMerger
                     del Merger
                     if coord == "Nattys":
                         del project_obj
                     
                 # end of coord loop
+
+                # take differences
+                F1diff = freq_diff(Freq_ref, Freq_nat)   
+                F2diff = freq_diff(Freq_ref, Freq_red)   
+                F1F2diff = freq_diff(Freq_nat, Freq_red)   
+                if n > 0:
+                    cma2_1_nat_diff = freq_diff(Freq_ref, cma2_data_nat)         
+                    cma2_1_red_diff = freq_diff(Freq_ref, cma2_data_red)         
             
+                dir_of_file = dirname(os.getcwd())
+                basename = return_path_base(dir_of_file) 
+                d = {'Molecule': basename, 'Ref. Freq': Freq_ref, 'Natty Freq': Freq_nat,
+                     'Ref - Nat':F1diff, 'Redundant Freq' : Freq_red, 'Ref - Redundant' :F2diff, 'Nat - Redundant': F1F2diff}
+                df = pd.DataFrame(data=d)
+                frame.append(df)
+                
+                if n > 0:
+                    d2 ={'Ref_Redundant' :F2diff,'CMA2_1_el' : cma2_1_red_diff}        
+                    df2 = pd.DataFrame(data=d2)
+                    df2.style.apply(highlight_greaterthan, axis =1)
+                    frame2.append(df2)
+
             # end of combo loop
 
+            # Clean up job directory
             os.remove("zmat")
             os.remove("zmat2")
             os.remove("fc.dat")
@@ -203,7 +291,19 @@ def execute():
  
 execute()
 os.chdir(hq)
-#megaframe = pd.concat(frame)
-#megaframe.to_csv('chonk.csv', index=False)
+megaframe = pd.concat(frame)
+megaframe.to_csv('CoordDep.csv', index=False)
+if n > 0:
+    megaframe2 = pd.concat(frame2)
+    megaframe2.to_csv('CMA2_Convergent.csv', index=False)
+#megaframe2.to_excel('CMA2_Convergent.xlsx', index=False)
+#writer = pd.ExcelWriter("CMA2_Convergent.xlsx",engine = 'xlsxwriter', encoding = 'utf-8')
+#megaframe2.to_excel(writer, sheet_name = 'Sheet1', index=False)
+#
+#workbook = writer.book
+#worksheet = writer.sheets['Sheet1']
+#
+#workbook.close()
+
 
 

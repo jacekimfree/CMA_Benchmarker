@@ -25,6 +25,7 @@ from concordantmodes.ted import TED
 from concordantmodes.trans_disp import TransDisp
 from concordantmodes.vulcan_template import VulcanTemplate
 from concordantmodes.zmat import Zmat
+
 import copy
 from fractions import Fraction
 #import manual_projection
@@ -63,7 +64,6 @@ class Merger(object):
         #}
         #options_obj = Options(**options_kwargs)
         self.Proj = Proj 
-        
         options = opts 
         #options = options_obj
         
@@ -164,7 +164,14 @@ class Merger(object):
             False
         )
         TED_GF.run()
-        
+       
+        eigs = len(TED_GF.S)
+        print('eigs')
+        print(eigs)        
+        self.eigs = eigs
+
+
+ 
         proj_tol = 1.0e-3
         eig_inv = inv(init_GF.L)  # (Normal modes (Q) x Sym internals (S) )
         for i in range(len(eig_inv)):
@@ -258,7 +265,8 @@ class Merger(object):
         
         def n_largest(n, FC):
             indexes = []
-            upper_triang = np.triu(FC,n)
+            upper_triang = abs(np.triu(FC,n))
+            #upper_triang = np.triu(FC,n)
             for i in range(0,n):
                 fc_cma2 = np.where(upper_triang == upper_triang.max())
                 index = [fc_cma2[0][0], fc_cma2[1][0]]
@@ -279,15 +287,15 @@ class Merger(object):
             self.F_zmat = F
         else:
             pass
-        F = np.diag(np.diag(F))
+        Fdiag = copy.copy(np.diag(np.diag(F)))
         
         print("Diagonal Force constant matrix in lower level normal mode basis:")
-        print(F)
+        print(Fdiag)
         #print('G matrix requested by mitchell')
         #print(G) 
         init_GF = GFMethod(
             G,
-            F,
+            Fdiag,
             options.tol,
             options.proj_tol,
             zmat_obj2,
@@ -308,33 +316,59 @@ class Merger(object):
         print(dir())
         #everything below this line pertains to CMA2 off-diag elements being included in the GF matrix computation, its not an optimal setup, obviously
         #plz fix it :( 
+        cma2_dict = {}
         self.cma2_freq = [] 
         if self.options.n_cma2 > 0:
-            for index in range(0, self.options.n_cma2):
-                if options.coords == 'Redundant':
-                    extras = n_largest(2, np.abs(copy.copy(self.F_redundant)))
-                    F[index] = self.F_redundant[index]     
-                elif options.coords == 'Custom':
-                    extras = n_largest(2, np.abs(copy.copy(self.F_custom)))
-                    F[index] = self.F_custom[index]     
-                elif options.coords == 'ZMAT' :
-                    extras = n_largest(2, np.abs(copy.copy(self.F_zmat)))
-                    F[index] = self.F_zmat[index]     
-                else:
-                    pass
-                print('Time for some off-diags')
-                init_GF = GFMethod(
-                    G,
-                    F,
-                    options.tol,
-                    options.proj_tol,
-                    zmat_obj2,
-                    TED_obj,
-                    False
-                )
-                init_GF.run()
-                print('CMA2 including ' + str(index + 1) + ' off-diagonal elements for ' + str(options.coords) + ' coordinates')
-                print(init_GF.freq) 
-
-        else:
-            print('CMA0 it is') 
+            options.off_diag = True
+            options.off_diag_bands = self.options.n_cma2
+            algo = Algorithm(eigs, None, options)
+            algo.run()
+            print('algo indices')
+            print(algo.indices)
+            #for index in range(0, self.options.n_cma2):
+            #    print('index')
+            #    print(index)
+            #    extras = n_largest(2, np.abs(copy.copy(F)))
+            temp = np.zeros((eigs,eigs))  
+            print('temp')
+            print(temp) 
+            for z, extra in enumerate(algo.indices):
+                #print('extra')
+                #print(extra)
+                #print(extra[0], extra[1]) 
+                
+                element = F[extra[0], extra[1]] 
+                temp[extra[0], extra[1]] = element
+                temp[extra[1], extra[0]] = element
+            print('temp')
+            print(temp)
+            #if options.coords == 'Redundant':
+            #    #F[index] = self.F_redundant[index]     
+            #if options.coords == 'Custom':
+            #    extras = n_largest(2, np.abs(copy.copy(self.F_custom)))
+            #    #F[index] = self.F_custom[index]     
+            #elif options.coords == 'ZMAT' :
+            #    extras = n_largest(2, np.abs(copy.copy(self.F_zmat)))
+            #    #F[index] = self.F_zmat[index]     
+            #else:
+            #    pass
+            print('Time for some off-diags')
+            init_GF = GFMethod(
+                G,
+                temp,
+                options.tol,
+                options.proj_tol,
+                zmat_obj2,
+                TED_obj,
+                False
+            )
+            init_GF.run()
+            print('CMA2 including ' + str(z + 1) + ' off-diagonal elements for ' + str(options.coords) + ' coordinates')
+            print(init_GF.freq) 
+            key = 'cma2_' +   str(options.coords) 
+            Fdiag = temp
+            cma2_dict[key] = init_GF.freq 
+        print(cma2_dict) 
+        self.cma2_dict = cma2_dict        
+        #else:
+        #    print('CMA0 it is') 
