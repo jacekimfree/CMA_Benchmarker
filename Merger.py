@@ -312,8 +312,8 @@ class Merger(object):
             self.Freq_zmat = init_GF.freq
         else:
             pass
-        print('merger needs to delete stuff as well')
-        print(dir())
+        #print('merger needs to delete stuff as well')
+        #print(dir())
         #everything below this line pertains to CMA2 off-diag elements being included in the GF matrix computation, its not an optimal setup, obviously
         #plz fix it :( 
         cma2_dict = {}
@@ -368,7 +368,7 @@ class Merger(object):
             key = 'cma2_' +   str(options.coords) 
             Fdiag = temp
             cma2_dict[key] = init_GF.freq 
-        print(cma2_dict) 
+        #print(cma2_dict) 
         self.cma2_dict = cma2_dict        
         #else:
         #    print('CMA0 it is') 
