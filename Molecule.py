@@ -4,6 +4,8 @@
 import os
 import re
 
+import pandas as pd
+
 class Molecule(object):
 
     def __init__(self,job):
@@ -16,17 +18,29 @@ class Molecule(object):
         #self.proj_mat = 
     
     def run(self):
+        # ID info
         print('Molecule Class!')
         print("="*25)
         print(f"{self.name + ' ' + self.ID:^25}")
         print("="*25)
-        print(f"Geometries:")
+
+        # Geometries
+        print("Geometries:")
         for geom in self.geoms:
+            print()
             print(geom)
             for line in self.geoms[geom]:
-                print(line)
+                print(f"{line[0]:<2}    {float(line[1]):>13.10f}    {float(line[2]):>13.10f}    {float(line[3]):>13.10f}")
+        print()
 
-    def grab_geoms(self, combo):
+        # Frequencies
+        print("Frequencies:")
+        print()
+        print(pd.DataFrame(data=self.freqs).to_string(index=False))
+        print()
+
+    def get_geoms(self, combo):
+        cma1 = False
         if combo[0] not in os.listdir():
             cma1 = True
         for lvl in combo:
@@ -56,3 +70,4 @@ class Molecule(object):
             if cma1 == True:
                 break
 
+        

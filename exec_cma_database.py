@@ -31,8 +31,8 @@ combos = list(product(h_theory,l_theory))
 coord_type = ["Nattys", "Redundant"]
 
 # Specify paths to grab data from
-# Options: '/1_Closed_Shell', '/1_Linear', '/1*', '/2_Open_Shell', '/2*'
-paths = ['/2*']
+# Options: '/1_Closed_Shell', '/1_Linear', '/1*', '/2_Open_Shell', '/2_Linear', '/2*'
+paths = ['/2_Open_Shell']
 
 # Various output control statements
 n = 0                   # Number of CMA2 corrections (n = 0 -> CMA0)
@@ -201,7 +201,7 @@ def execute():
                     
                         print()
                         print("="*50)
-                        print(" "*17+"Current Analysis")
+                        print(" "*16+"Current Parameters")
                         print("-"*50)
                         print(f"  Job                     {mol.name} ({mol.ID})") 
                         print(f"  High level of theory    {combo[0]}")
@@ -244,6 +244,7 @@ def execute():
                         # Collect data
                         if coord_type.index(coord) == 0:
                             d[f'Ref ({combo[0]})'] = execMerger.reference_freq
+                            mol.freqs[f'Ref ({combo[0]})'] = execMerger.reference_freq
                             
                             # Number the modes
                             d['Molecule'] = [f"{mol.name} ({mol.ID}) mode {i+1}" for i in range(len(execMerger.reference_freq))]
@@ -251,9 +252,11 @@ def execute():
                         if coord == "Nattys":
                             d[f'Natty ({combo[1]})'] = execMerger.Freq_custom
                             d[f'Ref - Nat ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_custom)
+                            mol.freqs[f'Natty ({combo[1]})'] = execMerger.Freq_custom
                         if coord == "Redundant":
                             d[f'Red ({combo[1]})'] = execMerger.Freq_redundant
                             d[f'Ref - Red ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_redundant)
+                            mol.freqs[f'Red ({combo[1]})'] = execMerger.Freq_redundant
                     
                         # Collect data for CMA2
                         if n > 0:
