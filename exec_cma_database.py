@@ -31,20 +31,18 @@ combos = list(product(h_theory,l_theory))
 coord_type = ["Nattys", "Redundant"]
 
 # Specify paths to grab data from
-# Options: '/1_Closed_Shell', '/2_Open_Shell'
-paths = ['/2_Open_Shell']
+# Options: '/1_Closed_Shell', '/1_Linear', '/1*', '/2_Open_Shell', '/2*'
+paths = ['/2*']
 
-# Set to true to output database .csv file
-csv = False
+# Various output control statements
+n = 0                   # Number of CMA2 corrections (n = 0 -> CMA0)
+cma1 = False            # Run CMA1 instead of CMA0
+csv = False             # Generate database .csv file
+SI = True               # Generate LaTeX SI file
+compute_all = False     # Not implemented yet, run calculations for all
 
-# Set to true for CMA1
-cma1 = True
-
-# Number of CMA2 corrections 
-# n = 0, 1, 2, ... (n = 0 -> CMA0)
-n = 0
-
-compute_all = False
+if n > 0 and cma1 == True:
+    raise RuntimeError("Don't do both CMA1 and CMA2 at the same time yet")
 
 # =====================
 # Some useful functions
@@ -55,12 +53,9 @@ def freq_diff(F1, F2):
 
 def averages(F_diff):
     return np.average(F_diff), np.average(abs(F_diff)) 
+
 def stdev(F_diff):
     return np.std(F_diff)
-
-def return_path_base(jobpath):
-    name = os.path.basename(os.path.normpath(jobpath)) 
-    return name
 
 def highlight_greaterthan(x):
     print('this is x.Ref__Redundant')
@@ -120,10 +115,6 @@ print(
 
 print("Authors: The Dorktor, Nathaniel Kitzpapi, the other one")
 print()
-#print("Levels of theory for diagonals: ", end="")
-#print(*h_theory, sep=", ")
-#print("                 off-diagonals: ", end="")
-#print(*l_theory, sep=", ")
 print("Combinations of levels of theory (high, low): ", end="")
 print(*combos, sep=", ")
 print("Coordinate types: ", end="")
@@ -135,12 +126,12 @@ print()
 for path in paths:
     path_ind.append(len(jobb_list))
     tmp_list = glob.glob(hq + path + "/[1-9]*_*/")
-    ind = np.argsort(np.array([int(re.search(hq + path + r"/(\d*)_", name).group(1)) for name in tmp_list]))
+    ind = np.argsort(np.array([int(re.search(r"/\d_.*/(\d*)_.*", name).group(1)) for name in tmp_list]))
     tmp_list = [tmp_list[i] for i in ind]
     jobb_list += tmp_list
 
 # Gives printout for each molecule in jobb_list
-print("Generating database entries for:",end="")
+print(f"Generating database entries for {len(jobb_list)} jobs:",end="")
 for i, job in enumerate(jobb_list):
     if i in path_ind:
         print("\n\nDirectory: {}".format(paths[path_ind.index(i)]),end="")
@@ -175,14 +166,9 @@ def execute():
             # Initialize objects
             mol = Molecule(job)
             basename = return_path_base(job) 
-            d = {
-            #'Molecule' : f"{mol.name} ({mol.ID})"
-            'Molecule' : None
-            }
+            d = {'Molecule' : None}     # Ensures molecule is first column
             if n > 0: 
-                d2 = {
-                'Molecule' : f"{mol.name} ({mol.ID})"
-                }
+                d2 = {'Molecule' : None}
 
             if i in path_ind:
                 print(f"Currently running jobs in {paths[path_ind.index(i)]}\n")
@@ -191,9 +177,12 @@ def execute():
             print(f"//{basename:^40}//")
             print("////////////////////////////////////////////")
 
-            # Run CMA0/CMA2 for each combination of theory
+            # Run CMA for each combination of theory
             for combo in combos:
 
+                # Grab geometry information 
+                mol.get_geoms(combo)
+            
                 if cma1 == False:
                     # Copy the necessary files with correct names
                     shutil.copyfile(job + combo[1] + "/zmat", job + "zmat")
@@ -214,12 +203,18 @@ def execute():
                         print("="*50)
                         print(" "*17+"Current Analysis")
                         print("-"*50)
-                        print("  High level of theory    " + combo[0])
-                        print("  Low level of theory     " + combo[1])
-                        print("  Coordinate type         " + coord)
+                        print(f"  Job                     {mol.name} ({mol.ID})") 
+                        print(f"  High level of theory    {combo[0]}")
+                        print(f"  Low level of theory     {combo[1]}")
+                        print(f"  Coordinate type         {coord}")
                         print("="*50)
                         print()
                     
+                        # Skip redundants if linear molecule
+                        if 'Linear' in job and coord == 'Redundant':
+                            print("What kind of idiot would use redundants for a linear molecule")
+                            continue
+
                         from Merger import Merger
                         execMerger = Merger()
                          
@@ -262,6 +257,7 @@ def execute():
                     
                         # Collect data for CMA2
                         if n > 0:
+                            d2[f"Ref {combo[0]}"] = execMerger.reference_freq
                             cma2_data = [] 
                             cma2_dict = execMerger.cma2_dict
                             key = 'cma2_'  + str(execMerger.options.coords) 
@@ -271,9 +267,9 @@ def execute():
                             print(cma2_data[0])
                     
                             if coord == "Nattys":
-                                d2['Ref_Redundant'] = F2diff
+                                d2[f'Ref - Nat {combo[1]}'] = freq_diff(execMerger.reference_freq, cma2_dict[key])
                             if coord == "Redundant":
-                                d2['CMA2_1_el'] = cma2_1_red_diff
+                                d2[f'Ref - Red {combo[1]}'] = freq_diff(execMerger.reference_freq, cma2_dict[key])
                     
                         # delete objects so they are forced to reload
                         del execMerger
@@ -284,7 +280,7 @@ def execute():
                     # end of coord loop
 
                     # Difference between Natty and Redundant freqs
-                    if 'Nattys' in coord_type and 'Redundant' in coord_type:
+                    if 'Nattys' in coord_type and 'Redundant' in coord_type and 'Linear' not in job:
                         d[f'Nat - Red {combo[1]}'] = freq_diff(d[f'Natty ({combo[1]})'], d[f'Red ({combo[1]})'])
                     
                     if n > 0:
@@ -326,24 +322,7 @@ def execute():
                             del execMerger
                             del Merger
 
-                # Grab geometry information 
-                mol.grab_geoms(combo)
-            
             # end of combo loop
-
-            # Add to pandas dataframe
-            if csv == True:
-                df = pd.DataFrame(data=d)
-                print(df)
-                print()
-                frame.append(df)
-            
-            if n > 0:
-                d2 ={'Ref_Redundant' : F2diff,
-                     'CMA2_1_el' : cma2_1_red_diff}        
-                df2 = pd.DataFrame(data=d2)
-                df2.style.apply(highlight_greaterthan, axis =1)
-                frame2.append(df2)
 
             # Print molecule information
             mol.run()
@@ -356,6 +335,24 @@ def execute():
                 os.remove("fc2.dat")
             sys.path.remove(job)
             del mol
+
+            # Skip dataframe if linear molecule
+            if 'Linear' in job:
+                continue
+
+            # Add to pandas dataframe
+            if csv == True:
+                df = pd.DataFrame(data=d)
+                # print(df)
+                # print()
+                frame.append(df)
+            
+            if n > 0:
+                d2 ={'Ref_Redundant' : F2diff,
+                     'CMA2_1_el' : cma2_1_red_diff}        
+                df2 = pd.DataFrame(data=d2)
+                df2.style.apply(highlight_greaterthan, axis =1)
+                frame2.append(df2)
 
         # end of job loop
 
