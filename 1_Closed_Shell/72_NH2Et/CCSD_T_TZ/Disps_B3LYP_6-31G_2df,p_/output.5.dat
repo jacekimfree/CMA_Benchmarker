@@ -1,0 +1,659 @@
+
+    -----------------------------------------------------------------------
+          Psi4: An Open-Source Ab Initio Electronic Structure Package
+                               Psi4 1.4a2.dev629 
+
+                         Git: Rev {master} 2938fc2 dirty
+
+
+    D. G. A. Smith, L. A. Burns, A. C. Simmonett, R. M. Parrish,
+    M. C. Schieber, R. Galvelis, P. Kraus, H. Kruse, R. Di Remigio,
+    A. Alenaizan, A. M. James, S. Lehtola, J. P. Misiewicz, M. Scheurer,
+    R. A. Shaw, J. B. Schriber, Y. Xie, Z. L. Glick, D. A. Sirianni,
+    J. S. O'Brien, J. M. Waldrop, A. Kumar, E. G. Hohenstein,
+    B. P. Pritchard, B. R. Brooks, H. F. Schaefer III, A. Yu. Sokolov,
+    K. Patkowski, A. E. DePrince III, U. Bozkaya, R. A. King,
+    F. A. Evangelista, J. M. Turney, T. D. Crawford, C. D. Sherrill,
+    J. Chem. Phys. 152(18) 184108 (2020). https://doi.org/10.1063/5.0006002
+
+                            Additional Code Authors
+    E. T. Seidl, C. L. Janssen, E. F. Valeev, M. L. Leininger,
+    J. F. Gonthier, R. M. Richard, H. R. McAlexander, M. Saitow, X. Wang,
+    P. Verma, and M. H. Lechner
+
+             Previous Authors, Complete List of Code Contributors,
+                       and Citations for Specific Modules
+    https://github.com/psi4/psi4/blob/master/codemeta.json
+    https://github.com/psi4/psi4/graphs/contributors
+    http://psicode.org/psi4manual/master/introduction.html#citing-psifour
+
+    -----------------------------------------------------------------------
+
+
+    Psi4 started on: Saturday, 06 November 2021 03:54PM
+
+    Process ID: 27959
+    Host:       n023
+    PSIDATADIR: /opt/psi/4/master/share/psi4
+    Memory:     500.0 MiB
+    Threads:    1
+    
+  ==> Input File <==
+
+--------------------------------------------------------------------------
+import os
+memory 14 GB 
+ 
+molecule {
+ C   -2.4168206061    0.5000947993    0.0016173197
+ C    0.0109339310   -1.0661203546   -0.0015724991
+ N    2.3680687969    0.3956024336    0.0005317416
+ H   -4.0950026384   -0.7022374562   -0.0004880283
+ H   -2.4985246508    1.7155042251   -1.6701882938
+ H   -2.4984683578    1.7158117760    1.6697586040
+ H    0.0415325577   -2.3049653357    1.6538049058
+ H    0.0415072275   -2.3052876935   -1.6533594117
+ H    2.3765349832    1.5605846147    1.5249607033
+ H    2.3765071868    1.5605388214   -1.5250650416
+units bohr
+}
+
+basis {
+
+assign 6-31g_2dfp_
+
+[ 6-31g_2dfp_ ]
+
+spherical
+
+!----------------------------------------------------------------------
+! Basis Set Exchange
+! Version v0.8.13
+! https://www.basissetexchange.org
+!----------------------------------------------------------------------
+!   Basis set: 6-31G(2df,p)
+! Description: 6-31G(2df,p)
+!        Role: orbital
+!     Version: 0  (Data from the original Basis Set Exchange)
+!----------------------------------------------------------------------
+
+
+****
+H     0
+S    3   1.00
+     18.7311370              0.03349460
+      2.8253937              0.23472695
+      0.6401217              0.81375733
+S    1   1.00
+      0.1612778              1.00000000
+P    1   1.00
+      1.5000000              1.0000000
+P    1   1.00
+      0.3750000              1.0000000
+****
+B     0
+S    6   1.00
+   2068.8823000              0.0018663
+    310.6495700              0.0142515
+     70.6830330              0.0695516
+     19.8610800              0.2325729
+      6.2993048              0.4670787
+      2.1270270              0.3634314
+SP   3   1.00
+      4.7279710             -0.1303938              0.0745976
+      1.1903377             -0.1307889              0.3078467
+      0.3594117              1.1309444              0.7434568
+SP   1   1.00
+      0.1267512              1.0000000              1.0000000
+D    1   1.00
+      0.8020000              1.0000000
+D    1   1.00
+      0.2005000              1.0000000
+F    1   1.00
+      0.5000000              1.0000000
+****
+C     0
+S    6   1.00
+   3047.5249000              0.0018347
+    457.3695100              0.0140373
+    103.9486900              0.0688426
+     29.2101550              0.2321844
+      9.2866630              0.4679413
+      3.1639270              0.3623120
+SP   3   1.00
+      7.8682724             -0.1193324              0.0689991
+      1.8812885             -0.1608542              0.3164240
+      0.5442493              1.1434564              0.7443083
+SP   1   1.00
+      0.1687144              1.0000000              1.0000000
+D    1   1.00
+      1.2520000              1.0000000
+D    1   1.00
+      0.3130000              1.0000000
+F    1   1.00
+      0.8000000              1.0000000
+****
+N     0
+S    6   1.00
+   4173.5110000              0.0018348
+    627.4579000              0.0139950
+    142.9021000              0.0685870
+     40.2343300              0.2322410
+     12.8202100              0.4690700
+      4.3904370              0.3604550
+SP   3   1.00
+     11.6263580             -0.1149610              0.0675800
+      2.7162800             -0.1691180              0.3239070
+      0.7722180              1.1458520              0.7408950
+SP   1   1.00
+      0.2120313              1.0000000              1.0000000
+D    1   1.00
+      1.8260000              1.0000000
+D    1   1.00
+      0.4565000              1.0000000
+F    1   1.00
+      1.0000000              1.0000000
+****
+O     0
+S    6   1.00
+   5484.6717000              0.0018311
+    825.2349500              0.0139501
+    188.0469600              0.0684451
+     52.9645000              0.2327143
+     16.8975700              0.4701930
+      5.7996353              0.3585209
+SP   3   1.00
+     15.5396160             -0.1107775              0.0708743
+      3.5999336             -0.1480263              0.3397528
+      1.0137618              1.1307670              0.7271586
+SP   1   1.00
+      0.2700058              1.0000000              1.0000000
+D    1   1.00
+      2.5840000              1.0000000
+D    1   1.00
+      0.6460000              1.0000000
+F    1   1.00
+      1.4000000              1.0000000
+****
+F     0
+S    6   1.00
+   7001.7130900              0.0018196169
+   1051.3660900              0.0139160796
+    239.2856900              0.0684053245
+     67.3974453              0.233185760
+     21.5199573              0.471267439
+      7.40310130             0.356618546
+SP   3   1.00
+     20.8479528             -0.108506975            0.0716287243
+      4.80830834            -0.146451658            0.3459121030
+      1.34406986             1.128688580            0.7224699570
+SP   1   1.00
+      0.358151393            1.0000000              1.0000000
+D    1   1.00
+      3.5000000              1.0000000
+D    1   1.00
+      0.8750000              1.0000000
+F    1   1.00
+      1.8500000              1.0000000
+****
+Al     0
+S    6   1.00
+  13983.1000000              0.00194267
+   2098.7500000              0.0148599
+    477.7050000              0.0728494
+    134.3600000              0.2468300
+     42.8709000              0.4872580
+     14.5189000              0.3234960
+SP   6   1.00
+    239.6680000             -0.00292619             0.00460285
+     57.4419000             -0.0374080              0.0331990
+     18.2859000             -0.1144870              0.1362820
+      6.5991400              0.1156350              0.3304760
+      2.4904900              0.6125950              0.4491460
+      0.9445400              0.3937990              0.2657040
+SP   3   1.00
+      1.2779000             -0.2276060             -0.0175130
+      0.3975900              0.00144583             0.2445330
+      0.1600950              1.0927900              0.8049340
+SP   1   1.00
+      0.0556577              1.0000000              1.0000000
+D    1   1.00
+      0.6500000              1.0000000
+D    1   1.00
+      0.1625000              1.0000000
+F    1   1.00
+      0.2500000              1.0000000
+****
+Si     0
+S    6   1.00
+  16115.9000000              0.00195948
+   2425.5800000              0.01492880
+    553.8670000              0.07284780
+    156.3400000              0.24613000
+     50.0683000              0.48591400
+     17.0178000              0.32500200
+SP   6   1.00
+    292.7180000             -0.00278094             0.00443826
+     69.8731000             -0.03571460             0.03266790
+     22.3363000             -0.11498500             0.13472100
+      8.1503900              0.09356340             0.32867800
+      3.1345800              0.60301700             0.44964000
+      1.2254300              0.41895900             0.26137200
+SP   3   1.00
+      1.7273800             -0.24463000            -0.01779510
+      0.5729220              0.00431572             0.25353900
+      0.2221920              1.09818000             0.80066900
+SP   1   1.00
+      0.0778369              1.00000000             1.00000000
+D    1   1.00
+      0.9000000              1.0000000
+D    1   1.00
+      0.2250000              1.0000000
+F    1   1.00
+      0.3200000              1.0000000
+****
+P     0
+S    6   1.00
+  19413.3000000              0.0018516
+   2909.4200000              0.0142062
+    661.3640000              0.0699995
+    185.7590000              0.2400790
+     59.1943000              0.4847620
+     20.0310000              0.3352000
+SP   6   1.00
+    339.4780000             -0.00278217             0.00456462
+     81.0101000             -0.0360499              0.03369360
+     25.8780000             -0.1166310              0.13975500
+      9.4522100              0.0968328              0.33936200
+      3.6656600              0.6144180              0.45092100
+      1.4674600              0.4037980              0.23858600
+SP   3   1.00
+      2.1562300             -0.2529230             -0.01776530
+      0.7489970              0.0328517              0.27405800
+      0.2831450              1.0812500              0.78542100
+SP   1   1.00
+      0.0998317              1.0000000              1.00000000
+D    1   1.00
+      1.1000000              1.0000000
+D    1   1.00
+      0.2750000              1.0000000
+F    1   1.00
+      0.4500000              1.0000000
+****
+S     0
+S    6   1.00
+  21917.1000000              0.0018690
+   3301.4900000              0.0142300
+    754.1460000              0.0696960
+    212.7110000              0.2384870
+     67.9896000              0.4833070
+     23.0515000              0.3380740
+SP   6   1.00
+    423.7350000             -0.0023767              0.0040610
+    100.7100000             -0.0316930              0.0306810
+     32.1599000             -0.1133170              0.1304520
+     11.8079000              0.0560900              0.3272050
+      4.6311000              0.5922550              0.4528510
+      1.8702500              0.4550060              0.2560420
+SP   3   1.00
+      2.6158400             -0.2503740             -0.0145110
+      0.9221670              0.0669570              0.3102630
+      0.3412870              1.0545100              0.7544830
+SP   1   1.00
+      0.1171670              1.0000000              1.0000000
+D    1   1.00
+      1.3000000              1.0000000
+D    1   1.00
+      0.3250000              1.0000000
+F    1   1.00
+      0.5500000              1.0000000
+****
+Cl     0
+S    6   1.00
+  25180.1000000              0.0018330
+   3780.3500000              0.0140340
+    860.4740000              0.0690970
+    242.1450000              0.2374520
+     77.3349000              0.4830340
+     26.2470000              0.3398560
+SP   6   1.00
+    491.7650000             -0.0022974              0.0039894
+    116.9840000             -0.0307140              0.0303180
+     37.4153000             -0.1125280              0.1298800
+     13.7834000              0.0450160              0.3279510
+      5.4521500              0.5893530              0.4535270
+      2.2258800              0.4652060              0.2521540
+SP   3   1.00
+      3.1864900             -0.2518300             -0.0142990
+      1.1442700              0.0615890              0.3235720
+      0.4203770              1.0601800              0.7435070
+SP   1   1.00
+      0.1426570              1.0000000              1.0000000
+D    1   1.00
+      1.5000000              1.0000000
+D    1   1.00
+      0.3750000              1.0000000
+F    1   1.00
+      0.7000000              1.0000000
+****
+}
+
+
+set {
+reference rhf                          
+freeze_core true
+e_convergence 10                       
+d_convergence 10                      
+dft_spherical_points 1202
+dft_radial_points 99
+}
+
+e = energy('b3lyp')
+
+print_out('Grab this energy {0}'.format(e))
+--------------------------------------------------------------------------
+
+  Memory set to  13.039 GiB by Python driver.
+
+Scratch directory: /tmp/
+
+*** tstart() called on n023
+*** at Sat Nov  6 15:54:48 2021
+
+   => Loading Basis Set <=
+
+    Name: ANONYMOUS7E1657EC
+    Role: ORBITAL
+    Keyword: BASIS
+    atoms 1-2  entry C          line    48 inputblock 6-31g_2dfp_ 
+    atoms 3    entry N          line    69 inputblock 6-31g_2dfp_ 
+    atoms 4-10 entry H          line    15 inputblock 6-31g_2dfp_ 
+
+
+         ---------------------------------------------------------
+                                   SCF
+               by Justin Turney, Rob Parrish, Andy Simmonett
+                          and Daniel G. A. Smith
+                              RKS Reference
+                        1 Threads,  13351 MiB Core
+         ---------------------------------------------------------
+
+  ==> Geometry <==
+
+    Molecular point group: c1
+    Full point group: C1
+
+    Geometry (in Bohr), charge = 0, multiplicity = 1:
+
+       Center              X                  Y                   Z               Mass       
+    ------------   -----------------  -----------------  -----------------  -----------------
+         C           -2.416829176322     0.500161489506     0.001453024458    12.000000000000
+         C            0.010925360778    -1.066053664394    -0.001736794342    12.000000000000
+         N            2.368060226678     0.395669123806     0.000367446358    14.003074004430
+         H           -4.095011208622    -0.702170765994    -0.000652323542     1.007825032230
+         H           -2.498533221022     1.715570915306    -1.670352589042     1.007825032230
+         H           -2.498476928022     1.715878466206     1.669594308758     1.007825032230
+         H            0.041523987478    -2.304898645494     1.653640610558     1.007825032230
+         H            0.041498657278    -2.305221003294    -1.653523706942     1.007825032230
+         H            2.376526412978     1.560651304906     1.524796408058     1.007825032230
+         H            2.376498616578     1.560605511606    -1.525229336842     1.007825032230
+
+  Running in c1 symmetry.
+
+  Rotational constants: A =      1.06169  B =      0.29321  C =      0.26132 [cm^-1]
+  Rotational constants: A =  31828.68488  B =   8790.30544  C =   7834.05789 [MHz]
+  Nuclear repulsion =   82.790252923335174
+
+  Charge       = 0
+  Multiplicity = 1
+  Electrons    = 26
+  Nalpha       = 13
+  Nbeta        = 13
+
+  ==> Algorithm <==
+
+  SCF Algorithm Type is DF.
+  DIIS enabled.
+  MOM disabled.
+  Fractional occupation disabled.
+  Guess Type is SAD.
+  Energy threshold   = 1.00e-10
+  Density threshold  = 1.00e-10
+  Integral threshold = 0.00e+00
+
+  ==> Primary Basis <==
+
+  Basis Set: ANONYMOUS7E1657EC
+    Blend: 6-31G_2DFP_
+    Number of shells: 52
+    Number of basis function: 134
+    Number of Cartesian functions: 149
+    Spherical Harmonics?: true
+    Max angular momentum: 3
+
+  ==> DFT Potential <==
+
+   => Composite Functional: B3LYP <= 
+
+    B3LYP Hyb-GGA Exchange-Correlation Functional
+
+    P. J. Stephens, F. J. Devlin, C. F. Chabalowski, and M. J. Frisch, J. Phys. Chem. 98, 11623 (1994)
+
+    Deriv               =              1
+    GGA                 =           TRUE
+    Meta                =          FALSE
+
+    Exchange Hybrid     =           TRUE
+    MP2 Hybrid          =          FALSE
+
+   => Exchange Functionals <=
+
+    0.0800   Slater exchange
+    0.7200         Becke 88
+
+   => Exact (HF) Exchange <=
+
+    0.2000               HF 
+
+   => Correlation Functionals <=
+
+    0.1900   Vosko, Wilk & Nusair (VWN5_RPA)
+    0.8100   Lee, Yang & Parr
+
+   => Molecular Quadrature <=
+
+    Radial Scheme          =       TREUTLER
+    Pruning Scheme         =           NONE
+    Nuclear Scheme         =       TREUTLER
+
+    BS radius alpha        =              1
+    Pruning alpha          =              1
+    Radial Points          =             99
+    Spherical Points       =           1202
+    Total Points           =        1116887
+    Total Blocks           =           7448
+    Max Points             =            256
+    Max Functions          =            134
+    Weights Tolerance      =       1.00E-15
+
+   => Loading Basis Set <=
+
+    Name: (ANONYMOUS7E1657EC AUX)
+    Role: JKFIT
+    Keyword: DF_BASIS_SCF
+    atoms 1-2  entry C          line   198 file /opt/psi/4/master/share/psi4/basis/def2-universal-jkfit.gbs 
+    atoms 3    entry N          line   258 file /opt/psi/4/master/share/psi4/basis/def2-universal-jkfit.gbs 
+    atoms 4-10 entry H          line    18 file /opt/psi/4/master/share/psi4/basis/def2-universal-jkfit.gbs 
+
+  ==> Integral Setup <==
+
+  DFHelper Memory: AOs need 0.052 GiB; user supplied 6.110 GiB. Using in-core AOs.
+
+  ==> MemDFJK: Density-Fitted J/K Matrices <==
+
+    J tasked:                   Yes
+    K tasked:                   Yes
+    wK tasked:                   No
+    OpenMP threads:               1
+    Memory [MiB]:              6256
+    Algorithm:                 Core
+    Schwarz Cutoff:           1E-12
+    Mask sparsity (%):       0.4901
+    Fitting Condition:        1E-10
+
+   => Auxiliary Basis Set <=
+
+  Basis Set: (ANONYMOUS7E1657EC AUX)
+    Blend: DEF2-UNIVERSAL-JKFIT
+    Number of shells: 117
+    Number of basis function: 353
+    Number of Cartesian functions: 411
+    Spherical Harmonics?: true
+    Max angular momentum: 4
+
+  Cached 100.0% of DFT collocation blocks in 3.669 [GiB].
+
+  Minimum eigenvalue in the overlap matrix is 1.7509663203E-03.
+  Reciprocal condition number of the overlap matrix is 2.9634300648E-04.
+    Using symmetric orthogonalization.
+
+  ==> Pre-Iterations <==
+
+  SCF Guess: Superposition of Atomic Densities via on-the-fly atomic UHF (no occupation information).
+
+   -------------------------
+    Irrep   Nso     Nmo    
+   -------------------------
+     A        134     134 
+   -------------------------
+    Total     134     134
+   -------------------------
+
+  ==> Iterations <==
+
+                           Total Energy        Delta E     RMS |[F,P]|
+
+   @DF-RKS iter SAD:  -134.60971979210231   -1.34610e+02   0.00000e+00 
+   @DF-RKS iter   1:  -134.86070182266985   -2.50982e-01   6.01011e-03 DIIS
+   @DF-RKS iter   2:  -134.66191914484423    1.98783e-01   7.55741e-03 DIIS
+   @DF-RKS iter   3:  -135.18498086158311   -5.23062e-01   5.77109e-04 DIIS
+   @DF-RKS iter   4:  -135.18690870830068   -1.92785e-03   3.16702e-04 DIIS
+   @DF-RKS iter   5:  -135.18774196147842   -8.33253e-04   5.21828e-05 DIIS
+   @DF-RKS iter   6:  -135.18776308963467   -2.11282e-05   1.39934e-05 DIIS
+   @DF-RKS iter   7:  -135.18776451245904   -1.42282e-06   4.38225e-06 DIIS
+   @DF-RKS iter   8:  -135.18776467779227   -1.65333e-07   5.97777e-07 DIIS
+   @DF-RKS iter   9:  -135.18776468139737   -3.60509e-09   4.66857e-08 DIIS
+   @DF-RKS iter  10:  -135.18776468142244   -2.50679e-11   6.07172e-09 DIIS
+   @DF-RKS iter  11:  -135.18776468142323   -7.95808e-13   1.12843e-09 DIIS
+   @DF-RKS iter  12:  -135.18776468142295    2.84217e-13   2.75602e-10 DIIS
+   @DF-RKS iter  13:  -135.18776468142337   -4.26326e-13   3.53764e-11 DIIS
+  Energy and wave function converged.
+
+
+  ==> Post-Iterations <==
+
+    Orbital Energies [Eh]
+    ---------------------
+
+    Doubly Occupied:                                                      
+
+       1A    -14.304015     2A    -10.197276     3A    -10.167125  
+       4A     -0.874382     5A     -0.724487     6A     -0.605705  
+       7A     -0.490753     8A     -0.432410     9A     -0.407161  
+      10A     -0.402121    11A     -0.356925    12A     -0.335989  
+      13A     -0.234130  
+
+    Virtual:                                                              
+
+      14A      0.071713    15A      0.121085    16A      0.126170  
+      17A      0.141491    18A      0.160747    19A      0.175408  
+      20A      0.184053    21A      0.219443    22A      0.259444  
+      23A      0.414917    24A      0.419953    25A      0.440344  
+      26A      0.455473    27A      0.473046    28A      0.514430  
+      29A      0.523906    30A      0.560360    31A      0.568449  
+      32A      0.591904    33A      0.607845    34A      0.613391  
+      35A      0.622658    36A      0.635932    37A      0.640226  
+      38A      0.672678    39A      0.718803    40A      0.732462  
+      41A      0.800389    42A      0.820793    43A      0.859436  
+      44A      0.905815    45A      0.934260    46A      1.058486  
+      47A      1.059038    48A      1.090844    49A      1.115903  
+      50A      1.147264    51A      1.160615    52A      1.181987  
+      53A      1.239657    54A      1.264913    55A      1.272826  
+      56A      1.319846    57A      1.349911    58A      1.370038  
+      59A      1.379293    60A      1.418948    61A      1.471480  
+      62A      1.483935    63A      1.497537    64A      1.516046  
+      65A      1.516214    66A      1.567977    67A      1.632728  
+      68A      1.690951    69A      1.693228    70A      1.790827  
+      71A      1.834814    72A      1.844783    73A      1.975609  
+      74A      2.074701    75A      2.133279    76A      2.157556  
+      77A      2.448901    78A      2.778949    79A      2.837647  
+      80A      2.868799    81A      2.923453    82A      2.953898  
+      83A      2.956936    84A      3.019371    85A      3.115851  
+      86A      3.120947    87A      3.169429    88A      3.185529  
+      89A      3.196515    90A      3.360671    91A      3.397059  
+      92A      3.466703    93A      3.473035    94A      3.523037  
+      95A      3.526032    96A      3.547339    97A      3.581309  
+      98A      3.625672    99A      3.670121   100A      3.756633  
+     101A      3.759777   102A      3.849762   103A      3.904281  
+     104A      3.967821   105A      4.010629   106A      4.040186  
+     107A      4.129749   108A      4.171584   109A      4.189209  
+     110A      4.234068   111A      4.235224   112A      4.279250  
+     113A      4.386872   114A      4.428368   115A      4.439663  
+     116A      4.531893   117A      4.532928   118A      4.583026  
+     119A      4.703257   120A      4.705991   121A      4.814879  
+     122A      4.839163   123A      4.939397   124A      4.999378  
+     125A      5.012233   126A      5.139803   127A      5.229275  
+     128A      5.255809   129A      5.314988   130A      5.350374  
+     131A      5.363042   132A      5.440859   133A      5.793578  
+     134A      5.870812  
+
+    Final Occupation by Irrep:
+              A 
+    DOCC [    13 ]
+
+  @DF-RKS Final Energy:  -135.18776468142337
+
+   => Energetics <=
+
+    Nuclear Repulsion Energy =             82.7902529233351743
+    One-Electron Energy =                -345.0119359484285724
+    Two-Electron Energy =                 143.5596708333371794
+    DFT Exchange-Correlation Energy =     -16.5257524896671661
+    Empirical Dispersion Energy =           0.0000000000000000
+    VV10 Nonlocal Energy =                  0.0000000000000000
+    Total Energy =                       -135.1877646814233742
+
+Computation Completed
+
+
+Properties will be evaluated at   0.000000,   0.000000,   0.000000 [a0]
+
+Properties computed using the SCF density matrix
+
+  Nuclear Dipole Moment: [e a0]
+     X:    -2.1150      Y:     0.6147      Z:    -0.0009
+
+  Electronic Dipole Moment: [e a0]
+     X:     1.7458      Y:    -0.2991      Z:     0.0007
+
+  Dipole Moment: [e a0]
+     X:    -0.3692      Y:     0.3157      Z:    -0.0002     Total:     0.4857
+
+  Dipole Moment: [D]
+     X:    -0.9383      Y:     0.8023      Z:    -0.0005     Total:     1.2346
+
+
+*** tstop() called on n023 at Sat Nov  6 15:56:03 2021
+Module time:
+	user time   =      74.44 seconds =       1.24 minutes
+	system time =       0.73 seconds =       0.01 minutes
+	total time  =         75 seconds =       1.25 minutes
+Total time:
+	user time   =      74.44 seconds =       1.24 minutes
+	system time =       0.73 seconds =       0.01 minutes
+	total time  =         75 seconds =       1.25 minutes
+Grab this energy -135.18776468142337
+    Psi4 stopped on: Saturday, 06 November 2021 03:56PM
+    Psi4 wall time for execution: 0:01:15.23
+
+*** Psi4 exiting successfully. Buy a developer a beer!

@@ -1,0 +1,421 @@
+
+    -----------------------------------------------------------------------
+          Psi4: An Open-Source Ab Initio Electronic Structure Package
+                               Psi4 1.4a2.dev629 
+
+                         Git: Rev {master} 2938fc2 dirty
+
+
+    D. G. A. Smith, L. A. Burns, A. C. Simmonett, R. M. Parrish,
+    M. C. Schieber, R. Galvelis, P. Kraus, H. Kruse, R. Di Remigio,
+    A. Alenaizan, A. M. James, S. Lehtola, J. P. Misiewicz, M. Scheurer,
+    R. A. Shaw, J. B. Schriber, Y. Xie, Z. L. Glick, D. A. Sirianni,
+    J. S. O'Brien, J. M. Waldrop, A. Kumar, E. G. Hohenstein,
+    B. P. Pritchard, B. R. Brooks, H. F. Schaefer III, A. Yu. Sokolov,
+    K. Patkowski, A. E. DePrince III, U. Bozkaya, R. A. King,
+    F. A. Evangelista, J. M. Turney, T. D. Crawford, C. D. Sherrill,
+    J. Chem. Phys. 152(18) 184108 (2020). https://doi.org/10.1063/5.0006002
+
+                            Additional Code Authors
+    E. T. Seidl, C. L. Janssen, E. F. Valeev, M. L. Leininger,
+    J. F. Gonthier, R. M. Richard, H. R. McAlexander, M. Saitow, X. Wang,
+    P. Verma, and M. H. Lechner
+
+             Previous Authors, Complete List of Code Contributors,
+                       and Citations for Specific Modules
+    https://github.com/psi4/psi4/blob/master/codemeta.json
+    https://github.com/psi4/psi4/graphs/contributors
+    http://psicode.org/psi4manual/master/introduction.html#citing-psifour
+
+    -----------------------------------------------------------------------
+
+
+    Psi4 started on: Friday, 03 September 2021 03:38PM
+
+    Process ID: 32695
+    Host:       n045
+    PSIDATADIR: /opt/psi/4/master/share/psi4
+    Memory:     500.0 MiB
+    Threads:    1
+    
+  ==> Input File <==
+
+--------------------------------------------------------------------------
+import os
+memory 14 GB 
+ 
+molecule {
+ X   -1.4072428745   -1.4211842455   -0.0000000000
+ C    0.0007228304   -0.0083158272   -0.0000013747
+ X    1.4072196362   -1.4212074838    0.0000000000
+ C   -0.0038496093    0.0015530313   -2.4817662805
+ H   -1.2426967003   -1.2375336606   -3.5403385975
+ H    1.2401035221    1.2474831324   -3.5251942591
+ C    0.0013671989   -0.0009299262    2.4817762914
+ H    1.2436017387   -1.2366416347    3.5403142113
+ H   -1.2392257421    1.2483494942    3.5252100091
+units bohr
+}
+
+basis {
+
+assign 6-31g_2dfp_
+
+[ 6-31g_2dfp_ ]
+spherical
+
+!----------------------------------------------------------------------
+! Basis Set Exchange
+! Version v0.8.13
+! https://www.basissetexchange.org
+!----------------------------------------------------------------------
+!   Basis set: 6-31G(2df,p)
+! Description: 6-31G(2df,p)
+!        Role: orbital
+!     Version: 0  (Data from the original Basis Set Exchange)
+!----------------------------------------------------------------------
+
+
+****
+H     0
+S    3   1.00
+     18.7311370              0.03349460
+      2.8253937              0.23472695
+      0.6401217              0.81375733
+S    1   1.00
+      0.1612778              1.00000000
+P    1   1.00
+      1.5000000              1.0000000
+P    1   1.00
+      0.3750000              1.0000000
+****
+C     0
+S    6   1.00
+   3047.5249000              0.0018347
+    457.3695100              0.0140373
+    103.9486900              0.0688426
+     29.2101550              0.2321844
+      9.2866630              0.4679413
+      3.1639270              0.3623120
+SP   3   1.00
+      7.8682724             -0.1193324              0.0689991
+      1.8812885             -0.1608542              0.3164240
+      0.5442493              1.1434564              0.7443083
+SP   1   1.00
+      0.1687144              1.0000000              1.0000000
+D    1   1.00
+      1.2520000              1.0000000
+D    1   1.00
+      0.3130000              1.0000000
+F    1   1.00
+      0.8000000              1.0000000
+****
+}
+
+
+set {
+opt_type min                            
+reference rhf                          
+freeze_core true
+e_convergence 10                       
+d_convergence 10                      
+ensure_bt_convergence true           
+dft_spherical_points 590
+dft_radial_points 99
+}
+
+e = energy('b3lyp')
+
+print_out('Grab this energy {0}'.format(e))
+--------------------------------------------------------------------------
+
+  Memory set to  13.039 GiB by Python driver.
+
+Scratch directory: /tmp/
+
+*** tstart() called on n045
+*** at Fri Sep  3 15:38:03 2021
+
+   => Loading Basis Set <=
+
+    Name: ANONYMOUS046E2135
+    Role: ORBITAL
+    Keyword: BASIS
+    atoms 1-2, 5   entry C          line    27 inputblock 6-31g_2dfp_ 
+    atoms 3-4, 6-7 entry H          line    15 inputblock 6-31g_2dfp_ 
+
+
+         ---------------------------------------------------------
+                                   SCF
+               by Justin Turney, Rob Parrish, Andy Simmonett
+                          and Daniel G. A. Smith
+                              RKS Reference
+                        1 Threads,  13351 MiB Core
+         ---------------------------------------------------------
+
+  ==> Geometry <==
+
+    Molecular point group: c1
+    Full point group: C1
+
+    Geometry (in Bohr), charge = 0, multiplicity = 1:
+
+       Center              X                  Y                   Z               Mass       
+    ------------   -----------------  -----------------  -----------------  -----------------
+         C            0.001205407557    -0.006555058393    -0.000003746110    12.000000000000
+         C           -0.003367032143     0.003313800107    -2.481768651910    12.000000000000
+         H           -1.242214123143    -1.235772891793    -3.540340968910     1.007825032230
+         H            1.240586099257     1.249243901207    -3.525196630510     1.007825032230
+         C            0.001849776057     0.000830842607     2.481773919990    12.000000000000
+         H            1.244084315857    -1.234880865893     3.540311839890     1.007825032230
+         H           -1.238743164943     1.250110263007     3.525207637690     1.007825032230
+
+  Running in c1 symmetry.
+
+  Rotational constants: A =      4.84038  B =      0.29460  C =      0.29458 [cm^-1]
+  Rotational constants: A = 145111.00526  B =   8831.79439  C =   8831.28249 [MHz]
+  Nuclear repulsion =   59.006513412645283
+
+  Charge       = 0
+  Multiplicity = 1
+  Electrons    = 22
+  Nalpha       = 11
+  Nbeta        = 11
+
+  ==> Algorithm <==
+
+  SCF Algorithm Type is DF.
+  DIIS enabled.
+  MOM disabled.
+  Fractional occupation disabled.
+  Guess Type is SAD.
+  Energy threshold   = 1.00e-10
+  Density threshold  = 1.00e-10
+  Integral threshold = 0.00e+00
+
+  ==> Primary Basis <==
+
+  Basis Set: ANONYMOUS046E2135
+    Blend: 6-31G_2DFP_
+    Number of shells: 40
+    Number of basis function: 110
+    Number of Cartesian functions: 125
+    Spherical Harmonics?: true
+    Max angular momentum: 3
+
+  ==> DFT Potential <==
+
+   => Composite Functional: B3LYP <= 
+
+    B3LYP Hyb-GGA Exchange-Correlation Functional
+
+    P. J. Stephens, F. J. Devlin, C. F. Chabalowski, and M. J. Frisch, J. Phys. Chem. 98, 11623 (1994)
+
+    Deriv               =              1
+    GGA                 =           TRUE
+    Meta                =          FALSE
+
+    Exchange Hybrid     =           TRUE
+    MP2 Hybrid          =          FALSE
+
+   => Exchange Functionals <=
+
+    0.0800   Slater exchange
+    0.7200         Becke 88
+
+   => Exact (HF) Exchange <=
+
+    0.2000               HF 
+
+   => Correlation Functionals <=
+
+    0.1900   Vosko, Wilk & Nusair (VWN5_RPA)
+    0.8100   Lee, Yang & Parr
+
+   => Molecular Quadrature <=
+
+    Radial Scheme          =       TREUTLER
+    Pruning Scheme         =           NONE
+    Nuclear Scheme         =       TREUTLER
+
+    BS radius alpha        =              1
+    Pruning alpha          =              1
+    Radial Points          =             99
+    Spherical Points       =            590
+    Total Points           =         387195
+    Total Blocks           =           2859
+    Max Points             =            256
+    Max Functions          =            110
+    Weights Tolerance      =       1.00E-15
+
+   => Loading Basis Set <=
+
+    Name: (ANONYMOUS046E2135 AUX)
+    Role: JKFIT
+    Keyword: DF_BASIS_SCF
+    atoms 1-2, 5   entry C          line   198 file /opt/psi/4/master/share/psi4/basis/def2-universal-jkfit.gbs 
+    atoms 3-4, 6-7 entry H          line    18 file /opt/psi/4/master/share/psi4/basis/def2-universal-jkfit.gbs 
+
+  ==> Integral Setup <==
+
+  DFHelper Memory: AOs need 0.030 GiB; user supplied 8.712 GiB. Using in-core AOs.
+
+  ==> MemDFJK: Density-Fitted J/K Matrices <==
+
+    J tasked:                   Yes
+    K tasked:                   Yes
+    wK tasked:                   No
+    OpenMP threads:               1
+    Memory [MiB]:              8920
+    Algorithm:                 Core
+    Schwarz Cutoff:           1E-12
+    Mask sparsity (%):       0.8099
+    Fitting Condition:        1E-10
+
+   => Auxiliary Basis Set <=
+
+  Basis Set: (ANONYMOUS046E2135 AUX)
+    Blend: DEF2-UNIVERSAL-JKFIT
+    Number of shells: 99
+    Number of basis function: 297
+    Number of Cartesian functions: 347
+    Spherical Harmonics?: true
+    Max angular momentum: 4
+
+  Cached 100.0% of DFT collocation blocks in 1.067 [GiB].
+
+  Minimum eigenvalue in the overlap matrix is 5.5048992274E-04.
+  Reciprocal condition number of the overlap matrix is 1.1302399811E-04.
+    Using symmetric orthogonalization.
+
+  ==> Pre-Iterations <==
+
+  SCF Guess: Superposition of Atomic Densities via on-the-fly atomic UHF (no occupation information).
+
+   -------------------------
+    Irrep   Nso     Nmo    
+   -------------------------
+     A        110     110 
+   -------------------------
+    Total     110     110
+   -------------------------
+
+  ==> Iterations <==
+
+                           Total Energy        Delta E     RMS |[F,P]|
+
+   @DF-RKS iter SAD:  -116.06768353957318   -1.16068e+02   0.00000e+00 
+   @DF-RKS iter   1:  -116.45326874802960   -3.85585e-01   5.58900e-03 DIIS
+   @DF-RKS iter   2:  -116.47268754993323   -1.94188e-02   5.27003e-03 DIIS
+   @DF-RKS iter   3:  -116.66668591447355   -1.93998e-01   2.48083e-04 DIIS
+   @DF-RKS iter   4:  -116.66645814384805    2.27771e-04   3.25329e-04 DIIS
+   @DF-RKS iter   5:  -116.66711851516726   -6.60371e-04   1.04820e-05 DIIS
+   @DF-RKS iter   6:  -116.66711916849019   -6.53323e-07   1.98635e-06 DIIS
+   @DF-RKS iter   7:  -116.66711919411742   -2.56272e-08   2.66776e-07 DIIS
+   @DF-RKS iter   8:  -116.66711919450655   -3.89136e-10   4.08977e-08 DIIS
+   @DF-RKS iter   9:  -116.66711919451566   -9.10916e-12   1.26770e-08 DIIS
+   @DF-RKS iter  10:  -116.66711919451703   -1.36424e-12   4.74284e-09 DIIS
+   @DF-RKS iter  11:  -116.66711919451670    3.26850e-13   1.13160e-09 DIIS
+   @DF-RKS iter  12:  -116.66711919451679   -8.52651e-14   1.12452e-10 DIIS
+   @DF-RKS iter  13:  -116.66711919451697   -1.84741e-13   1.23573e-11 DIIS
+  Energy and wave function converged.
+
+
+  ==> Post-Iterations <==
+
+    Orbital Energies [Eh]
+    ---------------------
+
+    Doubly Occupied:                                                      
+
+       1A    -10.201509     2A    -10.184656     3A    -10.184627  
+       4A     -0.784871     5A     -0.699877     6A     -0.519287  
+       7A     -0.446531     8A     -0.440968     9A     -0.440937  
+      10A     -0.263531    11A     -0.263431  
+
+    Virtual:                                                              
+
+      12A      0.017538    13A      0.017670    14A      0.111325  
+      15A      0.127022    16A      0.194796    17A      0.194815  
+      18A      0.279518    19A      0.295284    20A      0.382091  
+      21A      0.454126    22A      0.480014    23A      0.480034  
+      24A      0.481160    25A      0.491637    26A      0.560342  
+      27A      0.560445    28A      0.563327    29A      0.594362  
+      30A      0.594443    31A      0.616619    32A      0.677696  
+      33A      0.693136    34A      0.717069    35A      0.717090  
+      36A      0.776835    37A      0.849921    38A      0.912060  
+      39A      0.912079    40A      0.997204    41A      0.997228  
+      42A      1.005581    43A      1.055603    44A      1.068890  
+      45A      1.102541    46A      1.156214    47A      1.156222  
+      48A      1.201443    49A      1.295366    50A      1.295476  
+      51A      1.369828    52A      1.439008    53A      1.579584  
+      54A      1.579707    55A      1.594004    56A      1.621077  
+      57A      1.654188    58A      1.859034    59A      2.147750  
+      60A      2.148143    61A      2.158988    62A      2.572411  
+      63A      2.692319    64A      2.738250    65A      2.738371  
+      66A      2.785168    67A      2.852468    68A      2.852559  
+      69A      2.870521    70A      2.870584    71A      2.966378  
+      72A      3.002479    73A      3.002698    74A      3.072228  
+      75A      3.102664    76A      3.102886    77A      3.109211  
+      78A      3.111166    79A      3.135501    80A      3.290101  
+      81A      3.290235    82A      3.311377    83A      3.312553  
+      84A      3.384853    85A      3.430341    86A      3.430560  
+      87A      3.564827    88A      3.609006    89A      3.808993  
+      90A      3.940172    91A      3.994813    92A      3.995163  
+      93A      4.012545    94A      4.101801    95A      4.101918  
+      96A      4.176323    97A      4.229222    98A      4.318362  
+      99A      4.369842   100A      4.381740   101A      4.422087  
+     102A      4.441680   103A      4.441858   104A      4.928077  
+     105A      4.928412   106A      5.203242   107A      5.221522  
+     108A      5.221657   109A      5.247215   110A      6.013354  
+
+    Final Occupation by Irrep:
+              A 
+    DOCC [    11 ]
+
+  @DF-RKS Final Energy:  -116.66711919451697
+
+   => Energetics <=
+
+    Nuclear Repulsion Energy =             59.0065134126452833
+    One-Electron Energy =                -272.1737559352898188
+    Two-Electron Energy =                 110.8315906127835433
+    DFT Exchange-Correlation Energy =     -14.3314672846559894
+    Empirical Dispersion Energy =           0.0000000000000000
+    VV10 Nonlocal Energy =                  0.0000000000000000
+    Total Energy =                       -116.6671191945169710
+
+Computation Completed
+
+
+Properties will be evaluated at   0.000000,   0.000000,   0.000000 [a0]
+
+Properties computed using the SCF density matrix
+
+  Nuclear Dipole Moment: [e a0]
+     X:     0.0018      Y:     0.0142      Z:    -0.0000
+
+  Electronic Dipole Moment: [e a0]
+     X:    -0.0010      Y:    -0.0123      Z:    -0.0000
+
+  Dipole Moment: [e a0]
+     X:     0.0009      Y:     0.0020      Z:    -0.0000     Total:     0.0022
+
+  Dipole Moment: [D]
+     X:     0.0023      Y:     0.0050      Z:    -0.0000     Total:     0.0055
+
+
+*** tstop() called on n045 at Fri Sep  3 15:38:26 2021
+Module time:
+	user time   =      22.48 seconds =       0.37 minutes
+	system time =       0.25 seconds =       0.00 minutes
+	total time  =         23 seconds =       0.38 minutes
+Total time:
+	user time   =      22.48 seconds =       0.37 minutes
+	system time =       0.25 seconds =       0.00 minutes
+	total time  =         23 seconds =       0.38 minutes
+Grab this energy -116.66711919451697
+    Psi4 stopped on: Friday, 03 September 2021 03:38PM
+    Psi4 wall time for execution: 0:00:22.76
+
+*** Psi4 exiting successfully. Buy a developer a beer!
