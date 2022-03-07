@@ -23,7 +23,8 @@ pd.set_option("display.max_columns", 15)
 # High and low levels of theory
 # Available: "CCSD_T_TZ", "CCSD_T_DZ", "B3LYP_6-31G_2df,p_"
 h_theory = ["CCSD_T_TZ"]
-l_theory = ["CCSD_T_DZ", "B3LYP_6-31G_2df,p_"]
+# l_theory = ["CCSD_T_DZ", "B3LYP_6-31G_2df,p_"]
+l_theory = ["B3LYP_6-31G_2df,p_"]
 combos = list(product(h_theory,l_theory))
 
 # Coordinates types to use
@@ -32,11 +33,12 @@ coord_type = ["Nattys", "Redundant"]
 
 # Specify paths to grab data from
 # Options: '/1_Closed_Shell', '/1_Linear', '/1*', '/2_Open_Shell', '/2_Linear', '/2*'
-paths = ['/2_Open_Shell']
+# paths = ['/2_Open_Shell']
+paths = ['/1_Closed_Shell']
 
 # Various output control statements
 n = 0                   # Number of CMA2 corrections (n = 0 -> CMA0)
-cma1 = False            # Run CMA1 instead of CMA0
+cma1 = True             # Run CMA1 instead of CMA0
 csv = False             # Generate database .csv file
 SI = True               # Generate LaTeX SI file
 compute_all = False     # Not implemented yet, run calculations for all
@@ -296,11 +298,17 @@ def execute():
 
                 elif cma1 == True:
                     # move into directory with higher level geom, fc.dat, and Disp directories
-                    os.chdir(f"{job}/{combo[0]}/") 
+                    os.chdir(f"{job}/")
                     
+                    shutil.copyfile(job + combo[0] + "/zmat", job + "zmat")
+                    shutil.copyfile(job + combo[0] + "/zmat", job + "zmat2")
+                    shutil.copyfile(job + combo[0] + "/fc.dat", job + "fc2.dat")       
+                   
                     # Add your code here
                     print(f"I am in {os.getcwd()} and I can see {os.listdir()}")
                     
+                    # raise RuntimeError
+
                     # In the future we can use this coord loop if we want to 
                     # But for now we will stick with redundants
                     for coord in coord_type:
@@ -310,11 +318,13 @@ def execute():
                         else:
                             # Import Merger
                             from Merger import Merger
-                            execMerger = Merger()
+                            execMerger = Merger(cma1_path= "/" + combo[0]+"/Disps_" + combo[1])
                             execMerger.options.man_proj = False
                             execMerger.options.coords = coord
+                            execMerger.options.n_cma2 = n
                             Proj = None
-                            
+                            execMerger.run(execMerger.options,Proj)
+                            # raise RuntimeError
                             # Run the thing
                             #execMerger.run(execMerger.options, Proj)
 
@@ -331,11 +341,15 @@ def execute():
             mol.run()
             
             # Clean up job directory
-            if cma1 == False:
-                os.remove("zmat")
-                os.remove("zmat2")
-                os.remove("fc.dat")
-                os.remove("fc2.dat")
+            # if cma1 == False:
+                # os.remove("zmat")
+                # os.remove("zmat2")
+                # os.remove("fc.dat")
+                # os.remove("fc2.dat")
+            os.remove("zmat")
+            os.remove("zmat2")
+            os.remove("fc2.dat")
+            
             sys.path.remove(job)
             del mol
 
