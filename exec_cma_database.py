@@ -37,14 +37,14 @@ coord_type = ["Nattys", "Redundant"]
 paths = ['/1_Closed_Shell']
 
 # Various output control statements
-n = 0                   # Number of CMA2 corrections (n = 0 -> CMA0)
+n = 1                   # Number of CMA2 corrections (n = 0 -> CMA0)
 cma1 = True             # Run CMA1 instead of CMA0
-csv = False             # Generate database .csv file
+csv = True              # Generate database .csv file
 SI = True               # Generate LaTeX SI file
 compute_all = False     # Not implemented yet, run calculations for all
 
-if n > 0 and cma1 == True:
-    raise RuntimeError("Don't do both CMA1 and CMA2 at the same time yet")
+# if n > 0 and cma1 == True:
+    # raise RuntimeError("Don't do both CMA1 and CMA2 at the same time yet")
 
 # =====================
 # Some useful functions
@@ -331,6 +331,46 @@ def execute():
                             # Collect the data in dictionary d to add it to the database
                             # e.g. d[f"Ref {combo[0]}"] = execMerger.reference_freq
                             # d[f"CMA1 {combo[1]}"] = execMerger.Freq_redundant
+                            # Collect data
+                            if coord_type.index(coord) == 1:
+                                print("Is this thing on?")
+                                d[f'Ref ({combo[0]})'] = execMerger.reference_freq
+                                print(execMerger.reference_freq)
+                                mol.freqs[f'Ref ({combo[0]})'] = execMerger.reference_freq
+                                
+                                # Number the modes
+                                d['Molecule'] = [f"{mol.name} ({mol.ID}) mode {i+1}" for i in range(len(execMerger.reference_freq))]
+                                print(d['Molecule'])
+                            
+                            if coord == "Nattys":
+                                d[f'Natty ({combo[1]})'] = execMerger.Freq_custom
+                                d[f'Ref - Nat ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_custom)
+                                mol.freqs[f'Natty ({combo[1]})'] = execMerger.Freq_custom
+                            if coord == "Redundant":
+                                d[f'Red ({combo[1]})'] = execMerger.Freq_redundant
+                                d[f'Ref - Red ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_redundant)
+                                mol.freqs[f'Red ({combo[1]})'] = execMerger.Freq_redundant
+                            
+                            # Collect data for CMA2
+                            if n > 0:
+                                d2['Molecule'] = [f"{mol.name} ({mol.ID}) mode {i+1}" for i in range(len(execMerger.reference_freq))]
+                                d2[f"Ref {combo[0]}"] = execMerger.reference_freq
+                                d2[f'Red ({combo[1]})'] = execMerger.Freq_redundant
+                                cma2_data = [] 
+                                cma2_dict = execMerger.cma2_dict
+                                key = 'cma2_'  + str(execMerger.options.coords) 
+                                d2[f'CMA2 ({combo[1]})'] = cma2_dict[key] 
+                                d2[f'Ref - Red ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_redundant)
+                                cma2_data.append(cma2_dict[key]) 
+                                print('cma2_data') 
+                                print(cma2_data)
+                                print(cma2_data[0])
+                            
+                                # if coord == "Nattys":
+                                    # d2[f'Ref - Nat {combo[1]}'] = freq_diff(execMerger.reference_freq, cma2_dict[key])
+                                if coord == "Redundant":
+                                    # d2[f'Ref - Red {combo[1]}'] = freq_diff(execMerger.reference_freq, cma2_dict[key])
+                                    d2[f'CMA2_1_el'] = freq_diff(execMerger.reference_freq, cma2_dict[key])
 
                             del execMerger
                             del Merger
@@ -341,14 +381,12 @@ def execute():
             mol.run()
             
             # Clean up job directory
-            # if cma1 == False:
-                # os.remove("zmat")
-                # os.remove("zmat2")
-                # os.remove("fc.dat")
-                # os.remove("fc2.dat")
+            if cma1 == False:
+                os.remove("fc.dat")
             os.remove("zmat")
             os.remove("zmat2")
             os.remove("fc2.dat")
+            
             
             sys.path.remove(job)
             del mol
@@ -358,15 +396,17 @@ def execute():
                 continue
 
             # Add to pandas dataframe
-            if csv == True:
+            if csv:
                 df = pd.DataFrame(data=d)
                 # print(df)
                 # print()
                 frame.append(df)
             
             if n > 0:
-                d2 ={'Ref_Redundant' : F2diff,
-                     'CMA2_1_el' : cma2_1_red_diff}        
+                # d2 ={'Ref_Redundant' : cma2_dict[key],
+                     # 'CMA2_1_el' : d2[f'Ref - Red {combo[1]}']}        
+                # d2['CMA2_1_el'] = d2[f'Ref - Red {combo[1]}']       
+                # d2 ={'CMA2_1_el' : cma2_1_red_diff}        
                 df2 = pd.DataFrame(data=d2)
                 df2.style.apply(highlight_greaterthan, axis =1)
                 frame2.append(df2)
@@ -377,7 +417,7 @@ def execute():
  
 execute()
 os.chdir(hq)
-if csv == True:
+if csv:
     megaframe = pd.concat(frame)
     megaframe.to_csv('CoordDep.csv', index=False, float_format="%.2f")
     if n > 0:
