@@ -424,33 +424,51 @@ class Merger(object):
         #print(dir())
         #everything below this line pertains to CMA2 off-diag elements being included in the GF matrix computation, its not an optimal setup, obviously
         #plz fix it :( 
-        cma2_dict = {}
-        self.cma2_freq = [] 
-        # raise RuntimeError
-        if self.options.n_cma2 > 0:
-            options.off_diag = True
-            options.off_diag_bands = self.options.n_cma2
-            algo = Algorithm(eigs, None, options)
-            algo.run()
-            print('algo indices')
-            print(algo.indices)
-            #for index in range(0, self.options.n_cma2):
-            #    print('index')
-            #    print(index)
-            #    extras = n_largest(2, np.abs(copy.copy(F)))
-            temp = np.zeros((eigs,eigs))  
-            print('temp')
-            print(temp) 
-            for z, extra in enumerate(algo.indices):
-                #print('extra')
-                #print(extra)
-                #print(extra[0], extra[1]) 
+        
+        def n_largest(n, FC):
+            indexes = []
+            upper_triang = abs(np.triu(FC,1))
+            #print('this is the upper triang')
+            #print(upper_triang)
+            length = len(upper_triang)
+            for i in range(0,n):
+                index = np.argmax(upper_triang)
+                if index > length:
+                    two_d = [index // length, index % length]
+                else:
+                    two_d = [0,index]
+                indexes.append(two_d)
                 
-                element = F[extra[0], extra[1]] 
-                temp[extra[0], extra[1]] = element
-                temp[extra[1], extra[0]] = element
-            print('temp')
-            print(temp)
+                upper_triang[two_d[0],two_d[1]] = 0
+            return indexes
+
+
+        if self.options.n_cma2 > 0:
+            if self.options.off_diag:
+                print('this is the option')
+                print(self.options.off_diag)
+                algo = Algorithm(eigs, None, options)
+                algo.run()
+                print('algo indices')
+                print(algo.indices)
+                temp = np.zeros((eigs,eigs))  
+                print('temp')
+                print(temp) 
+                for z, extra in enumerate(algo.indices):
+                    element = F[extra[0], extra[1]] 
+                    temp[extra[0], extra[1]] = element
+                    temp[extra[1], extra[0]] = element
+                print('temp')
+                print(temp)
+            else:
+                extras = n_largest(self.options.n_cma2, np.abs(copy.copy(F)))
+                temp = copy.copy(Fdiag)
+                for z, extra in enumerate(extras):
+                    element = F[extra[0], extra[1]] 
+                    temp[extra[0], extra[1]] = element
+                    temp[extra[1], extra[0]] = element
+                print('CMA2 FC matrix')
+                print(temp) 
             #if options.coords == 'Redundant':
             #    #F[index] = self.F_redundant[index]     
             #if options.coords == 'Custom':
@@ -472,12 +490,6 @@ class Merger(object):
                 False
             )
             init_GF.run()
-            print('CMA2 including ' + str(z + 1) + ' off-diagonal elements for ' + str(options.coords) + ' coordinates')
+            print('CMA2 including ' + str(z + 1) + ' off-diagonal bands/elements for ' + str(options.coords) + ' coordinates')
             print(init_GF.freq) 
-            key = 'cma2_' +   str(options.coords) 
-            Fdiag = temp
-            cma2_dict[key] = init_GF.freq 
-        #print(cma2_dict) 
-        self.cma2_dict = cma2_dict        
-        #else:
-        #    print('CMA0 it is') 
+            self.Freq_cma2 = init_GF.freq

@@ -16,6 +16,8 @@ from Molecule import Molecule
 
 pd.set_option("display.max_columns", 15)
 
+np.set_printoptions(precision=4)
+
 # =======================
 # Database Specifications
 # =======================
@@ -38,13 +40,11 @@ paths = ['/1_Closed_Shell']
 
 # Various output control statements
 n = 1                   # Number of CMA2 corrections (n = 0 -> CMA0)
-cma1 = True             # Run CMA1 instead of CMA0
+cma1 = False            # Run CMA1 instead of CMA0
 csv = True              # Generate database .csv file
 SI = True               # Generate LaTeX SI file
 compute_all = False     # Not implemented yet, run calculations for all
-
-# if n > 0 and cma1 == True:
-    # raise RuntimeError("Don't do both CMA1 and CMA2 at the same time yet")
+off_diag_bands = False  # (CMA2/3 ONLY) If set to true, "n" off-diag bands selected, if false, "n" largest fc will be selected
 
 # =====================
 # Some useful functions
@@ -185,7 +185,7 @@ def execute():
                 # Grab geometry information 
                 mol.get_geoms(combo)
             
-                if cma1 == False:
+                if not cma1:
                     # Copy the necessary files with correct names
                     shutil.copyfile(job + combo[1] + "/zmat", job + "zmat")
                     shutil.copyfile(job + combo[1] + "/fc.dat", job + "fc.dat")
@@ -239,6 +239,7 @@ def execute():
                             Proj = None
                     
                         execMerger.options.n_cma2 = n
+                        execMerger.options.off_diag = off_diag_bands
                     
                         # Run CMA
                         execMerger.run(execMerger.options, Proj)
@@ -262,19 +263,26 @@ def execute():
                     
                         # Collect data for CMA2
                         if n > 0:
-                            d2[f"Ref {combo[0]}"] = execMerger.reference_freq
-                            cma2_data = [] 
-                            cma2_dict = execMerger.cma2_dict
-                            key = 'cma2_'  + str(execMerger.options.coords) 
-                            cma2_data.append(cma2_dict[key]) 
-                            print('cma2_data') 
-                            print(cma2_data)
-                            print(cma2_data[0])
-                    
                             if coord == "Nattys":
-                                d2[f'Ref - Nat {combo[1]}'] = freq_diff(execMerger.reference_freq, cma2_dict[key])
+                                d2['Molecule'] = [f"{mol.name} ({mol.ID}) mode {i+1}" for i in range(len(execMerger.reference_freq))]
+                                d2[f"Ref {combo[0]}"] = execMerger.reference_freq
+                                d2[f'Natty ({combo[1]})'] = execMerger.Freq_custom
+                                cma2_freqs_natty = execMerger.Freq_cma2 
+                              
+                                d2[f'Natty CMA2 ({combo[1]})'] = cma2_freqs_natty 
+                                d2[f'Ref - Natty ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_custom)
+                                d2[f'Ref - Natty CMA2 ({combo[1]})'] = freq_diff(execMerger.reference_freq, cma2_freqs_natty)
+                                print('Give us CMA2!')                   
                             if coord == "Redundant":
-                                d2[f'Ref - Red {combo[1]}'] = freq_diff(execMerger.reference_freq, cma2_dict[key])
+                                d2['Molecule'] = [f"{mol.name} ({mol.ID}) mode {i+1}" for i in range(len(execMerger.reference_freq))]
+                                d2[f"Ref {combo[0]}"] = execMerger.reference_freq
+                                d2[f'Red ({combo[1]})'] = execMerger.Freq_redundant
+                                cma2_freqs_red = execMerger.Freq_cma2 
+                              
+                                d2[f'Natty CMA2 ({combo[1]})'] = cma2_freqs_red 
+                                d2[f'Ref - Red ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_redundant)
+                                d2[f'Ref - Red CMA2 ({combo[1]})'] = freq_diff(execMerger.reference_freq, cma2_freqs_red)
+                                print('Give us CMA2!')                   
                     
                         # delete objects so they are forced to reload
                         del execMerger
@@ -288,20 +296,16 @@ def execute():
                     if 'Nattys' in coord_type and 'Redundant' in coord_type and 'Linear' not in job:
                         d[f'Nat - Red {combo[1]}'] = freq_diff(d[f'Natty ({combo[1]})'], d[f'Red ({combo[1]})'])
                     
-                    if n > 0:
-                        cma2_1_nat_diff = freq_diff(Freq_ref, cma2_data_nat)         
-                        cma2_1_red_diff = freq_diff(Freq_ref, cma2_data_red)         
-                    
                 #======================
                 # Mitchell's playground
                 #======================
 
-                elif cma1 == True:
+                elif cma1:
                     # move into directory with higher level geom, fc.dat, and Disp directories
                     os.chdir(f"{job}/")
                     
-                    shutil.copyfile(job + combo[0] + "/zmat", job + "zmat")
-                    shutil.copyfile(job + combo[0] + "/zmat", job + "zmat2")
+                    shutil.copyfile(job + combo[0] + "/zmat_cma1", job + "zmat")
+                    shutil.copyfile(job + combo[0] + "/zmat_cma1", job + "zmat2")
                     shutil.copyfile(job + combo[0] + "/fc.dat", job + "fc2.dat")       
                    
                     # Add your code here
@@ -322,6 +326,7 @@ def execute():
                             execMerger.options.man_proj = False
                             execMerger.options.coords = coord
                             execMerger.options.n_cma2 = n
+                            execMerger.options.off_diag = off_diag_bands
                             Proj = None
                             execMerger.run(execMerger.options,Proj)
                             # raise RuntimeError
@@ -351,26 +356,28 @@ def execute():
                                 d[f'Ref - Red ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_redundant)
                                 mol.freqs[f'Red ({combo[1]})'] = execMerger.Freq_redundant
                             
-                            # Collect data for CMA2
+                            #Collect data for CMA2
                             if n > 0:
-                                d2['Molecule'] = [f"{mol.name} ({mol.ID}) mode {i+1}" for i in range(len(execMerger.reference_freq))]
-                                d2[f"Ref {combo[0]}"] = execMerger.reference_freq
-                                d2[f'Red ({combo[1]})'] = execMerger.Freq_redundant
-                                cma2_data = [] 
-                                cma2_dict = execMerger.cma2_dict
-                                key = 'cma2_'  + str(execMerger.options.coords) 
-                                d2[f'CMA2 ({combo[1]})'] = cma2_dict[key] 
-                                d2[f'Ref - Red ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_redundant)
-                                cma2_data.append(cma2_dict[key]) 
-                                print('cma2_data') 
-                                print(cma2_data)
-                                print(cma2_data[0])
-                            
-                                # if coord == "Nattys":
-                                    # d2[f'Ref - Nat {combo[1]}'] = freq_diff(execMerger.reference_freq, cma2_dict[key])
+
+                                if coord == "Nattys":
+                                    d2['Molecule'] = [f"{mol.name} ({mol.ID}) mode {i+1}" for i in range(len(execMerger.reference_freq))]
+                                    d2[f"Ref {combo[0]}"] = execMerger.reference_freq
+                                    d2[f'Natty ({combo[1]})'] = execMerger.Freq_custom
+                                    cma2_freqs_natty = execMerger.Freq_cma2 
+                                  
+                                    d2[f'Natty CMA2 ({combo[1]})'] = cma2_freqs_natty 
+                                    d2[f'Ref - Natty ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_custom)
+                                    d2[f'Ref - Natty CMA2 ({combo[1]})'] = freq_diff(execMerger.reference_freq, cma2_freqs_natty)
                                 if coord == "Redundant":
-                                    # d2[f'Ref - Red {combo[1]}'] = freq_diff(execMerger.reference_freq, cma2_dict[key])
-                                    d2[f'CMA2_1_el'] = freq_diff(execMerger.reference_freq, cma2_dict[key])
+                                    d2['Molecule'] = [f"{mol.name} ({mol.ID}) mode {i+1}" for i in range(len(execMerger.reference_freq))]
+                                    d2[f"Ref {combo[0]}"] = execMerger.reference_freq
+                                    d2[f'Red ({combo[1]})'] = execMerger.Freq_redundant
+                                    cma2_freqs_red = execMerger.Freq_cma2 
+                                  
+                                    d2[f'Natty CMA2 ({combo[1]})'] = cma2_freqs_red 
+                                    d2[f'Ref - Red ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_redundant)
+                                    d2[f'Ref - Red CMA2 ({combo[1]})'] = freq_diff(execMerger.reference_freq, cma2_freqs_red)
+
 
                             del execMerger
                             del Merger
@@ -381,7 +388,7 @@ def execute():
             mol.run()
             
             # Clean up job directory
-            if cma1 == False:
+            if not cma1:
                 os.remove("fc.dat")
             os.remove("zmat")
             os.remove("zmat2")
@@ -408,7 +415,7 @@ def execute():
                 # d2['CMA2_1_el'] = d2[f'Ref - Red {combo[1]}']       
                 # d2 ={'CMA2_1_el' : cma2_1_red_diff}        
                 df2 = pd.DataFrame(data=d2)
-                df2.style.apply(highlight_greaterthan, axis =1)
+                #df2.style.apply(highlight_greaterthan, axis =1)
                 frame2.append(df2)
 
         # end of job loop
