@@ -39,8 +39,9 @@ coord_type = ["Nattys", "Redundant"]
 paths = ['/1_Closed_Shell']
 
 # Various output control statements
-n = 1                   # Number of CMA2 corrections (n = 0 -> CMA0)
-cma1 = False            # Run CMA1 instead of CMA0
+n = 5                   # Number of CMA2 corrections (n = 0 -> CMA0)
+cma1 = True            # Run CMA1 instead of CMA0
+#cma1 = False            # Run CMA1 instead of CMA0
 csv = True              # Generate database .csv file
 SI = True               # Generate LaTeX SI file
 compute_all = False     # Not implemented yet, run calculations for all
@@ -184,7 +185,9 @@ def execute():
 
                 # Grab geometry information 
                 mol.get_geoms(combo)
-            
+                if not mol.direc_complete:
+                    break
+ 
                 if not cma1:
                     # Copy the necessary files with correct names
                     shutil.copyfile(job + combo[1] + "/zmat", job + "zmat")
@@ -299,15 +302,21 @@ def execute():
                 #======================
                 # Mitchell's playground
                 #======================
-
+                elif not mol.direc_complete:
+                    #cma1 = False 
+                    continue
+                
                 elif cma1:
                     # move into directory with higher level geom, fc.dat, and Disp directories
                     os.chdir(f"{job}/")
-                    
-                    shutil.copyfile(job + combo[0] + "/zmat_cma1", job + "zmat")
-                    shutil.copyfile(job + combo[0] + "/zmat_cma1", job + "zmat2")
-                    shutil.copyfile(job + combo[0] + "/fc.dat", job + "fc2.dat")       
-                   
+                    try: 
+                        shutil.copyfile(job + combo[0] + "/zmat_cma1", job + "zmat")
+                        shutil.copyfile(job + combo[0] + "/zmat_cma1", job + "zmat2")
+                        shutil.copyfile(job + combo[0] + "/fc.dat", job + "fc2.dat")       
+                    except:
+                        print('Once again, the directory does not contain the sufficient files for the specified job')
+                        mol.direc_complete = False
+                        break 
                     # Add your code here
                     print(f"I am in {os.getcwd()} and I can see {os.listdir()}")
                     
@@ -383,40 +392,42 @@ def execute():
                             del Merger
 
             # end of combo loop
+            if mol.direc_complete: 
+                # Print molecule information
+                mol.run()
+                
+                # Clean up job directory
+                if not cma1:
+                    os.remove("fc.dat")
+                try: 
+                    os.remove("zmat")
+                    os.remove("zmat2")
+                    os.remove("fc2.dat")
+                except:
+                    print('These are not the files you are looking for') 
+                
+                sys.path.remove(job)
+                del mol
 
-            # Print molecule information
-            mol.run()
-            
-            # Clean up job directory
-            if not cma1:
-                os.remove("fc.dat")
-            os.remove("zmat")
-            os.remove("zmat2")
-            os.remove("fc2.dat")
-            
-            
-            sys.path.remove(job)
-            del mol
+                # Skip dataframe if linear molecule
+                if 'Linear' in job:
+                    continue
 
-            # Skip dataframe if linear molecule
-            if 'Linear' in job:
-                continue
-
-            # Add to pandas dataframe
-            if csv:
-                df = pd.DataFrame(data=d)
-                # print(df)
-                # print()
-                frame.append(df)
-            
-            if n > 0:
-                # d2 ={'Ref_Redundant' : cma2_dict[key],
-                     # 'CMA2_1_el' : d2[f'Ref - Red {combo[1]}']}        
-                # d2['CMA2_1_el'] = d2[f'Ref - Red {combo[1]}']       
-                # d2 ={'CMA2_1_el' : cma2_1_red_diff}        
-                df2 = pd.DataFrame(data=d2)
-                #df2.style.apply(highlight_greaterthan, axis =1)
-                frame2.append(df2)
+                # Add to pandas dataframe
+                if csv:
+                    df = pd.DataFrame(data=d)
+                    # print(df)
+                    # print()
+                    frame.append(df)
+                
+                if n > 0:
+                    # d2 ={'Ref_Redundant' : cma2_dict[key],
+                         # 'CMA2_1_el' : d2[f'Ref - Red {combo[1]}']}        
+                    # d2['CMA2_1_el'] = d2[f'Ref - Red {combo[1]}']       
+                    # d2 ={'CMA2_1_el' : cma2_1_red_diff}        
+                    df2 = pd.DataFrame(data=d2)
+                    #df2.style.apply(highlight_greaterthan, axis =1)
+                    frame2.append(df2)
 
         # end of job loop
 

@@ -53,8 +53,15 @@ class Molecule(object):
                 filename = f"./zmat"
             else:
                 filename = f"./{lvl}/zmat"
-            with open(filename, "r") as f:
-                txt = f.readlines()
+            try: 
+                with open(filename, "r") as f:
+                    txt = f.readlines()
+                self.direc_complete = True 
+            except:
+                print(f'There is no file named {filename} in this directory')
+                self.direc_complete = False
+                break
+                #self.geoms = None 
             cart = []
             read = False
             for line in txt:
