@@ -311,7 +311,7 @@ def execute():
                     os.chdir(f"{job}/")
                     try: 
                         shutil.copyfile(job + combo[0] + "/zmat_cma1", job + "zmat")
-                        shutil.copyfile(job + combo[0] + "/zmat_cma1", job + "zmat2")
+                        shutil.copyfile(job + combo[0] + "/zmat_cma1_Final", job + "zmat2")
                         shutil.copyfile(job + combo[0] + "/fc.dat", job + "fc2.dat")       
                     except:
                         print('Once again, the directory does not contain the sufficient files for the specified job')
