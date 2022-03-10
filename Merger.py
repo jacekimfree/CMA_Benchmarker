@@ -359,6 +359,7 @@ class Merger(object):
             False
         )
         init_GF.run()
+        self.ted = init_GF.ted.TED      # TED matrix
         #print('frequencies???')
         self.reference_freq = init_GF.freq 
         #for diagnostic 

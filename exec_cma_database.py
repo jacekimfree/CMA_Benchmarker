@@ -25,8 +25,7 @@ np.set_printoptions(precision=4)
 # High and low levels of theory
 # Available: "CCSD_T_TZ", "CCSD_T_DZ", "B3LYP_6-31G_2df,p_"
 h_theory = ["CCSD_T_TZ"]
-# l_theory = ["CCSD_T_DZ", "B3LYP_6-31G_2df,p_"]
-l_theory = ["B3LYP_6-31G_2df,p_"]
+l_theory = ["CCSD_T_DZ", "B3LYP_6-31G_2df,p_"]
 combos = list(product(h_theory,l_theory))
 
 # Coordinates types to use
@@ -35,14 +34,12 @@ coord_type = ["Nattys", "Redundant"]
 
 # Specify paths to grab data from
 # Options: '/1_Closed_Shell', '/1_Linear', '/1*', '/2_Open_Shell', '/2_Linear', '/2*'
-# paths = ['/2_Open_Shell']
-paths = ['/1_Closed_Shell']
+paths = ['/2*']
 
 # Various output control statements
-n = 5                   # Number of CMA2 corrections (n = 0 -> CMA0)
-cma1 = True            # Run CMA1 instead of CMA0
-#cma1 = False            # Run CMA1 instead of CMA0
-csv = True              # Generate database .csv file
+n = 0                   # Number of CMA2 corrections (n = 0 -> CMA0)
+cma1 = False            # Run CMA1 instead of CMA0
+csv = False             # Generate database .csv file
 SI = True               # Generate LaTeX SI file
 compute_all = False     # Not implemented yet, run calculations for all
 off_diag_bands = False  # (CMA2/3 ONLY) If set to true, "n" off-diag bands selected, if false, "n" largest fc will be selected
@@ -235,6 +232,7 @@ def execute():
                             project_obj = foo.Projection(None)
                             project_obj.run()
                             Proj = copy.copy(project_obj.Proj)
+                            mol.proj = Proj
                         
                         else:
                             execMerger.options.man_proj = False
@@ -256,6 +254,7 @@ def execute():
                             d['Molecule'] = [f"{mol.name} ({mol.ID}) mode {i+1}" for i in range(len(execMerger.reference_freq))]
                     
                         if coord == "Nattys":
+                            mol.ted[combo[1]] = execMerger.ted
                             d[f'Natty ({combo[1]})'] = execMerger.Freq_custom
                             d[f'Ref - Nat ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_custom)
                             mol.freqs[f'Natty ({combo[1]})'] = execMerger.Freq_custom
@@ -317,10 +316,6 @@ def execute():
                         print('Once again, the directory does not contain the sufficient files for the specified job')
                         mol.direc_complete = False
                         break 
-                    # Add your code here
-                    print(f"I am in {os.getcwd()} and I can see {os.listdir()}")
-                    
-                    # raise RuntimeError
 
                     # In the future we can use this coord loop if we want to 
                     # But for now we will stick with redundants
@@ -390,6 +385,8 @@ def execute():
 
                             del execMerger
                             del Merger
+
+                mol.get_nattys(combo)
 
             # end of combo loop
             if mol.direc_complete: 
