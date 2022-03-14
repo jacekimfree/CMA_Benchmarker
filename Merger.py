@@ -2,6 +2,7 @@ import os
 import re
 import sys
 import shutil
+import json
 import subprocess
 import time
 import numpy as np
@@ -114,111 +115,174 @@ class Merger(object):
         else:
             init_bool = True
 
-            # First generate displacements in internal coordinates
-            indices = np.triu_indices(len(s_vec.proj.T))
-            indices = np.array(indices).T
-            eigs_init = np.eye(len(s_vec.proj.T))
+            os.chdir(os.getcwd() + self.cma1_path)
+            if os.path.exists(os.getcwd() + "/fc_int.dat"):
+                f_read_obj = FcRead("fc_int.dat")
+                f_read_obj.run()
+                # indices = np.triu_indices(len(s_vec.proj.T))
+                # indices = np.array(indices).T
+                # eigs_init = np.eye(len(s_vec.proj.T))
+                # init_disp = TransDisp(
+                    # s_vec,
+                    # zmat_obj,
+                    # options.disp,
+                    # eigs_init,
+                    # True,
+                    # options.disp_tol,
+                    # TED_obj,
+                    # options,
+                    # indices,
+                # )
+                fc_init = ForceConstant(
+                    None,
+                    [],
+                    [],
+                    0,
+                    options,
+                    [],
+                )
+                fc_init.FC =  f_read_obj.fc_mat
+                os.chdir('..')
+                os.chdir('..')
+            else:
+                # First generate displacements in internal coordinates
+                indices = np.triu_indices(len(s_vec.proj.T))
+                indices = np.array(indices).T
+                eigs_init = np.eye(len(s_vec.proj.T))
 
-            init_disp = TransDisp(
-                s_vec,
-                zmat_obj,
-                options.disp,
-                eigs_init,
-                True,
-                options.disp_tol,
-                TED_obj,
-                options,
-                indices,
-            )
-            init_disp.run()
-            prog_init = options.program_init
-            prog_name_init = prog_init.split("@")[0]
-
-            if options.calc_init:
-                print("We don't want to compute anything here, change your calc_init keyword to false.")
-                raise RuntimeError
-                dir_obj_init = DirectoryTree(
-                    prog_name_init,
+                init_disp = TransDisp(
+                    s_vec,
                     zmat_obj,
-                    init_disp,
-                    options.cart_insert_init,
-                    init_disp.p_disp,
-                    init_disp.m_disp,
+                    options.disp,
+                    eigs_init,
+                    True,
+                    options.disp_tol,
+                    TED_obj,
                     options,
                     indices,
-                    "templateInit.dat",
-                    "DispsInit",
                 )
-                dir_obj_init.run()
-                os.chdir(rootdir + "/DispsInit")
-                disp_list = []
-                for i in os.listdir(rootdir + "/DispsInit"):
-                    disp_list.append(i)
+                init_disp.run()
+                prog_init = options.program_init
+                prog_name_init = prog_init.split("@")[0]
 
-                if options.cluster != "sapelo":
-                    v_template = VulcanTemplate(
-                        options, len(disp_list), prog_name_init, prog_init
+                if options.calc_init:
+                    print("We don't want to compute anything here, change your calc_init keyword to false.")
+                    raise RuntimeError
+                    dir_obj_init = DirectoryTree(
+                        prog_name_init,
+                        zmat_obj,
+                        init_disp,
+                        options.cart_insert_init,
+                        init_disp.p_disp,
+                        init_disp.m_disp,
+                        options,
+                        indices,
+                        "templateInit.dat",
+                        "DispsInit",
                     )
-                    out = v_template.run()
-                    with open("displacements.sh", "w") as file:
-                        file.write(out)
+                    dir_obj_init.run()
+                    os.chdir(rootdir + "/DispsInit")
+                    disp_list = []
+                    for i in os.listdir(rootdir + "/DispsInit"):
+                        disp_list.append(i)
 
-                    # Submits an array, then checks if all jobs have finished every
-                    # 10 seconds.
-                    sub = Submit(disp_list,options)
-                    sub.run()
+                    if options.cluster != "sapelo":
+                        v_template = VulcanTemplate(
+                            options, len(disp_list), prog_name_init, prog_init
+                        )
+                        out = v_template.run()
+                        with open("displacements.sh", "w") as file:
+                            file.write(out)
+
+                        # Submits an array, then checks if all jobs have finished every
+                        # 10 seconds.
+                        sub = Submit(disp_list,options)
+                        sub.run()
+                    else:
+                        s_template = SapeloTemplate(
+                            options, len(disp_list), prog_name_init, prog_init
+                        )
+                        out = s_template.run()
+                        with open("optstep.sh", "w") as file:
+                            file.write(out)
+                        for z in range(0, len(disp_list)):
+                            source = os.getcwd() + "/optstep.sh"
+                            os.chdir("./" + str(z + 1))
+                            destination = os.getcwd()
+                            shutil.copy2(source, destination)
+                            os.chdir("../")
+                        sub = Submit(disp_list, options)
+                        sub.run()
+
+                reap_obj_init = Reap(
+                    prog_name_init,
+                    zmat_obj,
+                    init_disp.disp_cart,
+                    options,
+                    init_disp.n_coord,
+                    eigs_init,
+                    indices,
+                    options.energy_regex_init,
+                    options.success_regex_init,
+                )
+                if os.path.exists(os.getcwd() + '/auxiliary'):
+                    with open("auxiliary", "r") as file:
+                        energies = json.load(file)
+                    os.chdir('..')
+                    ref_en_init = energies[0]
+                    size = len(reap_obj_init.eigs)
+                    p_en_array = np.zeros((size, size))
+                    m_en_array = np.zeros((size, size))
+                    for i in range(len(indices)):
+                        j, k = indices[i][0], indices[i][1]
+                        p_en_array[j, k] = energies[2*i+1]
+                        m_en_array[j, k] = energies[2*i+2]
+                    reap_obj_init.ref_en = ref_en_init
+                    reap_obj_init.p_en_array = p_en_array
+                    reap_obj_init.m_en_array = m_en_array
                 else:
-                    s_template = SapeloTemplate(
-                        options, len(disp_list), prog_name_init, prog_init
-                    )
-                    out = s_template.run()
-                    with open("optstep.sh", "w") as file:
-                        file.write(out)
-                    for z in range(0, len(disp_list)):
-                        source = os.getcwd() + "/optstep.sh"
-                        os.chdir("./" + str(z + 1))
-                        destination = os.getcwd()
-                        shutil.copy2(source, destination)
-                        os.chdir("../")
-                    sub = Submit(disp_list, options)
-                    sub.run()
+                    reap_obj_init.energy_regex = "Grab this energy (\-\d+\.\d+)"
+                    reap_obj_init.success_regex = "beer"
+                    reap_obj_init.options.dir_reap = False
+                    # os.chdir(rootdir + "/DispsInit")
+                    reap_obj_init.run()
+                if os.path.exists(os.getcwd() + '/auxiliary'):
+                    shutil.move(os.getcwd() + '/auxiliary', os.getcwd()+'/..' + self.cma1_path +'/auxiliary')
+                
 
-            os.chdir(os.getcwd() + self.cma1_path)
-            reap_obj_init = Reap(
-                prog_name_init,
-                zmat_obj,
-                init_disp.disp_cart,
-                options,
-                init_disp.n_coord,
-                eigs_init,
-                indices,
-                options.energy_regex_init,
-                options.success_regex_init,
-            )
-            reap_obj_init.energy_regex = "Grab this energy (\-\d+\.\d+)"
-            reap_obj_init.success_regex = "beer"
-            reap_obj_init.options.dir_reap = False
-            # print("not recalculating", os.getcwd())
-            # os.chdir(rootdir + "/DispsInit")
-            reap_obj_init.run()
+                # nate
+                p_en_array_init = reap_obj_init.p_en_array
+                m_en_array_init = reap_obj_init.m_en_array
+                ref_en_init = reap_obj_init.ref_en
 
-            # nate
-            p_en_array_init = reap_obj_init.p_en_array
-            m_en_array_init = reap_obj_init.m_en_array
-            ref_en_init = reap_obj_init.ref_en
+                fc_init = ForceConstant(
+                    init_disp,
+                    p_en_array_init,
+                    m_en_array_init,
+                    ref_en_init,
+                    options,
+                    indices,
+                )
+                fc_init.run()
+                print("Computed Force Constants:")
+                print(fc_init.FC)
+                f_conv_obj = FcConv(
+                    fc_init.FC,
+                    s_vec,
+                    zmat_obj,
+                    "internal",
+                    False,
+                    TED_obj,
+                    options.units,
+                )
+                f_conv_obj.N = len(fc_init.FC)
+                f_conv_obj.print_const(fc_name="fc_int.dat")
+                shutil.move(os.getcwd() + '/fc_int.dat', os.getcwd()+'/..' + self.cma1_path +'/fc_int.dat')
 
-            fc_init = ForceConstant(
-                init_disp,
-                p_en_array_init,
-                m_en_array_init,
-                ref_en_init,
-                options,
-                indices,
-            )
-            fc_init.run()
-            print("Computed Force Constants:")
-            print(fc_init.FC)
-            os.chdir("..")
+                # if os.path.exists(os.getcwd() + '/auxiliary'):
+                print(os.getcwd())
+                # raise RuntimeError
+                os.chdir("..")
         
         if not init_bool:
             f_read_obj.run()
@@ -275,7 +339,7 @@ class Merger(object):
        
         eigs = len(TED_GF.S)
         print('eigs')
-        print(eigs)        
+        print(eigs)
         self.eigs = eigs
 
 
@@ -290,7 +354,7 @@ class Merger(object):
         
         print("Everything before this statement has been crosschecked with merger/coordep") 
         # Now run the TZ force constant transformation
-        
+        print(os.getcwd())
         zmat_obj2 = Zmat(options)
         zmat_obj2.run(zmat_name="zmat2")
         
