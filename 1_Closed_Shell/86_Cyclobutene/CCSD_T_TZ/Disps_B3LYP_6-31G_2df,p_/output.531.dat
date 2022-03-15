@@ -30,10 +30,10 @@
     -----------------------------------------------------------------------
 
 
-    Psi4 started on: Monday, 15 November 2021 01:04PM
+    Psi4 started on: Monday, 14 March 2022 06:33PM
 
-    Process ID: 21137
-    Host:       n085
+    Process ID: 461
+    Host:       n066
     PSIDATADIR: /opt/psi/4/master/share/psi4
     Memory:     500.0 MiB
     Threads:    4
@@ -45,6 +45,7 @@ import os
 memory 14 GB 
  
 molecule {
+ X   -0.0000000000   -0.0000000000   -1.5692840500
  C   -1.2727150451    0.0002662230    1.4944335311
  C    1.2727150451    0.0002662230    1.4944335311
  C   -1.4850089849   -0.0002769796   -1.3740447579
@@ -357,12 +358,12 @@ print_out('Grab this energy {0}'.format(e))
 
 Scratch directory: /tmp/
 
-*** tstart() called on n085
-*** at Mon Nov 15 13:04:47 2021
+*** tstart() called on n066
+*** at Mon Mar 14 18:33:02 2022
 
    => Loading Basis Set <=
 
-    Name: ANONYMOUS355E21C0
+    Name: ANONYMOUS53E8E054
     Role: ORBITAL
     Keyword: BASIS
     atoms 1-4  entry C          line    48 inputblock 6-31g_2dfp_ 
@@ -422,7 +423,7 @@ Scratch directory: /tmp/
 
   ==> Primary Basis <==
 
-  Basis Set: ANONYMOUS355E21C0
+  Basis Set: ANONYMOUS53E8E054
     Blend: 6-31G_2DFP_
     Number of shells: 56
     Number of basis function: 152
@@ -477,7 +478,7 @@ Scratch directory: /tmp/
 
    => Loading Basis Set <=
 
-    Name: (ANONYMOUS355E21C0 AUX)
+    Name: (ANONYMOUS53E8E054 AUX)
     Role: JKFIT
     Keyword: DF_BASIS_SCF
     atoms 1-4  entry C          line   198 file /opt/psi/4/master/share/psi4/basis/def2-universal-jkfit.gbs 
@@ -501,7 +502,7 @@ Scratch directory: /tmp/
 
    => Auxiliary Basis Set <=
 
-  Basis Set: (ANONYMOUS355E21C0 AUX)
+  Basis Set: (ANONYMOUS53E8E054 AUX)
     Blend: DEF2-UNIVERSAL-JKFIT
     Number of shells: 136
     Number of basis function: 408
@@ -532,19 +533,19 @@ Scratch directory: /tmp/
 
                            Total Energy        Delta E     RMS |[F,P]|
 
-   @DF-RKS iter SAD:  -155.53041500788947   -1.55530e+02   0.00000e+00 
-   @DF-RKS iter   1:  -155.69405657603579   -1.63642e-01   6.68737e-03 DIIS
-   @DF-RKS iter   2:  -155.52194890089754    1.72108e-01   8.59007e-03 DIIS
-   @DF-RKS iter   3:  -155.98410828450250   -4.62159e-01   4.53660e-04 DIIS
-   @DF-RKS iter   4:  -155.98508638238329   -9.78098e-04   1.34209e-04 DIIS
+   @DF-RKS iter SAD:  -155.53041500788956   -1.55530e+02   0.00000e+00 
+   @DF-RKS iter   1:  -155.69405657603585   -1.63642e-01   6.68737e-03 DIIS
+   @DF-RKS iter   2:  -155.52194890089748    1.72108e-01   8.59007e-03 DIIS
+   @DF-RKS iter   3:  -155.98410828450241   -4.62159e-01   4.53660e-04 DIIS
+   @DF-RKS iter   4:  -155.98508638238303   -9.78098e-04   1.34209e-04 DIIS
    @DF-RKS iter   5:  -155.98516598244726   -7.96001e-05   6.87452e-05 DIIS
-   @DF-RKS iter   6:  -155.98519414455254   -2.81621e-05   4.84566e-06 DIIS
-   @DF-RKS iter   7:  -155.98519428406820   -1.39516e-07   3.42622e-07 DIIS
-   @DF-RKS iter   8:  -155.98519428476425   -6.96048e-10   8.71792e-08 DIIS
-   @DF-RKS iter   9:  -155.98519428480944   -4.51905e-11   1.10648e-08 DIIS
-   @DF-RKS iter  10:  -155.98519428481006   -6.25278e-13   1.26964e-09 DIIS
-   @DF-RKS iter  11:  -155.98519428481009   -2.84217e-14   3.68095e-10 DIIS
-   @DF-RKS iter  12:  -155.98519428481021   -1.13687e-13   9.82962e-11 DIIS
+   @DF-RKS iter   6:  -155.98519414455242   -2.81621e-05   4.84566e-06 DIIS
+   @DF-RKS iter   7:  -155.98519428406834   -1.39516e-07   3.42622e-07 DIIS
+   @DF-RKS iter   8:  -155.98519428476439   -6.96048e-10   8.71792e-08 DIIS
+   @DF-RKS iter   9:  -155.98519428480950   -4.51053e-11   1.10648e-08 DIIS
+   @DF-RKS iter  10:  -155.98519428480995   -4.54747e-13   1.26964e-09 DIIS
+   @DF-RKS iter  11:  -155.98519428481001   -5.68434e-14   3.68095e-10 DIIS
+   @DF-RKS iter  12:  -155.98519428481018   -1.70530e-13   9.82962e-11 DIIS
   Energy and wave function converged.
 
 
@@ -614,17 +615,17 @@ Scratch directory: /tmp/
              Ap   App 
     DOCC [     9,    6 ]
 
-  @DF-RKS Final Energy:  -155.98519428481021
+  @DF-RKS Final Energy:  -155.98519428481018
 
    => Energetics <=
 
     Nuclear Repulsion Energy =            112.9525648633025696
-    One-Electron Energy =                -432.1162989865872532
-    Two-Electron Energy =                 182.5554221247417388
-    DFT Exchange-Correlation Energy =     -19.3768822862672323
+    One-Electron Energy =                -432.1162989865873669
+    Two-Electron Energy =                 182.5554221247419093
+    DFT Exchange-Correlation Energy =     -19.3768822862672678
     Empirical Dispersion Energy =           0.0000000000000000
     VV10 Nonlocal Energy =                  0.0000000000000000
-    Total Energy =                       -155.9851942848102055
+    Total Energy =                       -155.9851942848101771
 
 Computation Completed
 
@@ -646,17 +647,17 @@ Properties computed using the SCF density matrix
      X:     0.0040      Y:     0.0826      Z:     0.0000     Total:     0.0827
 
 
-*** tstop() called on n085 at Mon Nov 15 13:05:05 2021
+*** tstop() called on n066 at Mon Mar 14 18:33:21 2022
 Module time:
-	user time   =      68.30 seconds =       1.14 minutes
-	system time =       1.15 seconds =       0.02 minutes
-	total time  =         18 seconds =       0.30 minutes
+	user time   =      74.67 seconds =       1.24 minutes
+	system time =       1.23 seconds =       0.02 minutes
+	total time  =         19 seconds =       0.32 minutes
 Total time:
-	user time   =      68.30 seconds =       1.14 minutes
-	system time =       1.15 seconds =       0.02 minutes
-	total time  =         18 seconds =       0.30 minutes
-Grab this energy -155.9851942848102
-    Psi4 stopped on: Monday, 15 November 2021 01:05PM
-    Psi4 wall time for execution: 0:00:17.89
+	user time   =      74.67 seconds =       1.24 minutes
+	system time =       1.23 seconds =       0.02 minutes
+	total time  =         19 seconds =       0.32 minutes
+Grab this energy -155.98519428481018
+    Psi4 stopped on: Monday, 14 March 2022 06:33PM
+    Psi4 wall time for execution: 0:00:19.58
 
 *** Psi4 exiting successfully. Buy a developer a beer!
