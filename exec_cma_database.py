@@ -36,7 +36,8 @@ coord_type = ["Nattys", "Redundant"]
 # Specify paths to grab data from
 # Options: '/1_Closed_Shell', '/1_Linear', '/1*', '/2_Open_Shell', '/2_Linear', '/2*'
 # paths = ['/2_Open_Shell']
-paths = ['/1_Closed_Shell']
+# paths = ['/1_Closed_Shell']
+paths = ['/1_Closed_Shell','/2_Open_Shell']
 
 # Various output control statements
 n = 5                   # Number of CMA2 corrections (n = 0 -> CMA0)
