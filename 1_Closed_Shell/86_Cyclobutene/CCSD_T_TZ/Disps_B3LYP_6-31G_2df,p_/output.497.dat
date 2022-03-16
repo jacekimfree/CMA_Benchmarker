@@ -30,10 +30,10 @@
     -----------------------------------------------------------------------
 
 
-    Psi4 started on: Monday, 15 November 2021 01:03PM
+    Psi4 started on: Monday, 14 March 2022 06:31PM
 
-    Process ID: 266983
-    Host:       n070
+    Process ID: 23140
+    Host:       n023
     PSIDATADIR: /opt/psi/4/master/share/psi4
     Memory:     500.0 MiB
     Threads:    4
@@ -45,6 +45,7 @@ import os
 memory 14 GB 
  
 molecule {
+ X    0.0000000000   -0.0000000000   -1.5692840500
  C   -1.2729270886    0.0002660273    1.4938578440
  C    1.2729270886    0.0002660273    1.4938578440
  C   -1.4859605365   -0.0002776778   -1.3750531683
@@ -357,12 +358,12 @@ print_out('Grab this energy {0}'.format(e))
 
 Scratch directory: /tmp/
 
-*** tstart() called on n070
-*** at Mon Nov 15 13:03:07 2021
+*** tstart() called on n023
+*** at Mon Mar 14 18:31:33 2022
 
    => Loading Basis Set <=
 
-    Name: ANONYMOUS68DEC117
+    Name: ANONYMOUS811951EB
     Role: ORBITAL
     Keyword: BASIS
     atoms 1-4  entry C          line    48 inputblock 6-31g_2dfp_ 
@@ -422,7 +423,7 @@ Scratch directory: /tmp/
 
   ==> Primary Basis <==
 
-  Basis Set: ANONYMOUS68DEC117
+  Basis Set: ANONYMOUS811951EB
     Blend: 6-31G_2DFP_
     Number of shells: 56
     Number of basis function: 152
@@ -477,7 +478,7 @@ Scratch directory: /tmp/
 
    => Loading Basis Set <=
 
-    Name: (ANONYMOUS68DEC117 AUX)
+    Name: (ANONYMOUS811951EB AUX)
     Role: JKFIT
     Keyword: DF_BASIS_SCF
     atoms 1-4  entry C          line   198 file /opt/psi/4/master/share/psi4/basis/def2-universal-jkfit.gbs 
@@ -501,7 +502,7 @@ Scratch directory: /tmp/
 
    => Auxiliary Basis Set <=
 
-  Basis Set: (ANONYMOUS68DEC117 AUX)
+  Basis Set: (ANONYMOUS811951EB AUX)
     Blend: DEF2-UNIVERSAL-JKFIT
     Number of shells: 136
     Number of basis function: 408
@@ -532,19 +533,19 @@ Scratch directory: /tmp/
 
                            Total Energy        Delta E     RMS |[F,P]|
 
-   @DF-RKS iter SAD:  -155.53088688443691   -1.55531e+02   0.00000e+00 
-   @DF-RKS iter   1:  -155.69434789455903   -1.63461e-01   6.68437e-03 DIIS
-   @DF-RKS iter   2:  -155.52372325786993    1.70625e-01   8.57507e-03 DIIS
-   @DF-RKS iter   3:  -155.98406043627861   -4.60337e-01   4.54453e-04 DIIS
-   @DF-RKS iter   4:  -155.98504516440869   -9.84728e-04   1.31860e-04 DIIS
-   @DF-RKS iter   5:  -155.98512170585491   -7.65414e-05   6.78791e-05 DIIS
-   @DF-RKS iter   6:  -155.98514916975870   -2.74639e-05   4.85729e-06 DIIS
-   @DF-RKS iter   7:  -155.98514930974906   -1.39990e-07   3.41610e-07 DIIS
-   @DF-RKS iter   8:  -155.98514931043891   -6.89852e-10   8.68974e-08 DIIS
-   @DF-RKS iter   9:  -155.98514931048376   -4.48495e-11   1.10430e-08 DIIS
-   @DF-RKS iter  10:  -155.98514931048447   -7.10543e-13   1.22907e-09 DIIS
-   @DF-RKS iter  11:  -155.98514931048442    5.68434e-14   3.55485e-10 DIIS
-   @DF-RKS iter  12:  -155.98514931048436    5.68434e-14   9.54197e-11 DIIS
+   @DF-RKS iter SAD:  -155.53088688458789   -1.55531e+02   0.00000e+00 
+   @DF-RKS iter   1:  -155.69434789471688   -1.63461e-01   6.68437e-03 DIIS
+   @DF-RKS iter   2:  -155.52372325803512    1.70625e-01   8.57507e-03 DIIS
+   @DF-RKS iter   3:  -155.98406043644241   -4.60337e-01   4.54453e-04 DIIS
+   @DF-RKS iter   4:  -155.98504516457294   -9.84728e-04   1.31860e-04 DIIS
+   @DF-RKS iter   5:  -155.98512170601884   -7.65414e-05   6.78791e-05 DIIS
+   @DF-RKS iter   6:  -155.98514916992249   -2.74639e-05   4.85729e-06 DIIS
+   @DF-RKS iter   7:  -155.98514930991303   -1.39991e-07   3.41610e-07 DIIS
+   @DF-RKS iter   8:  -155.98514931060299   -6.89965e-10   8.68974e-08 DIIS
+   @DF-RKS iter   9:  -155.98514931064773   -4.47358e-11   1.10430e-08 DIIS
+   @DF-RKS iter  10:  -155.98514931064847   -7.38964e-13   1.22907e-09 DIIS
+   @DF-RKS iter  11:  -155.98514931064841    5.68434e-14   3.55485e-10 DIIS
+   @DF-RKS iter  12:  -155.98514931064844   -2.84217e-14   9.54196e-11 DIIS
   Energy and wave function converged.
 
 
@@ -614,17 +615,17 @@ Scratch directory: /tmp/
              Ap   App 
     DOCC [     9,    6 ]
 
-  @DF-RKS Final Energy:  -155.98514931048436
+  @DF-RKS Final Energy:  -155.98514931064844
 
    => Energetics <=
 
     Nuclear Repulsion Energy =            112.9589753841067932
-    One-Electron Energy =                -432.1276478759173187
-    Two-Electron Energy =                 182.5620555756552221
-    DFT Exchange-Correlation Energy =     -19.3785323943290457
+    One-Electron Energy =                -432.1276478760387363
+    Two-Electron Energy =                 182.5620555756212866
+    DFT Exchange-Correlation Energy =     -19.3785323943377925
     Empirical Dispersion Energy =           0.0000000000000000
     VV10 Nonlocal Energy =                  0.0000000000000000
-    Total Energy =                       -155.9851493104843598
+    Total Energy =                       -155.9851493106484384
 
 Computation Completed
 
@@ -646,17 +647,17 @@ Properties computed using the SCF density matrix
      X:     0.0040      Y:     0.0881      Z:     0.0000     Total:     0.0882
 
 
-*** tstop() called on n070 at Mon Nov 15 13:03:28 2021
+*** tstop() called on n023 at Mon Mar 14 18:31:57 2022
 Module time:
-	user time   =      78.98 seconds =       1.32 minutes
-	system time =       1.85 seconds =       0.03 minutes
-	total time  =         21 seconds =       0.35 minutes
+	user time   =      92.78 seconds =       1.55 minutes
+	system time =       1.04 seconds =       0.02 minutes
+	total time  =         24 seconds =       0.40 minutes
 Total time:
-	user time   =      78.98 seconds =       1.32 minutes
-	system time =       1.85 seconds =       0.03 minutes
-	total time  =         21 seconds =       0.35 minutes
-Grab this energy -155.98514931048436
-    Psi4 stopped on: Monday, 15 November 2021 01:03PM
-    Psi4 wall time for execution: 0:00:21.22
+	user time   =      92.78 seconds =       1.55 minutes
+	system time =       1.04 seconds =       0.02 minutes
+	total time  =         24 seconds =       0.40 minutes
+Grab this energy -155.98514931064844
+    Psi4 stopped on: Monday, 14 March 2022 06:31PM
+    Psi4 wall time for execution: 0:00:24.14
 
 *** Psi4 exiting successfully. Buy a developer a beer!

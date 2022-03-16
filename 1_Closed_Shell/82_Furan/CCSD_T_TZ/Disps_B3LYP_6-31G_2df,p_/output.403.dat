@@ -30,10 +30,10 @@
     -----------------------------------------------------------------------
 
 
-    Psi4 started on: Sunday, 14 November 2021 02:03PM
+    Psi4 started on: Monday, 14 March 2022 06:08PM
 
-    Process ID: 30058
-    Host:       n087
+    Process ID: 28201
+    Host:       n049
     PSIDATADIR: /opt/psi/4/master/share/psi4
     Memory:     500.0 MiB
     Threads:    4
@@ -45,14 +45,15 @@ import os
 memory 14 GB 
  
 molecule {
- O   -0.0000000000    0.0036689452   -2.1396952208
+ X   -0.0000000000    0.0000000000   -0.2578467100
+ O    0.0000000000    0.0036689452   -2.1396952208
  C   -0.0000000000    2.0718726138   -0.6057450455
- C   -0.0000000000   -2.0622926051   -0.5948251873
+ C    0.0000000000   -2.0622926051   -0.5948251873
  C   -0.0000000000   -1.3626278964    1.8785056161
  C    0.0000000000    1.3584446060    1.8608756373
  H   -0.0000000000    3.8766869587   -1.5462600095
- H   -0.0000000000   -3.8647783659   -1.5347160216
- H   -0.0000000000   -2.6125330814    3.4825321654
+ H    0.0000000000   -3.8647783659   -1.5347160216
+ H    0.0000000000   -2.6125330814    3.4825321654
  H    0.0000000000    2.5915588251    3.4742372759
 units bohr
 }
@@ -356,12 +357,12 @@ print_out('Grab this energy {0}'.format(e))
 
 Scratch directory: /tmp/
 
-*** tstart() called on n087
-*** at Sun Nov 14 14:03:32 2021
+*** tstart() called on n049
+*** at Mon Mar 14 18:08:18 2022
 
    => Loading Basis Set <=
 
-    Name: ANONYMOUS92AEAF3C
+    Name: ANONYMOUSDF1A937B
     Role: ORBITAL
     Keyword: BASIS
     atoms 1   entry O          line    90 inputblock 6-31g_2dfp_ 
@@ -421,7 +422,7 @@ Scratch directory: /tmp/
 
   ==> Primary Basis <==
 
-  Basis Set: ANONYMOUS92AEAF3C
+  Basis Set: ANONYMOUSDF1A937B
     Blend: 6-31G_2DFP_
     Number of shells: 56
     Number of basis function: 162
@@ -476,7 +477,7 @@ Scratch directory: /tmp/
 
    => Loading Basis Set <=
 
-    Name: (ANONYMOUS92AEAF3C AUX)
+    Name: (ANONYMOUSDF1A937B AUX)
     Role: JKFIT
     Keyword: DF_BASIS_SCF
     atoms 1   entry O          line   318 file /opt/psi/4/master/share/psi4/basis/def2-universal-jkfit.gbs 
@@ -501,7 +502,7 @@ Scratch directory: /tmp/
 
    => Auxiliary Basis Set <=
 
-  Basis Set: (ANONYMOUS92AEAF3C AUX)
+  Basis Set: (ANONYMOUSDF1A937B AUX)
     Blend: DEF2-UNIVERSAL-JKFIT
     Number of shells: 149
     Number of basis function: 449
@@ -532,22 +533,22 @@ Scratch directory: /tmp/
 
                            Total Energy        Delta E     RMS |[F,P]|
 
-   @DF-RKS iter SAD:  -229.70869188124092   -2.29709e+02   0.00000e+00 
-   @DF-RKS iter   1:  -229.80276228418097   -9.40704e-02   5.37355e-03 DIIS
-   @DF-RKS iter   2:  -229.71914775953707    8.36145e-02   6.27366e-03 DIIS
-   @DF-RKS iter   3:  -230.02018673231441   -3.01039e-01   1.41179e-03 DIIS
-   @DF-RKS iter   4:  -230.03270897708794   -1.25222e-02   5.55295e-04 DIIS
-   @DF-RKS iter   5:  -230.03466552449146   -1.95655e-03   1.17708e-04 DIIS
-   @DF-RKS iter   6:  -230.03472008838224   -5.45639e-05   6.27082e-05 DIIS
+   @DF-RKS iter SAD:  -229.70869188124104   -2.29709e+02   0.00000e+00 
+   @DF-RKS iter   1:  -229.80276228418111   -9.40704e-02   5.37355e-03 DIIS
+   @DF-RKS iter   2:  -229.71914775953709    8.36145e-02   6.27366e-03 DIIS
+   @DF-RKS iter   3:  -230.02018673231430   -3.01039e-01   1.41179e-03 DIIS
+   @DF-RKS iter   4:  -230.03270897708785   -1.25222e-02   5.55295e-04 DIIS
+   @DF-RKS iter   5:  -230.03466552449129   -1.95655e-03   1.17708e-04 DIIS
+   @DF-RKS iter   6:  -230.03472008838213   -5.45639e-05   6.27082e-05 DIIS
    @DF-RKS iter   7:  -230.03474407140575   -2.39830e-05   3.23150e-06 DIIS
-   @DF-RKS iter   8:  -230.03474415199267   -8.05869e-08   5.36421e-07 DIIS
-   @DF-RKS iter   9:  -230.03474415344999   -1.45732e-09   3.61577e-07 DIIS
-   @DF-RKS iter  10:  -230.03474415435520   -9.05203e-10   7.99984e-08 DIIS
-   @DF-RKS iter  11:  -230.03474415439536   -4.01599e-11   3.91603e-08 DIIS
-   @DF-RKS iter  12:  -230.03474415440689   -1.15392e-11   1.03509e-08 DIIS
-   @DF-RKS iter  13:  -230.03474415440766   -7.67386e-13   8.53182e-10 DIIS
-   @DF-RKS iter  14:  -230.03474415440803   -3.69482e-13   1.40085e-10 DIIS
-   @DF-RKS iter  15:  -230.03474415440755    4.83169e-13   1.89905e-11 DIIS
+   @DF-RKS iter   8:  -230.03474415199261   -8.05869e-08   5.36421e-07 DIIS
+   @DF-RKS iter   9:  -230.03474415345011   -1.45749e-09   3.61577e-07 DIIS
+   @DF-RKS iter  10:  -230.03474415435537   -9.05260e-10   7.99984e-08 DIIS
+   @DF-RKS iter  11:  -230.03474415439518   -3.98188e-11   3.91603e-08 DIIS
+   @DF-RKS iter  12:  -230.03474415440658   -1.13971e-11   1.03509e-08 DIIS
+   @DF-RKS iter  13:  -230.03474415440778   -1.19371e-12   8.53181e-10 DIIS
+   @DF-RKS iter  14:  -230.03474415440755    2.27374e-13   1.40085e-10 DIIS
+   @DF-RKS iter  15:  -230.03474415440758   -2.84217e-14   1.89908e-11 DIIS
   Energy and wave function converged.
 
 
@@ -620,14 +621,14 @@ Scratch directory: /tmp/
              Ap   App 
     DOCC [    15,    3 ]
 
-  @DF-RKS Final Energy:  -230.03474415440755
+  @DF-RKS Final Energy:  -230.03474415440758
 
    => Energetics <=
 
     Nuclear Repulsion Energy =            160.7639852718251063
-    One-Electron Energy =                -629.3493500449109206
-    Two-Electron Energy =                 264.2772780037906841
-    DFT Exchange-Correlation Energy =     -25.7266573851124285
+    One-Electron Energy =                -629.3493500449114890
+    Two-Electron Energy =                 264.2772780037913094
+    DFT Exchange-Correlation Energy =     -25.7266573851124818
     Empirical Dispersion Energy =           0.0000000000000000
     VV10 Nonlocal Energy =                  0.0000000000000000
     Total Energy =                       -230.0347441544075480
@@ -652,17 +653,17 @@ Properties computed using the SCF density matrix
      X:     0.0081      Y:    -0.5925      Z:     0.0000     Total:     0.5926
 
 
-*** tstop() called on n087 at Sun Nov 14 14:03:52 2021
+*** tstop() called on n049 at Mon Mar 14 18:08:40 2022
 Module time:
-	user time   =      77.42 seconds =       1.29 minutes
-	system time =       1.15 seconds =       0.02 minutes
-	total time  =         20 seconds =       0.33 minutes
+	user time   =      85.11 seconds =       1.42 minutes
+	system time =       1.13 seconds =       0.02 minutes
+	total time  =         22 seconds =       0.37 minutes
 Total time:
-	user time   =      77.42 seconds =       1.29 minutes
-	system time =       1.15 seconds =       0.02 minutes
-	total time  =         20 seconds =       0.33 minutes
-Grab this energy -230.03474415440755
-    Psi4 stopped on: Sunday, 14 November 2021 02:03PM
-    Psi4 wall time for execution: 0:00:20.13
+	user time   =      85.11 seconds =       1.42 minutes
+	system time =       1.13 seconds =       0.02 minutes
+	total time  =         22 seconds =       0.37 minutes
+Grab this energy -230.03474415440758
+    Psi4 stopped on: Monday, 14 March 2022 06:08PM
+    Psi4 wall time for execution: 0:00:22.12
 
 *** Psi4 exiting successfully. Buy a developer a beer!
