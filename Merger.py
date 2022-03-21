@@ -50,7 +50,7 @@ class Merger(object):
         self.options = options_obj 
         self.cma1_path = cma1_path
     #function that returns diagonal fc matrix + n-largest off-diagonal elements
-    def run(self,opts, Proj):
+    def run(self, opts, Proj, energy_regex=None, success_regex=None):
 
         print("You have imported the merger script!")
         
@@ -69,7 +69,7 @@ class Merger(object):
         self.Proj = Proj 
         options = opts 
         #options = options_obj
-        
+        options.cart_insert_init = 9
         rootdir = os.getcwd()
         zmat_obj = Zmat(options)
         zmat_obj.run()
@@ -117,6 +117,8 @@ class Merger(object):
 
             os.chdir(os.getcwd() + self.cma1_path)
             if os.path.exists(os.getcwd() + "/fc_int.dat"):
+                if os.path.exists(os.getcwd()+'/DispsInit'):
+                    shutil.rmtree("DispsInit")
                 f_read_obj = FcRead("fc_int.dat")
                 f_read_obj.run()
                 # indices = np.triu_indices(len(s_vec.proj.T))
@@ -166,8 +168,10 @@ class Merger(object):
                 prog_name_init = prog_init.split("@")[0]
 
                 if options.calc_init:
-                    print("We don't want to compute anything here, change your calc_init keyword to false.")
-                    raise RuntimeError
+                    # print("We don't want to compute anything here, change your calc_init keyword to false.")
+                    # raise RuntimeError
+                    if os.path.exists(os.getcwd()+'/DispsInit'):
+                        shutil.rmtree("DispsInit")
                     dir_obj_init = DirectoryTree(
                         prog_name_init,
                         zmat_obj,
@@ -181,9 +185,12 @@ class Merger(object):
                         "DispsInit",
                     )
                     dir_obj_init.run()
-                    os.chdir(rootdir + "/DispsInit")
+                    # print(os.getcwd())
+                    # raise RuntimeError
+                    # os.chdir(rootdir + "/DispsInit")
                     disp_list = []
-                    for i in os.listdir(rootdir + "/DispsInit"):
+                    # for i in os.listdir(rootdir + "/DispsInit"):
+                    for i in os.listdir(os.getcwd()):
                         disp_list.append(i)
 
                     if options.cluster != "sapelo":
@@ -225,29 +232,34 @@ class Merger(object):
                     options.energy_regex_init,
                     options.success_regex_init,
                 )
-                if os.path.exists(os.getcwd() + '/auxiliary'):
-                    with open("auxiliary", "r") as file:
-                        energies = json.load(file)
-                    os.chdir('..')
-                    ref_en_init = energies[0]
-                    size = len(reap_obj_init.eigs)
-                    p_en_array = np.zeros((size, size))
-                    m_en_array = np.zeros((size, size))
-                    for i in range(len(indices)):
-                        j, k = indices[i][0], indices[i][1]
-                        p_en_array[j, k] = energies[2*i+1]
-                        m_en_array[j, k] = energies[2*i+2]
-                    reap_obj_init.ref_en = ref_en_init
-                    reap_obj_init.p_en_array = p_en_array
-                    reap_obj_init.m_en_array = m_en_array
-                else:
-                    reap_obj_init.energy_regex = "Grab this energy (\-\d+\.\d+)"
-                    reap_obj_init.success_regex = "beer"
-                    reap_obj_init.options.dir_reap = False
-                    # os.chdir(rootdir + "/DispsInit")
+                reap_obj_init.energy_regex = energy_regex
+                reap_obj_init.success_regex = success_regex
+                # if os.path.exists(os.getcwd() + '/auxiliary'):
+                    # with open("auxiliary", "r") as file:
+                        # energies = json.load(file)
+                    # os.chdir('..')
+                    # ref_en_init = energies[0]
+                    # size = len(reap_obj_init.eigs)
+                    # p_en_array = np.zeros((size, size))
+                    # m_en_array = np.zeros((size, size))
+                    # for i in range(len(indices)):
+                        # j, k = indices[i][0], indices[i][1]
+                        # p_en_array[j, k] = energies[2*i+1]
+                        # m_en_array[j, k] = energies[2*i+2]
+                    # reap_obj_init.ref_en = ref_en_init
+                    # reap_obj_init.p_en_array = p_en_array
+                    # reap_obj_init.m_en_array = m_en_array
+                # elif options.calc_init:
+                if options.calc_init:
+                    # print(os.getcwd())
+                    # raise RuntimeError
                     reap_obj_init.run()
-                if os.path.exists(os.getcwd() + '/auxiliary'):
-                    shutil.move(os.getcwd() + '/auxiliary', os.getcwd()+'/..' + self.cma1_path +'/auxiliary')
+                    os.chdir("..")
+                else:
+                    reap_obj_init.options.dir_reap = False
+                    reap_obj_init.run()
+                # if os.path.exists(os.getcwd() + '/auxiliary'):
+                    # shutil.move(os.getcwd() + '/auxiliary', os.getcwd()+'/..' + self.cma1_path +'/auxiliary')
                 
 
                 # nate
@@ -280,7 +292,7 @@ class Merger(object):
                 shutil.move(os.getcwd() + '/fc_int.dat', os.getcwd()+'/..' + self.cma1_path +'/fc_int.dat')
 
                 # if os.path.exists(os.getcwd() + '/auxiliary'):
-                print(os.getcwd())
+                # print(os.getcwd())
                 # raise RuntimeError
                 os.chdir("..")
         

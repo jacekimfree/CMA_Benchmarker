@@ -25,8 +25,11 @@ np.set_printoptions(precision=4)
 # High and low levels of theory
 # Available: "CCSD_T_TZ", "CCSD_T_DZ", "B3LYP_6-31G_2df,p_"
 h_theory = ["CCSD_T_TZ"]
-# l_theory = ["CCSD_T_DZ", "B3LYP_6-31G_2df,p_"]
-l_theory = ["B3LYP_6-31G_2df,p_"]
+l_theory = ["CCSD_T_DZ", "B3LYP_6-31G_2df,p_"]
+# cma1_energy_regexes = ["\(T\) total energy\s+(\-\d+\.\d+)","Grab this energy (\-\d+\.\d+)"]
+cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)","Grab this energy (\-\d+\.\d+)"]
+cma1_success_regexes = ["Variable memory released","beer"]
+# l_theory = ["B3LYP_6-31G_2df,p_"]
 combos = list(product(h_theory,l_theory))
 
 # Coordinates types to use
@@ -180,10 +183,9 @@ def execute():
             print("////////////////////////////////////////////")
             print(f"//{basename:^40}//")
             print("////////////////////////////////////////////")
-
+            countt = 0
             # Run CMA for each combination of theory
             for combo in combos:
-
                 # Grab geometry information 
                 mol.get_geoms(combo)
                 if not mol.direc_complete:
@@ -333,12 +335,18 @@ def execute():
                             # Import Merger
                             from Merger import Merger
                             execMerger = Merger(cma1_path= "/" + combo[0]+"/Disps_" + combo[1])
+                            # print(os.getcwd())
+                            # raise RuntimeError
+                            if os.path.exists(os.getcwd() + "/" + combo[0]+"/Disps_" + combo[1] + "/templateInit.dat"):
+                                execMerger.options.calc_init = True
+                                # shutil.copy(os.getcwd() + "/" + combo[0]+"/Disps_" + combo[1] + "/templateInit.dat",os.getcwd() + "/" + combo[0]+ "/templateInit.dat")
                             execMerger.options.man_proj = False
                             execMerger.options.coords = coord
                             execMerger.options.n_cma2 = n
                             execMerger.options.off_diag = off_diag_bands
                             Proj = None
-                            execMerger.run(execMerger.options,Proj)
+                            # print(cma1_energy_regexes)
+                            execMerger.run(execMerger.options,Proj,energy_regex=cma1_energy_regexes[countt],success_regex=cma1_success_regexes[countt])
                             # raise RuntimeError
                             # Run the thing
                             #execMerger.run(execMerger.options, Proj)
@@ -391,6 +399,7 @@ def execute():
 
                             del execMerger
                             del Merger
+                countt += 1
 
             # end of combo loop
             if mol.direc_complete: 
@@ -404,6 +413,7 @@ def execute():
                     os.remove("zmat")
                     os.remove("zmat2")
                     os.remove("fc2.dat")
+                    os.remove("templateInit.dat")
                 except:
                     print('These are not the files you are looking for') 
                 
