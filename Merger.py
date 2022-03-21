@@ -318,6 +318,7 @@ class Merger(object):
             False
         )
         init_GF.run()
+        self.ref_init = init_GF.freq
         
         # Now for the TED check.
         G = np.dot(np.dot(LA.inv(init_GF.L), g_mat.G), LA.inv(init_GF.L).T)

@@ -13,6 +13,7 @@ import re
 from itertools import product
 
 from Molecule import Molecule
+from SI_stuff import header, footer
 
 pd.set_option("display.max_columns", 15)
 
@@ -88,7 +89,6 @@ def return_path_base(jobpath):
     name = os.path.basename(os.path.normpath(jobpath)) 
     return name
 
-
 # ====================================
 # Print out information about database
 # ====================================
@@ -149,6 +149,10 @@ frame = []
 if n > 0:
     frame2 = []
 
+# Start SI file or clears contents
+if SI:
+    si = open("SI.tex", "w")
+    si.write(header)
 
 # ============
 # Do the thing
@@ -249,6 +253,8 @@ def execute():
                         if coord_type.index(coord) == 0:
                             d[f'Ref ({combo[0]})'] = execMerger.reference_freq
                             mol.freqs[f'Ref ({combo[0]})'] = execMerger.reference_freq
+                            d[f'Ref ({combo[1]})'] = execMerger.ref_init
+                            mol.freqs[f'Ref ({combo[1]})'] = execMerger.ref_init
                             
                             # Number the modes
                             d['Molecule'] = [f"{mol.name} ({mol.ID}) mode {i+1}" for i in range(len(execMerger.reference_freq))]
@@ -392,6 +398,8 @@ def execute():
             if mol.direc_complete: 
                 # Print molecule information
                 mol.run()
+                if SI:
+                    si.write(mol.build_latex_output())
                 
                 # Clean up job directory
                 if not cma1:
@@ -447,5 +455,8 @@ if csv:
 #
 #workbook.close()
 
-
+# Ends SI file 
+if SI:
+    si.write(footer)
+    si.close()
 

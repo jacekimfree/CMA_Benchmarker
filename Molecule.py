@@ -53,23 +53,26 @@ class Molecule(object):
             if nic[0] > 1:
                 print(f"{i+1:2}    1/\u221a{nic[0]}[", end='')
                 for j, term in enumerate(nic[1:]):
+                    out = term[1].coord_out
                     if j == 0:
-                        if term[0] == 1.0:
-                            print(term[1], end='')
+                        if term[0] == 1:
+                            print(out, end='')
+                        elif term[0] == -1:
+                            print(f"-{out}", end='')
                         else:
-                            print(f"{int(term[0])}{term[1]}", end='')
+                            print(f"{term[0]}{out}", end='')
                         continue
                     if term[0] > 0:
                         sign = "+"
                     else:
                         sign = "-"
-                    if abs(term[0]) == 1.0:
-                        print(f" {sign} {term[1]}", end='')
+                    if abs(term[0]) == 1:
+                        print(f" {sign} {out}", end='')
                     else:
-                        print(f" {sign} {int(abs(term[0]))}{term[1]}", end='')
+                        print(f" {sign} {abs(term[0])}{out}", end='')
                 print("]")
             else:
-                print(f"{i+1:2}    {nic[1][1]}")
+                print(f"{i+1:2}    {nic[1][1].coord_out}")
         print()
         
         # TED
@@ -146,66 +149,176 @@ class Molecule(object):
 
         # Format zmat to be more readable
         for i, coord in enumerate(zmat):
-            # Bond distances
-            if len(coord) == 2:
-                zmat[i] = f"r({ coord[0] },{ coord[1] })"
-            # Bond angles
-            if len(coord) == 3:
-                zmat[i] = f"\u03b8({ coord[0] },{ coord[1] },{ coord[2] })"
-            if len(coord) == 5:
-                # Torsions
-                if coord[-1] == "T":
-                    zmat[i] = f"\u03c4({ coord[0] },{ coord[1] },{ coord[2] },{ coord[3] })"
-                # Out of plane angles
-                if coord[-1] == "O":
-                    zmat[i] = f"\u03b3({ coord[0] },{ coord[1] },{ coord[2] },{ coord[3] })"
-                # Linear bends
-                if coord[-1] == "L":
-                    zmat[i] = f"\u03b8({ coord[0] },{ coord[1] },{ coord[2] },{ coord[3] })"
-                # Linx bends
-                if coord[-1] == "Lx":
-                    zmat[i] = f"\u03b8x({ coord[0] },{ coord[1] },{ coord[2] },{ coord[3] })"
-                # Liny bends
-                if coord[-1] == "Ly":
-                    zmat[i] = f"\u03b8y({ coord[0] },{ coord[1] },{ coord[2] },{ coord[3] })"
+            zmat[i] = ZCoord(coord)
         
         # Combine proj and zmat 
         nics = []
         for coord in self.proj.T:
-            tmp = coord/np.abs(coord)[coord>0].min()
+            tmp = coord/np.abs(coord)[coord!=0].min()
             tmp = np.rint(tmp)
             nic = [int(np.sum(np.square(tmp)))]
             for i, coeff in enumerate(tmp):
-                if abs(coeff) >= 1:
-                    nic.append((coeff, zmat[i]))
+                if abs(coeff) > 0:
+                    nic.append((int(coeff), zmat[i]))
             nics.append(nic)
 
         self.nics = nics
 
+    def build_latex_output(self):
+        txt = f"\\subsection{{\\ce{{{self.name}}}}}\n\n"
 
-        # Generate NIC representaions
-        # for i, coord in enumerate(zmat):
-        #     # Bond distances
-        #     if len(coord) == 2:
-        #         zmat[i] = f"r_{{{ coord[0] },{ coord[1] }}}"
-        #     # Bond angles
-        #     if len(coord) == 3:
-        #         zmat[i] = f"\\theta_{{{ coord[0] },{ coord[1] },{ coord[2] }}}"
-        #     if len(coord) == 5:
-        #         # Torsions
-        #         if coord[-1] == "T":
-        #             zmat[i] = f"\\tau_{{{ coord[0] },{ coord[1] },{ coord[2] },{ coord[3] }}}"
-        #         # Out of plane angles
-        #         if coord[-1] == "O":
-        #             zmat[i] = f"\gamma_{{{ coord[0] },{ coord[1] },{ coord[2] },{ coord[3] }}}"
-        #         # Linear bends
-        #         if coord[-1] == "L":
-        #             zmat[i] = f"\\theta_{{{ coord[0] },{ coord[1] },{ coord[2] },{ coord[3] }}}"
-        #         # Linx bends
-        #         if coord[-1] == "Lx":
-        #             zmat[i] = f"\\theta_{{{ coord[0] },{ coord[1] },{ coord[2] },{ coord[3] }}}"
-        #         # Liny bends
-        #         if coord[-1] == "Ly":
-        #             zmat[i] = f"\\theta_{{{ coord[0] },{ coord[1] },{ coord[2] },{ coord[3] }}}"
-        # print(*zmat)
+        # Geometries
+        txt += ("\\begin{table}[h!]\n"
+                "\\subsubsection*{Geometries}\n\n"
+                "\\begin{multicols}{2}\n"
+                "\\centering\n\n") 
+        for i, g in enumerate(self.geoms):
+
+            if g == "CCSD_T_TZ":
+                caption = "CCSD(T)/cc-pVTZ"
+            elif g == "CCSD_T_DZ":
+                caption = "CCSD(T)/cc-pVDZ"
+            elif g == "B3LYP_6-31G_2df,p_":
+                caption = "B3LYP/6-31G(2df,p)"
+            else:
+                caption = g
+    
+            txt += (f"\\caption{{{caption} Cartesian Coordinates (Bohr)}}\n"
+                     "\\begin{tabular}{llrrr}\n"
+                     "\\hline\n")
+            for j, line in enumerate(self.geoms[g]):
+                txt += f"  {j+1:<2} & {line[0]:<2} & ${float(line[1]):>11.8f}$ & ${float(line[2]):>11.8f}$ & ${float(line[3]):>11.8f}$ \\\\\n"
+            txt += ("\\hline\n"
+                    "\\end{tabular}\n\n")
+            if i%2 == 1:
+                txt += ("\\end{multicols}\n"
+                        "\\end{table}\n\n"
+                        "\\begin{table}[h]\n")
+                if i < len(self.geoms)-2:
+                    txt += ("\\begin{multicols}{2}\n")
+                txt += "\\centering\n"
+        
+        txt += "\\end{table}\n\n"
+
+        # Frequencies
+        txt += ("\\begin{table}[h!]\n"
+                "\\subsubsection*{Frequencies}\n\n"
+                "\\centering\n"
+                "\\caption{Harmonic frequencies for reference and CMA0 data.}")
+        
+        labels = [("Reference","CCSD(T)/","cc-pVTZ")]
+        for key in self.freqs:
+            if key == "Ref (CCSD_T_DZ)":
+                labels.append(("Reference","CCSD(T)/","cc-pVDZ"))
+            if key == "Ref (B3LYP_6-31G_2df,p_)":
+                labels.append(("Reference","B3LYP/","6-31G(2df,p)"))
+            if key == "Natty (CCSD_T_DZ)":
+                labels.append(("CMA0","NICs","TZ/DZ"))
+            if key == "Red (CCSD_T_DZ)":
+                labels.append(("CMA0"," Redundant","TZ/DZ"))
+            if key == "Natty (B3LYP_6-31G_2df,p_)":
+                labels.append(("CMA0","NICs","TZ/DFT"))
+            if key == "Red (B3LYP_6-31G_2df,p_)":
+                labels.append(("CMA0","Redundant","TZ/DFT"))
+        ind = pd.MultiIndex.from_tuples(labels)       
+        fdf = pd.DataFrame(data=self.freqs)
+        fdf.columns = ind
+        fdf.index += 1
+
+        txt += fdf.to_latex(float_format="%.2f",column_format="c"*(len(self.freqs)+1),multicolumn_format="c")
+        txt += "\\end{table}\n\n"
+
+        # Nattys
+        tmp = ""
+        l = 0
+        for i, nic in enumerate(self.nics):
+            if len(nic) > l:
+                l = len(nic)
+            tmp += f"  {i+1:<3}"
+            for j, term in enumerate(nic[1:]):
+                out = term[1].latex_out
+                if j == 0:
+                    if term[0] == 1:
+                        tmp += f" & ${out}"
+                    elif term[0] == -1:
+                        tmp += f" & $-{out}"
+                    else:
+                        tmp += f" & ${term[0]}{out}"
+                    continue
+                if term[0] > 0:
+                    sign = "+"
+                else:
+                    sign = "-"
+                if abs(term[0]) == 1:
+                    tmp += f" {sign} {out}"
+                else:
+                    tmp += f" {sign} {abs(term[0])}{out}"
+            tmp += "$ \\\\\n"
+
+        if l > 9:
+            txt += "\\begin{landscape}\n"
+
+        txt += ("\\begin{table}[h!]\n"
+                "\\subsubsection*{Natural Internal Coordinates}\n\n"
+                "\\centering\n"
+               f"\\caption{{Natural internal coordinates for \\ce{{{self.name}}}.}}\n"
+                "\\begin{tabular}{ll}\n"
+                "\\toprule\n")
+
+        txt += tmp
+
+        txt += ("\\bottomrule\n"
+                "\\end{tabular}\n"
+                "\\end{table}\n\n")
+
+        if l > 9:
+            txt += "\\end{landscape}\n\n"
+        
+        # TED
+
+        txt += "\\clearpage\n\n"
+
+        return txt
+
+class ZCoord(object):
+    '''
+    Easy formating and output for zmat coordinates because they are annoying
+    '''
+
+    def __init__(self,ind):
+        # Identify coordinate type
+        if len(ind) == 2:
+            self.ind = ",".join(ind)
+            self.coord_out = f"r({self.ind})"
+            self.latex_out = f"r_{{{self.ind}}}"
+        if len(ind) == 3:
+            self.ind = ",".join(ind)
+            self.coord_out = f"\u03b8({self.ind})"
+            self.latex_out = f"\\theta_{{{self.ind}}}"
+        if len(ind) == 5:
+            if ind[-1] == "T":
+                self.ind = ",".join(ind[:-1])
+                self.coord_out = f"\u03c4({self.ind})"
+                self.latex_out = f"\\tau_{{{self.ind}}}"
+            # Out of plane angles
+            if ind[-1] == "O":
+                self.ind = ",".join(ind[:-1])
+                self.coord_out = f"\u03b3({self.ind})"
+                self.latex_out = f"\\gamma_{{{self.ind}}}"
+            # Linear bends
+            if ind[-1] == "L":
+                self.ind = ",".join(ind[:-1])
+                self.coord_out = f"\u03b8({self.ind})"
+                self.latex_out = f"\\theta_{{{self.ind}}}"
+            # Linx bends
+            if ind[-1] == "Lx":
+                self.ind = ",".join(ind[:-1])
+                self.coord_out = f"\u03b8x({self.ind})"
+                self.latex_out = f"\\theta x_{{{self.ind}}}"
+            # Liny bends
+            if ind[-1] == "Ly":
+                self.ind = ",".join(ind[:-1])
+                self.coord_out = f"\u03b8y({self.ind})"
+                self.latex_out = f"\\theta y_{{{self.ind}}}"
+
 
