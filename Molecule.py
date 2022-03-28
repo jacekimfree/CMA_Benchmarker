@@ -14,6 +14,10 @@ class Molecule(object):
         info = re.search(r"/(\d*)_.*/(\d*)_(.*)/", job)
         self.ID = f"{info.group(1)}.{info.group(2)}"
         self.name = info.group(3)
+        if info.group(1) == "1":
+            self.section = "\\section{Closed Shell}\n\n"
+        elif info.group(1) == "2":
+            self.section = "\\section{Open Shell}\n\n"
         self.geoms = {}
         self.freqs = {}
         self.ted = {}
@@ -169,27 +173,27 @@ class Molecule(object):
 
         # Geometries
         txt += ("\\begin{table}[h!]\n"
-                "\\subsubsection*{Geometries}\n\n"
+                "\\subsubsection*{Geometries}\n"
                 "\\begin{multicols}{2}\n"
-                "\\centering\n\n") 
+                "\\centering\n") 
         for i, g in enumerate(self.geoms):
 
             if g == "CCSD_T_TZ":
-                caption = "CCSD(T)/cc-pVTZ"
+                cap = "CCSD(T)/cc-pVTZ"
             elif g == "CCSD_T_DZ":
-                caption = "CCSD(T)/cc-pVDZ"
+                cap = "CCSD(T)/cc-pVDZ"
             elif g == "B3LYP_6-31G_2df,p_":
-                caption = "B3LYP/6-31G(2df,p)"
+                cap = "B3LYP/6-31G(2df,p)"
             else:
-                caption = g
+                cap = g
     
-            txt += (f"\\caption{{{caption} Cartesian Coordinates (Bohr)}}\n"
+            txt += (f"\\caption{{{cap} Cartesian Coordinates (Bohr)}}\n"
                      "\\begin{tabular}{llrrr}\n"
-                     "\\hline\n")
+                     "\\toprule\n")
             for j, line in enumerate(self.geoms[g]):
-                txt += f"  {j+1:<2} & {line[0]:<2} & ${float(line[1]):>11.8f}$ & ${float(line[2]):>11.8f}$ & ${float(line[3]):>11.8f}$ \\\\\n"
-            txt += ("\\hline\n"
-                    "\\end{tabular}\n\n")
+                txt += f"{j+1:<2} & {line[0]:<2} & ${float(line[1]):>11.8f}$ & ${float(line[2]):>11.8f}$ & ${float(line[3]):>11.8f}$ \\\\\n"
+            txt += ("\\bottomrule\n"
+                    "\\end{tabular}\n")
             if i%2 == 1:
                 txt += ("\\end{multicols}\n"
                         "\\end{table}\n\n"
@@ -202,9 +206,8 @@ class Molecule(object):
 
         # Frequencies
         txt += ("\\begin{table}[h!]\n"
-                "\\subsubsection*{Frequencies}\n\n"
-                "\\centering\n"
-                "\\caption{Harmonic frequencies for reference and CMA0 data.}")
+                "\\subsubsection*{Frequencies}\n"
+                "\\centering\n")
         
         labels = [("Reference","CCSD(T)/","cc-pVTZ")]
         for key in self.freqs:
@@ -225,15 +228,13 @@ class Molecule(object):
         fdf.columns = ind
         fdf.index += 1
 
+        txt += "\\caption{Harmonic frequencies for reference and CMA0 data.}\n"
         txt += fdf.to_latex(float_format="%.2f",column_format="c"*(len(self.freqs)+1),multicolumn_format="c")
         txt += "\\end{table}\n\n"
 
         # Nattys
         tmp = ""
-        l = 0
         for i, nic in enumerate(self.nics):
-            if len(nic) > l:
-                l = len(nic)
             tmp += f"  {i+1:<3}"
             for j, term in enumerate(nic[1:]):
                 out = term[1].latex_out
@@ -253,16 +254,20 @@ class Molecule(object):
                     tmp += f" {sign} {out}"
                 else:
                     tmp += f" {sign} {abs(term[0])}{out}"
+                if (j % 10) + 1 == 10:
+                    tmp += ("$ \\\\\n"
+                            " & $")
             tmp += "$ \\\\\n"
 
-        if l > 9:
-            txt += "\\begin{landscape}\n"
-
         txt += ("\\begin{table}[h!]\n"
-                "\\subsubsection*{Natural Internal Coordinates}\n\n"
+                "\\subsubsection*{Natural Internal Coordinates}\n"
                 "\\centering\n"
-               f"\\caption{{Natural internal coordinates for \\ce{{{self.name}}}.}}\n"
-                "\\begin{tabular}{ll}\n"
+               f"\\caption{{Natural internal coordinates for \\ce{{{self.name}}}.}}\n")
+
+        if len(tmp) >= 40:
+            txt += "\\small\n"
+
+        txt += ("\\begin{tabular}{ll}\n"
                 "\\toprule\n")
 
         txt += tmp
@@ -271,13 +276,25 @@ class Molecule(object):
                 "\\end{tabular}\n"
                 "\\end{table}\n\n")
 
-        if l > 9:
-            txt += "\\end{landscape}\n\n"
-        
         # TED
+        txt += ("\\begin{table}\n"
+                "\\subsection*{Total Energy Distribution}\n"
+                "\\centering")
+
+        for ted in self.ted:
+            if ted[1] == "CCSD_T_DZ":
+                l = "CCSD(T)/cc-pVDZ"
+            elif ted[1] == "B3LYP_6-31G_2df,p_":
+                l = "B3LYLP/6-31G(2df,p)"
+            txt += f"\\caption{{Total energy distribution for CCSD(T)/cc-pVTZ frequencies on the {l} modes.}}\n"
+            tdf = pd.DataFrame(data=self.ted[ted])
+            tdf.columns = [f"{i:.1f}" for i in self.freqs[f"Natty ({ted[1]})"]]
+            tdf.index += 1
+            txt += tdf.to_latex(float_format="%.1f", column_format="l"+"r"*len(tdf.columns))
+
+        txt += "\\end{table}\n\n"
 
         txt += "\\clearpage\n\n"
-
         return txt
 
 class ZCoord(object):
