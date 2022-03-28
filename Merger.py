@@ -419,10 +419,10 @@ class Merger(object):
             F = fc_init.FC
         # redundant basis 
         G = np.dot(np.dot(TED_obj.proj.T,G),TED_obj.proj)
-        #G = np.dot(np.dot(eig_inv, G), eig_inv.T)
+        G = np.dot(np.dot(eig_inv, G), eig_inv.T)
         # G[np.abs(G) < options.tol] = 0
         F = np.dot(np.dot(TED_obj.proj.T,F),TED_obj.proj)
-        #F = np.dot(np.dot(inv(eig_inv).T, F), inv(eig_inv))
+        F = np.dot(np.dot(inv(eig_inv).T, F), inv(eig_inv))
         #We shouldn't be zeroing out parts of the FC matrix just because they're small
         #F[np.abs(F) < options.tol] = 0
          
@@ -437,6 +437,35 @@ class Merger(object):
         )
         init_GF.run()
         self.ted = init_GF.ted.TED      # TED matrix
+        
+        m = 2 
+        var = 0.95 
+        
+        def checkted(ted):
+            temps = []
+            for i in range(0,np.shape(ted)[0]):
+                ted_slice = ted[:,i] 
+                temp = copy.copy(ted_slice)
+                for j in range(0,m):
+                    largest = np.argmax(temp)
+                    if temp[largest] < 0.9:
+                        print('not big enough')
+                    print('largest')
+                    print(largest,temp[largest])
+                    temps.append([i,largest])
+                    temp[largest] = 0
+                    print('another')
+                    print(temp)
+            return temps
+        print('is this the ted im looking for?')
+        ted_breakdown = init_GF.ted_breakdown
+        print(ted_breakdown)  
+        
+        #temps = checkted(ted_breakdown) 
+        
+        #print('temps')
+        #print(temps)
+        
         #print('frequencies???')
         self.reference_freq = init_GF.freq 
         #for diagnostic 
@@ -446,20 +475,20 @@ class Merger(object):
             L_A = init_GF.L
          
         #L tensor tempering to normal mode basis
-        G = np.dot(np.dot(eig_inv, G), eig_inv.T)
-        F = np.dot(np.dot(inv(eig_inv).T, F), inv(eig_inv))
+        #$G = np.dot(np.dot(eig_inv, G), eig_inv.T)
+        #$F = np.dot(np.dot(inv(eig_inv).T, F), inv(eig_inv))
         
-        def n_largest(n, FC):
-            indexes = []
-            upper_triang = abs(np.triu(FC,n))
-            #upper_triang = np.triu(FC,n)
-            for i in range(0,n):
-                fc_cma2 = np.where(upper_triang == upper_triang.max())
-                index = [fc_cma2[0][0], fc_cma2[1][0]]
-                indexes.append(index)
-                upper_triang[index[0],index[1]] = 0
-            print(indexes)
-            return indexes
+        #def n_largest(n, FC):
+        #    indexes = []
+        #    upper_triang = abs(np.triu(FC,n))
+        #    #upper_triang = np.triu(FC,n)
+        #    for i in range(0,n):
+        #        fc_cma2 = np.where(upper_triang == upper_triang.max())
+        #        index = [fc_cma2[0][0], fc_cma2[1][0]]
+        #        indexes.append(index)
+        #        upper_triang[index[0],index[1]] = 0
+        #    print(indexes)
+        #    return indexes
         
         print("Full Force constant matrix in lower level normal mode basis:")
         print(F)
@@ -540,6 +569,18 @@ class Merger(object):
                 print(temp)
             else:
                 extras = n_largest(self.options.n_cma2, np.abs(copy.copy(F)))
+                #91_ccsd extras = [[4,5],[10,11],[14,16]] 
+                #72_ccsd extras = [[4,5]]
+                #90_ccsd extras = [[15,17]]
+                #2.16_ccsd extras = [[7,9],[8,9]]
+                #10_ccsd extras = [[12,15]]
+                #82_ccsd extras = [[14,15]]
+                #70_ccsd extras = [[10,11],[0,1]]
+                #85_ccsd extras = [[1,4],[3,5]]
+                #extras = [[17,19]]
+                #extras = [[0,2]]
+                print('extras')
+                print(extras)
                 temp = copy.copy(Fdiag)
                 for z, extra in enumerate(extras):
                     element = F[extra[0], extra[1]] 
