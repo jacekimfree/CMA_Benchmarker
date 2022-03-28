@@ -13,7 +13,7 @@ import re
 from itertools import product
 
 from Molecule import Molecule
-from SI_stuff import header, footer
+from SI_stuff import *
 
 pd.set_option("display.max_columns", 15)
 
@@ -38,7 +38,7 @@ coord_type = ["Nattys", "Redundant"]
 
 # Specify paths to grab data from
 # Options: '/1_Closed_Shell', '/1_Linear', '/1*', '/2_Open_Shell', '/2_Linear', '/2*'
-paths = ['/2*']
+paths = ['/1*','/2*']
 
 # Various output control statements
 n = 0                   # Number of CMA2 corrections (n = 0 -> CMA0)
@@ -211,6 +211,7 @@ if n > 0:
 if SI:
     si = open("SI.tex", "w")
     si.write(header)
+section = ""
 
 # ============
 # Do the thing
@@ -420,7 +421,7 @@ def execute():
                             print(d['Molecule'])
                         
                         if coord == "Nattys":
-                            mol.ted[combo[1]] = execMerger.ted
+                            mol.ted[combo] = execMerger.ted
                             d[f'Natty ({combo[1]})'] = execMerger.Freq_custom
                             d[f'Ref - Nat ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_custom)
                             mol.freqs[f'Natty ({combo[1]})'] = execMerger.Freq_custom
@@ -456,6 +457,7 @@ def execute():
                         del Merger
             countt += 1
 
+<<<<<<< Updated upstream
         # end of combo loop
         if mol.direc_complete: 
             # Print molecule information

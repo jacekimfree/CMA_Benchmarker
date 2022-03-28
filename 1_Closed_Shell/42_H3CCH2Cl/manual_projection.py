@@ -32,7 +32,7 @@ class Projection(object):
         CH_str2 = normalize(np.array([
         [1, 1],
         [1,-1],
-        ).T) 
+        ]).T) 
 
         HA_ang = np.eye(1)
 
