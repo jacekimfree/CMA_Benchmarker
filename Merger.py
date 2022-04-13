@@ -50,7 +50,7 @@ class Merger(object):
         self.options = options_obj 
         self.cma1_path = cma1_path
     #function that returns diagonal fc matrix + n-largest off-diagonal elements
-    def run(self, opts, Proj, energy_regex=None, success_regex=None):
+    def run(self, opts, Proj, energy_regex=None, success_regex=None, cma1_coord=None):
 
         print("You have imported the merger script!")
         
@@ -69,7 +69,7 @@ class Merger(object):
         self.Proj = Proj 
         options = opts 
         #options = options_obj
-        options.cart_insert_init = 9
+        # options.cart_insert_init = 9
         rootdir = os.getcwd()
         zmat_obj = Zmat(options)
         zmat_obj.run()
@@ -114,12 +114,15 @@ class Merger(object):
             f_read_obj = FcRead("FCMFINAL")
         else:
             init_bool = True
+            if cma1_coord == None:
+                print("You need to specify the cma1_coord variable for this feature. Check execMerger.run()")
+                raise RuntimeError
 
             os.chdir(os.getcwd() + self.cma1_path)
-            if os.path.exists(os.getcwd() + "/fc_int.dat"):
+            if os.path.exists(os.getcwd() + "/fc_int_"+cma1_coord+".dat"):
                 if os.path.exists(os.getcwd()+'/DispsInit'):
                     shutil.rmtree("DispsInit")
-                f_read_obj = FcRead("fc_int.dat")
+                f_read_obj = FcRead("fc_int_"+cma1_coord+".dat")
                 f_read_obj.run()
                 # indices = np.triu_indices(len(s_vec.proj.T))
                 # indices = np.array(indices).T
@@ -148,9 +151,12 @@ class Merger(object):
                 os.chdir('..')
             else:
                 # First generate displacements in internal coordinates
-                indices = np.triu_indices(len(s_vec.proj.T))
-                indices = np.array(indices).T
                 eigs_init = np.eye(len(s_vec.proj.T))
+                if not self.options.deriv_level:
+                    indices = np.triu_indices(len(s_vec.proj.T))
+                    indices = np.array(indices).T
+                else:
+                    indices = np.arange(len(eigs_init))
 
                 init_disp = TransDisp(
                     s_vec,
@@ -162,6 +168,7 @@ class Merger(object):
                     TED_obj,
                     options,
                     indices,
+                    deriv_level = self.options.deriv_level
                 )
                 init_disp.run()
                 prog_init = options.program_init
@@ -183,6 +190,7 @@ class Merger(object):
                         indices,
                         "templateInit.dat",
                         "DispsInit",
+                        deriv_level = self.options.deriv_level
                     )
                     dir_obj_init.run()
                     # print(os.getcwd())
@@ -231,6 +239,7 @@ class Merger(object):
                     indices,
                     options.energy_regex_init,
                     options.success_regex_init,
+                    deriv_level = self.options.deriv_level
                 )
                 reap_obj_init.energy_regex = energy_regex
                 reap_obj_init.success_regex = success_regex
@@ -263,17 +272,37 @@ class Merger(object):
                 
 
                 # nate
-                p_en_array_init = reap_obj_init.p_en_array
-                m_en_array_init = reap_obj_init.m_en_array
-                ref_en_init = reap_obj_init.ref_en
+                if not self.options.deriv_level:
+                    p_array_init = reap_obj_init.p_en_array
+                    m_array_init = reap_obj_init.m_en_array
+                    ref_en_init = reap_obj_init.ref_en
+                else:
+                    cart_p_array_init = reap_obj_init.p_grad_array
+                    cart_m_array_init = reap_obj_init.m_grad_array
+                    p_array_init = np.zeros(np.eye(len(eigs_init)).shape)
+                    m_array_init = np.zeros(np.eye(len(eigs_init)).shape)
+                    ref_en_init = None
+                    # Need to convert this array here from cartesians to internals using projected A-tensor
+                    for i in indices:
+                        grad_s_vec = SVectors(
+                            zmat_obj, self.options, zmat_obj.variable_dictionary_init
+                        )
+                        grad_s_vec.run(init_disp.p_disp[i],False)
+                        A_proj = np.dot(LA.pinv(grad_s_vec.B),TED_obj.proj)
+                        p_array_init[i] = np.dot(cart_p_array_init[i].T,A_proj)
+                        grad_s_vec.run(init_disp.m_disp[i],False)
+                        A_proj = np.dot(LA.pinv(grad_s_vec.B),TED_obj.proj)
+                        m_array_init[i] = np.dot(cart_m_array_init[i].T,A_proj)
+                    
 
                 fc_init = ForceConstant(
                     init_disp,
-                    p_en_array_init,
-                    m_en_array_init,
+                    p_array_init,
+                    m_array_init,
                     ref_en_init,
                     options,
                     indices,
+                    deriv_level=self.options.deriv_level
                 )
                 fc_init.run()
                 print("Computed Force Constants:")
@@ -288,8 +317,8 @@ class Merger(object):
                     options.units,
                 )
                 f_conv_obj.N = len(fc_init.FC)
-                f_conv_obj.print_const(fc_name="fc_int.dat")
-                shutil.move(os.getcwd() + '/fc_int.dat', os.getcwd()+'/..' + self.cma1_path +'/fc_int.dat')
+                f_conv_obj.print_const(fc_name="fc_int_"+cma1_coord+".dat")
+                shutil.move(os.getcwd() + "/fc_int_"+cma1_coord+".dat", os.getcwd()+"/.." + self.cma1_path +"/fc_int_"+cma1_coord+".dat")
 
                 # if os.path.exists(os.getcwd() + '/auxiliary'):
                 # print(os.getcwd())
@@ -311,7 +340,7 @@ class Merger(object):
             F = f_conv_obj.F
         else:
             F = fc_init.FC
-        
+        self.options.deriv_level = 0
         if options.coords != "ZMAT" and not init_bool:
             F = np.dot(TED_obj.proj.T, np.dot(F, TED_obj.proj))
         if options.coords != "ZMAT":
@@ -438,30 +467,30 @@ class Merger(object):
         m = 2 
         var = 0.95 
         
-        def checkted(ted):
-            temps = []
-            for i in range(0,np.shape(ted)[0]):
-                ted_slice = ted[:,i] 
-                temp = copy.copy(ted_slice)
-                for j in range(0,m):
-                    largest = np.argmax(temp)
-                    if temp[largest] < 0.9:
-                        print('not big enough')
-                    print('largest')
-                    print(largest,temp[largest])
-                    temps.append([i,largest])
-                    temp[largest] = 0
-                    print('another')
-                    print(temp)
-            return temps
-        print('is this the ted im looking for?')
-        ted_breakdown = init_GF.ted_breakdown
-        print(ted_breakdown)  
+        # def checkted(ted):
+            # temps = []
+            # for i in range(0,np.shape(ted)[0]):
+                # ted_slice = ted[:,i] 
+                # temp = copy.copy(ted_slice)
+                # for j in range(0,m):
+                    # largest = np.argmax(temp)
+                    # if temp[largest] < 0.9:
+                        # print('not big enough')
+                    # print('largest')
+                    # print(largest,temp[largest])
+                    # temps.append([i,largest])
+                    # temp[largest] = 0
+                    # print('another')
+                    # print(temp)
+            # return temps
+        # print('is this the ted im looking for?')
+        # ted_breakdown = init_GF.ted_breakdown
+        # print(ted_breakdown)  
         
-        #temps = checkted(ted_breakdown) 
+        # temps = checkted(ted_breakdown) 
         
-        #print('temps')
-        #print(temps)
+        # print('temps')
+        # print(temps)
         
         #print('frequencies???')
         self.reference_freq = init_GF.freq 
@@ -475,17 +504,17 @@ class Merger(object):
         #$G = np.dot(np.dot(eig_inv, G), eig_inv.T)
         #$F = np.dot(np.dot(inv(eig_inv).T, F), inv(eig_inv))
         
-        #def n_largest(n, FC):
-        #    indexes = []
-        #    upper_triang = abs(np.triu(FC,n))
-        #    #upper_triang = np.triu(FC,n)
-        #    for i in range(0,n):
-        #        fc_cma2 = np.where(upper_triang == upper_triang.max())
-        #        index = [fc_cma2[0][0], fc_cma2[1][0]]
-        #        indexes.append(index)
-        #        upper_triang[index[0],index[1]] = 0
-        #    print(indexes)
-        #    return indexes
+        def n_largest(n, FC):
+            indexes = []
+            upper_triang = abs(np.triu(FC,n))
+            #upper_triang = np.triu(FC,n)
+            for i in range(0,n):
+                fc_cma2 = np.where(upper_triang == upper_triang.max())
+                index = [fc_cma2[0][0], fc_cma2[1][0]]
+                indexes.append(index)
+                upper_triang[index[0],index[1]] = 0
+            print(indexes)
+            return indexes
         
         print("Full Force constant matrix in lower level normal mode basis:")
         print(F)

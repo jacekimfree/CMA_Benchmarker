@@ -15,12 +15,18 @@ class Projection(object):
 
     def run(self):
 
+        # HA_str = normalize(np.array([
+        # [2, 1, 1, 1, 1],
+        # [0, 1, 1, -1,-1],
+        # [4,-1,-1, -1, -1],
+        # [0, 1,-1, 1,-1],
+        # [0, 1,-1,-1, 1],
+        # ]).T)
         HA_str = normalize(np.array([
-        [1, 1, 1, 1, 1],
-        [2,-1,-1,-1,-1],
-        [2,-1,-1, 1, 1],
-        [0, 1,-1, 1,-1],
-        [0, 1,-1,-1, 1],
+        [ 1, 1, 1, 1],
+        [ 1, 1, -1, -1],
+        [ 1,-1, 1,-1],
+        [ 1,-1,-1, 1],
         ]).T)
        
         CH_str1 = normalize(np.array([
@@ -53,9 +59,13 @@ class Projection(object):
 
         tor = np.eye(1)
 
-        oop = np.eye(2)
+        oop = normalize(np.array([
+        [1, 1],
+        [1,-1],
+        ]).T)
 
-        Proj = block_diag(HA_str,CH_str1,CH_str2,CH_ang1,CH_ang2,tor,oop)
+        # Proj = block_diag(HA_str,CH_str1,CH_str2,CH_ang1,CH_ang2,tor,oop)
+        Proj = block_diag(np.eye(1),HA_str,CH_str1,CH_str2,CH_ang1,CH_ang2,tor,oop)
 
         self.Proj = Proj
 

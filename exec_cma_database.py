@@ -25,10 +25,11 @@ np.set_printoptions(precision=4)
 # High and low levels of theory
 # Available: "CCSD_T_TZ", "CCSD_T_DZ", "B3LYP_6-31G_2df,p_"
 h_theory = ["CCSD_T_TZ"]
-#l_theory = ["CCSD_T_DZ", "B3LYP_6-31G_2df,p_"]
-l_theory = ["CCSD_T_DZ"]
+l_theory = ["CCSD_T_DZ", "B3LYP_6-31G_2df,p_"]
+# l_theory = ["CCSD_T_DZ"]
 # cma1_energy_regexes = ["\(T\) total energy\s+(\-\d+\.\d+)","Grab this energy (\-\d+\.\d+)"]
 cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)","Grab this energy (\-\d+\.\d+)"]
+# cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)",[r"Total Gradient",r"tstop"]]
 cma1_success_regexes = ["Variable memory released","beer"]
 #l_theory = ["B3LYP_6-31G_2df,p_"]
 combos = list(product(h_theory,l_theory))
@@ -40,17 +41,20 @@ coord_type = ["Nattys", "Redundant"]
 # Specify paths to grab data from
 # Options: '/1_Closed_Shell', '/1_Linear', '/1*', '/2_Open_Shell', '/2_Linear', '/2*'
 #paths = ['/2_Open_Shell']
-paths = ['/1_Closed_Shell']
-#paths = ['/1_Closed_Shell','/2_Open_Shell']
+# paths = ['/1_Closed_Shell']
+paths = ['/1_Closed_Shell','/2_Open_Shell']
 
 # Various output control statements
-n = 5                   # Number of CMA2 corrections (n = 0 -> CMA0)
+# n = 5                   # Number of CMA2 corrections (n = 0 -> CMA0)
+n = 0                   # Number of CMA2 corrections (n = 0 -> CMA0)
 cma1 = True             # Run CMA1 instead of CMA0
 #cma1 = False           # Run CMA1 instead of CMA0
 csv = True              # Generate database .csv file
 SI = True               # Generate LaTeX SI file
-compute_all = False      # run calculations for all or a select few
+compute_all = True      # run calculations for all or a select few
+# compute_all = False      # run calculations for all or a select few
 off_diag_bands = False  # (CMA2/3 ONLY) If set to true, "n" off-diag bands selected, if false, "n" largest fc will be selected
+deriv_level = 0         # (CMA1) if 0, compute initial hessian by singlepoints. If 1, compute initial hessian with findif of gradients
 
 # =====================
 # Some useful functions
@@ -365,14 +369,6 @@ def execute():
             elif cma1:
                 # move into directory with higher level geom, fc.dat, and Disp directories
                 os.chdir(f"{job}/")
-                try: 
-                    shutil.copyfile(job + combo[0] + "/zmat_cma1", job + "zmat")
-                    shutil.copyfile(job + combo[0] + "/zmat_cma1_Final", job + "zmat2")
-                    shutil.copyfile(job + combo[0] + "/fc.dat", job + "fc2.dat")       
-                except:
-                    print('Once again, the directory does not contain the sufficient files for the specified job')
-                    mol.direc_complete = False
-                    break 
                 # Add your code here
                 print(f"I am in {os.getcwd()} and I can see {os.listdir()}")
                 
@@ -381,77 +377,111 @@ def execute():
                 # In the future we can use this coord loop if we want to 
                 # But for now we will stick with redundants
                 for coord in coord_type:
+                    from Merger import Merger
+                    execMerger = Merger(cma1_path= "/" + combo[0]+"/Disps_" + combo[1])
+                    if os.path.exists(os.getcwd() + "/" + combo[0]+"/Disps_" + combo[1] + "/templateInit.dat"):
+                        execMerger.options.calc_init = True
+                   
+                    if combo[1] == "CCSD_T_DZ":
+                        execMerger.options.cart_insert_init = 9
+                    elif combo[1] == "B3LYP_6-31G_2df,p_":
+                        execMerger.options.cart_insert_init = 4
+                        # execMerger.options.cart_insert_init = 315
+                        execMerger.options.program_init = "psi4@master"
+                    execMerger.options.coords = coord
+                    execMerger.options.n_cma2 = n
+                    execMerger.options.off_diag = off_diag_bands
+                    execMerger.options.deriv_level = deriv_level
                     if coord == "Nattys":
-                        print("No Nattys :(")
+                        try: 
+                            shutil.copyfile(job + combo[0] + "/zmat", job + "zmat")
+                            shutil.copyfile(job + combo[0] + "/zmat", job + "zmat2")
+                            shutil.copyfile(job + combo[0] + "/fc.dat", job + "fc2.dat")       
+                        except:
+                            print('Once again, the directory does not contain the sufficient files for the specified job')
+                            mol.direc_complete = False
+                            break 
+                        # print("No Nattys :(")
+                        cma1_coord = "nat"
+                        execMerger.options.man_proj = True
+                        execMerger.options.coords = 'Custom'
+                        spec = importlib.util.spec_from_file_location("manual_projection",  job + "/manual_projection.py")
+                        foo = importlib.util.module_from_spec(spec)
+                        spec.loader.exec_module(foo)
+                        project_obj = foo.Projection(None)
+                        project_obj.run()
+                        Proj = copy.copy(project_obj.Proj)
                 
                     else:
+                        try: 
+                            shutil.copyfile(job + combo[0] + "/zmat_cma1", job + "zmat")
+                            shutil.copyfile(job + combo[0] + "/zmat_cma1_Final", job + "zmat2")
+                            shutil.copyfile(job + combo[0] + "/fc.dat", job + "fc2.dat")       
+                        except:
+                            print('Once again, the directory does not contain the sufficient files for the specified job')
+                            mol.direc_complete = False
+                            break 
+                        cma1_coord = "red"
                         # Import Merger
-                        from Merger import Merger
-                        execMerger = Merger(cma1_path= "/" + combo[0]+"/Disps_" + combo[1])
                         # print(os.getcwd())
                         # raise RuntimeError
-                        if os.path.exists(os.getcwd() + "/" + combo[0]+"/Disps_" + combo[1] + "/templateInit.dat"):
-                            execMerger.options.calc_init = True
                             # shutil.copy(os.getcwd() + "/" + combo[0]+"/Disps_" + combo[1] + "/templateInit.dat",os.getcwd() + "/" + combo[0]+ "/templateInit.dat")
                         execMerger.options.man_proj = False
-                        execMerger.options.coords = coord
-                        execMerger.options.n_cma2 = n
-                        execMerger.options.off_diag = off_diag_bands
                         Proj = None
                         # print(cma1_energy_regexes)
-                        execMerger.run(execMerger.options,Proj,energy_regex=cma1_energy_regexes[countt],success_regex=cma1_success_regexes[countt])
-                        # raise RuntimeError
-                        # Run the thing
-                        #execMerger.run(execMerger.options, Proj)
+                    execMerger.run(execMerger.options,Proj,energy_regex=cma1_energy_regexes[countt],success_regex=cma1_success_regexes[countt],cma1_coord=cma1_coord)
+                    # raise RuntimeError
+                    # Run the thing
+                    #execMerger.run(execMerger.options, Proj)
 
-                        # Collect the data in dictionary d to add it to the database
-                        # e.g. d[f"Ref {combo[0]}"] = execMerger.reference_freq
-                        # d[f"CMA1 {combo[1]}"] = execMerger.Freq_redundant
-                        # Collect data
-                        if coord_type.index(coord) == 1:
-                            print("Is this thing on?")
-                            d[f'Ref ({combo[0]})'] = execMerger.reference_freq
-                            print(execMerger.reference_freq)
-                            mol.freqs[f'Ref ({combo[0]})'] = execMerger.reference_freq
-                            
-                            # Number the modes
-                            d['Molecule'] = [f"{mol.name} ({mol.ID}) mode {i+1}" for i in range(len(execMerger.reference_freq))]
-                            print(d['Molecule'])
+                    # Collect the data in dictionary d to add it to the database
+                    # e.g. d[f"Ref {combo[0]}"] = execMerger.reference_freq
+                    # d[f"CMA1 {combo[1]}"] = execMerger.Freq_redundant
+                    # Collect data
+                    if coord_type.index(coord) == 1:
+                        print("Is this thing on?")
+                        d[f'Ref ({combo[0]})'] = execMerger.reference_freq
+                        print(execMerger.reference_freq)
+                        mol.freqs[f'Ref ({combo[0]})'] = execMerger.reference_freq
                         
+                        # Number the modes
+                        d['Molecule'] = [f"{mol.name} ({mol.ID}) mode {i+1}" for i in range(len(execMerger.reference_freq))]
+                        print(d['Molecule'])
+                    
+                    if coord == "Nattys":
+                        d[f'Natty ({combo[1]})'] = execMerger.Freq_custom
+                        d[f'Ref - Nat ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_custom)
+                        mol.freqs[f'Natty ({combo[1]})'] = execMerger.Freq_custom
+                    if coord == "Redundant":
+                        d[f'Red ({combo[1]})'] = execMerger.Freq_redundant
+                        d[f'Ref - Red ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_redundant)
+                        mol.freqs[f'Red ({combo[1]})'] = execMerger.Freq_redundant
+                    
+                    #Collect data for CMA2
+                    if n > 0:
+
                         if coord == "Nattys":
-                            d[f'Natty ({combo[1]})'] = execMerger.Freq_custom
-                            d[f'Ref - Nat ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_custom)
-                            mol.freqs[f'Natty ({combo[1]})'] = execMerger.Freq_custom
+                            d2['Molecule'] = [f"{mol.name} ({mol.ID}) mode {i+1}" for i in range(len(execMerger.reference_freq))]
+                            d2[f"Ref {combo[0]}"] = execMerger.reference_freq
+                            d2[f'Natty ({combo[1]})'] = execMerger.Freq_custom
+                            cma2_freqs_natty = execMerger.Freq_cma2 
+                          
+                            d2[f'Natty CMA2 ({combo[1]})'] = cma2_freqs_natty 
+                            d2[f'Ref - Natty ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_custom)
+                            d2[f'Ref - Natty CMA2 ({combo[1]})'] = freq_diff(execMerger.reference_freq, cma2_freqs_natty)
                         if coord == "Redundant":
-                            d[f'Red ({combo[1]})'] = execMerger.Freq_redundant
-                            d[f'Ref - Red ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_redundant)
-                            mol.freqs[f'Red ({combo[1]})'] = execMerger.Freq_redundant
-                        
-                        #Collect data for CMA2
-                        if n > 0:
-
-                            if coord == "Nattys":
-                                d2['Molecule'] = [f"{mol.name} ({mol.ID}) mode {i+1}" for i in range(len(execMerger.reference_freq))]
-                                d2[f"Ref {combo[0]}"] = execMerger.reference_freq
-                                d2[f'Natty ({combo[1]})'] = execMerger.Freq_custom
-                                cma2_freqs_natty = execMerger.Freq_cma2 
-                              
-                                d2[f'Natty CMA2 ({combo[1]})'] = cma2_freqs_natty 
-                                d2[f'Ref - Natty ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_custom)
-                                d2[f'Ref - Natty CMA2 ({combo[1]})'] = freq_diff(execMerger.reference_freq, cma2_freqs_natty)
-                            if coord == "Redundant":
-                                d2['Molecule'] = [f"{mol.name} ({mol.ID}) mode {i+1}" for i in range(len(execMerger.reference_freq))]
-                                d2[f"Ref {combo[0]}"] = execMerger.reference_freq
-                                d2[f'Red ({combo[1]})'] = execMerger.Freq_redundant
-                                cma2_freqs_red = execMerger.Freq_cma2 
-                              
-                                d2[f'Natty CMA2 ({combo[1]})'] = cma2_freqs_red 
-                                d2[f'Ref - Red ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_redundant)
-                                d2[f'Ref - Red CMA2 ({combo[1]})'] = freq_diff(execMerger.reference_freq, cma2_freqs_red)
+                            d2['Molecule'] = [f"{mol.name} ({mol.ID}) mode {i+1}" for i in range(len(execMerger.reference_freq))]
+                            d2[f"Ref {combo[0]}"] = execMerger.reference_freq
+                            d2[f'Red ({combo[1]})'] = execMerger.Freq_redundant
+                            cma2_freqs_red = execMerger.Freq_cma2 
+                          
+                            d2[f'Natty CMA2 ({combo[1]})'] = cma2_freqs_red 
+                            d2[f'Ref - Red ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_redundant)
+                            d2[f'Ref - Red CMA2 ({combo[1]})'] = freq_diff(execMerger.reference_freq, cma2_freqs_red)
 
 
-                        del execMerger
-                        del Merger
+                    del execMerger
+                    del Merger
             countt += 1
 
         # end of combo loop
@@ -466,7 +496,7 @@ def execute():
                 os.remove("zmat")
                 os.remove("zmat2")
                 os.remove("fc2.dat")
-                os.remove("templateInit.dat")
+                # os.remove("templateInit.dat")
             except:
                 print('These are not the files you are looking for') 
             

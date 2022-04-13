@@ -19,7 +19,9 @@ class Projection(object):
         [(2/np.sqrt(6)), (-1/np.sqrt(6)), (-1/np.sqrt(6))],
         [0             , (1/np.sqrt(2)), (-1/np.sqrt(2))],
         ])
-        
+
+        stretches_mat = stretches_mat.T
+
         angles = np.array([
         [(2/np.sqrt(6)), (-1/np.sqrt(6)), (-1/np.sqrt(6))],
         [0,              (1/np.sqrt(2)),  (-1/np.sqrt(2))],
