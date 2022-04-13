@@ -39,14 +39,15 @@ coord_type = ["Nattys", "Redundant"]
 # Specify paths to grab data from
 # Options: '/1_Closed_Shell', '/1_Linear', '/1*', '/2_Open_Shell', '/2_Linear', '/2*'
 paths = ['/1*','/2*']
+job_list = ["1.71"]
 
 # Various output control statements
-n = 0                   # Number of CMA2 corrections (n = 0 -> CMA0)
-cma1 = False            # Run CMA1 instead of CMA0
-csv = False             # Generate database .csv file
-SI = True               # Generate LaTeX SI file
-compute_all = False      # run calculations for all or a select few
-off_diag_bands = False  # (CMA2/3 ONLY) If set to true, "n" off-diag bands selected, if false, "n" largest fc will be selected
+n = 0                    # Number of CMA2 corrections (n = 0 -> CMA0)
+cma1 = False             # Run CMA1 instead of CMA0
+csv = True               # Generate database .csv file
+SI = False                # Generate LaTeX SI file
+compute_all = False       # run calculations for all or a select few
+off_diag_bands = False   # (CMA2/3 ONLY) If set to true, "n" off-diag bands selected, if false, "n" largest fc will be selected
 
 # =====================
 # Some useful functions
@@ -181,15 +182,13 @@ if compute_all:
         tmp_list = [tmp_list[i] for i in ind]
         jobb_list += tmp_list
 else:
-    for path in paths:
-        path_ind.append(len(jobb_list))
-        tmp_list = glob.glob(hq + path + "/76_*/")
-        ind = np.argsort(np.array([int(re.search(r"/\d_.*/(\d*)_.*", name).group(1)) for name in tmp_list]))
-        tmp_list = [tmp_list[i] for i in ind]
-        jobb_list += tmp_list
+    for job in job_list:
+        id1, id2 = job.split(".")
+        jobb_list += glob.glob(hq + f"/{id1}_*" + f"/{id2}_*/")
 
 # Gives printout for each molecule in jobb_list
 print(f"Generating database entries for {len(jobb_list)} jobs:",end="")
+count = 0
 for i, job in enumerate(jobb_list):
     if i in path_ind:
         print("\n\nDirectory: {}".format(paths[path_ind.index(i)]),end="")
@@ -291,6 +290,8 @@ def execute():
                         project_obj = foo.Projection(None)
                         project_obj.run()
                         Proj = copy.copy(project_obj.Proj)
+                        mol.proj = Proj
+                        mol.get_nattys(combo)
                     
                     else:
                         execMerger.options.man_proj = False
@@ -457,11 +458,12 @@ def execute():
                         del Merger
             countt += 1
 
-<<<<<<< Updated upstream
         # end of combo loop
         if mol.direc_complete: 
             # Print molecule information
             mol.run()
+            if SI:
+                si.write(mol.build_latex_output())
             
             # Clean up job directory
             if not cma1:
