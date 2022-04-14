@@ -13,6 +13,7 @@ import re
 from itertools import product
 
 from Molecule import Molecule
+from SI_stuff import *
 
 pd.set_option("display.max_columns", 15)
 
@@ -26,13 +27,16 @@ np.set_printoptions(precision=4)
 # Available: "CCSD_T_TZ", "CCSD_T_DZ", "B3LYP_6-31G_2df,p_"
 h_theory = ["CCSD_T_TZ"]
 l_theory = ["CCSD_T_DZ", "B3LYP_6-31G_2df,p_"]
+<<<<<<< HEAD
 # l_theory = ["CCSD_T_DZ"]
 # cma1_energy_regexes = ["\(T\) total energy\s+(\-\d+\.\d+)","Grab this energy (\-\d+\.\d+)"]
+=======
+combos = list(product(h_theory,l_theory))
+
+>>>>>>> a70e47f2f7a1c4def6b58f3223ad679d56810887
 cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)","Grab this energy (\-\d+\.\d+)"]
 # cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)",[r"Total Gradient",r"tstop"]]
 cma1_success_regexes = ["Variable memory released","beer"]
-#l_theory = ["B3LYP_6-31G_2df,p_"]
-combos = list(product(h_theory,l_theory))
 
 # Coordinates types to use
 # Available: "Nattys", "Redundant", "ZMAT" (not yet tho)
@@ -40,6 +44,7 @@ coord_type = ["Nattys", "Redundant"]
 
 # Specify paths to grab data from
 # Options: '/1_Closed_Shell', '/1_Linear', '/1*', '/2_Open_Shell', '/2_Linear', '/2*'
+<<<<<<< HEAD
 #paths = ['/2_Open_Shell']
 # paths = ['/1_Closed_Shell']
 paths = ['/1_Closed_Shell','/2_Open_Shell']
@@ -55,6 +60,18 @@ compute_all = True      # run calculations for all or a select few
 # compute_all = False      # run calculations for all or a select few
 off_diag_bands = False  # (CMA2/3 ONLY) If set to true, "n" off-diag bands selected, if false, "n" largest fc will be selected
 deriv_level = 0         # (CMA1) if 0, compute initial hessian by singlepoints. If 1, compute initial hessian with findif of gradients
+=======
+paths = ['/1*','/2*']
+job_list = ["1.71"]
+
+# Various output control statements
+n = 0                    # Number of CMA2 corrections (n = 0 -> CMA0)
+cma1 = False             # Run CMA1 instead of CMA0
+csv = True               # Generate database .csv file
+SI = False                # Generate LaTeX SI file
+compute_all = False       # run calculations for all or a select few
+off_diag_bands = False   # (CMA2/3 ONLY) If set to true, "n" off-diag bands selected, if false, "n" largest fc will be selected
+>>>>>>> a70e47f2f7a1c4def6b58f3223ad679d56810887
 
 # =====================
 # Some useful functions
@@ -99,7 +116,6 @@ def build_dataframe(d,basename):
 def return_path_base(jobpath):
     name = os.path.basename(os.path.normpath(jobpath)) 
     return name
-
 
 # ====================================
 # Print out information about database
@@ -190,15 +206,13 @@ if compute_all:
         tmp_list = [tmp_list[i] for i in ind]
         jobb_list += tmp_list
 else:
-    for path in paths:
-        path_ind.append(len(jobb_list))
-        tmp_list = glob.glob(hq + path + "/76_*/")
-        ind = np.argsort(np.array([int(re.search(r"/\d_.*/(\d*)_.*", name).group(1)) for name in tmp_list]))
-        tmp_list = [tmp_list[i] for i in ind]
-        jobb_list += tmp_list
+    for job in job_list:
+        id1, id2 = job.split(".")
+        jobb_list += glob.glob(hq + f"/{id1}_*" + f"/{id2}_*/")
 
 # Gives printout for each molecule in jobb_list
 print(f"Generating database entries for {len(jobb_list)} jobs:",end="")
+count = 0
 for i, job in enumerate(jobb_list):
     if i in path_ind:
         print("\n\nDirectory: {}".format(paths[path_ind.index(i)]),end="")
@@ -216,6 +230,11 @@ frame = []
 if n > 0:
     frame2 = []
 
+# Start SI file or clears contents
+if SI:
+    si = open("SI.tex", "w")
+    si.write(header)
+section = ""
 
 # ============
 # Do the thing
@@ -295,6 +314,8 @@ def execute():
                         project_obj = foo.Projection(None)
                         project_obj.run()
                         Proj = copy.copy(project_obj.Proj)
+                        mol.proj = Proj
+                        mol.get_nattys(combo)
                     
                     else:
                         execMerger.options.man_proj = False
@@ -429,6 +450,7 @@ def execute():
                         execMerger.options.man_proj = False
                         Proj = None
                         # print(cma1_energy_regexes)
+<<<<<<< HEAD
                     execMerger.run(execMerger.options,Proj,energy_regex=cma1_energy_regexes[countt],success_regex=cma1_success_regexes[countt],cma1_coord=cma1_coord)
                     # raise RuntimeError
                     # Run the thing
@@ -443,6 +465,28 @@ def execute():
                         d[f'Ref ({combo[0]})'] = execMerger.reference_freq
                         print(execMerger.reference_freq)
                         mol.freqs[f'Ref ({combo[0]})'] = execMerger.reference_freq
+=======
+                        execMerger.run(execMerger.options,Proj,energy_regex=cma1_energy_regexes[countt],success_regex=cma1_success_regexes[countt])
+                        # raise RuntimeError
+                        # Run the thing
+                        #execMerger.run(execMerger.options, Proj)
+
+                        # Collect the data in dictionary d to add it to the database
+                        # e.g. d[f"Ref {combo[0]}"] = execMerger.reference_freq
+                        # d[f"CMA1 {combo[1]}"] = execMerger.Freq_redundant
+                        # Collect data
+                        if coord_type.index(coord) == 1:
+                            print("Is this thing on?")
+                            d[f'Ref ({combo[0]})'] = execMerger.reference_freq
+                            print(execMerger.reference_freq)
+                            mol.freqs[f'Ref ({combo[0]})'] = execMerger.reference_freq
+                            d[f'Ref ({combo[1]})'] = execMerger.ref_init
+                            mol.freqs[f'Ref ({combo[1]})'] = execMerger.ref_init
+                            
+                            # Number the modes
+                            d['Molecule'] = [f"{mol.name} ({mol.ID}) mode {i+1}" for i in range(len(execMerger.reference_freq))]
+                            print(d['Molecule'])
+>>>>>>> a70e47f2f7a1c4def6b58f3223ad679d56810887
                         
                         # Number the modes
                         d['Molecule'] = [f"{mol.name} ({mol.ID}) mode {i+1}" for i in range(len(execMerger.reference_freq))]
@@ -461,6 +505,7 @@ def execute():
                     if n > 0:
 
                         if coord == "Nattys":
+<<<<<<< HEAD
                             d2['Molecule'] = [f"{mol.name} ({mol.ID}) mode {i+1}" for i in range(len(execMerger.reference_freq))]
                             d2[f"Ref {combo[0]}"] = execMerger.reference_freq
                             d2[f'Natty ({combo[1]})'] = execMerger.Freq_custom
@@ -469,6 +514,12 @@ def execute():
                             d2[f'Natty CMA2 ({combo[1]})'] = cma2_freqs_natty 
                             d2[f'Ref - Natty ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_custom)
                             d2[f'Ref - Natty CMA2 ({combo[1]})'] = freq_diff(execMerger.reference_freq, cma2_freqs_natty)
+=======
+                            mol.ted[combo] = execMerger.ted
+                            d[f'Natty ({combo[1]})'] = execMerger.Freq_custom
+                            d[f'Ref - Nat ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_custom)
+                            mol.freqs[f'Natty ({combo[1]})'] = execMerger.Freq_custom
+>>>>>>> a70e47f2f7a1c4def6b58f3223ad679d56810887
                         if coord == "Redundant":
                             d2['Molecule'] = [f"{mol.name} ({mol.ID}) mode {i+1}" for i in range(len(execMerger.reference_freq))]
                             d2[f"Ref {combo[0]}"] = execMerger.reference_freq
@@ -488,6 +539,8 @@ def execute():
         if mol.direc_complete: 
             # Print molecule information
             mol.run()
+            if SI:
+                si.write(mol.build_latex_output())
             
             # Clean up job directory
             if not cma1:
@@ -544,5 +597,8 @@ if csv:
 #
 #workbook.close()
 
-
+# Ends SI file 
+if SI:
+    si.write(footer)
+    si.close()
 

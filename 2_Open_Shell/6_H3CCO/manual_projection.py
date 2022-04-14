@@ -19,25 +19,23 @@ class Projection(object):
         
         stretch_mat = normalize(np.array([
         [1, 1, 1],
+        [2,-1,-1],
         [0, 1,-1],
-        [2,-1,-1]
         ]).T)
         
-        beta_mat = normalize(np.array([
-        [1, 0, 0, 0],
-        [0, 2,-1,-1],
-        [0, 1, 1, 1],
-        [0, 0, 1,-1]
-        ]).T)
-        
-        alpha_mat = normalize(np.array([
-        [-1,-1, 2],
-        [ 1,-1, 0]
+        HA_ang = np.eye(1)
+
+        CH_ang = normalize(np.array([
+        [1, 1, 1,-1,-1,-1],
+        [2,-1,-1, 0, 0, 0],
+        [0, 1,-1, 0, 0, 0],
+        [0, 0, 0, 2,-1,-1],
+        [0, 0, 0, 0, 1,-1]
         ]).T)
         
         tor_mat = np.eye(1)
         
-        Proj = block_diag(bond_mat,stretch_mat,beta_mat,alpha_mat,tor_mat)
+        Proj = block_diag(bond_mat,stretch_mat,HA_ang,CH_ang,tor_mat)
 
         self.Proj = Proj
 
