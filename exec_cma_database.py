@@ -320,7 +320,10 @@ def execute():
                     if coord_type.index(coord) == 0:
                         d[f'Ref ({combo[0]})'] = execMerger.reference_freq
                         mol.freqs[f'Ref ({combo[0]})'] = execMerger.reference_freq
+                        d[f'Ref ({combo[1]})'] = execMerger.ref_init
+                        mol.freqs[f'Ref ({combo[1]})'] = execMerger.ref_init
                         
+
                         # Number the modes
                         d['Molecule'] = [f"{mol.name} ({mol.ID}) mode {i+1}" for i in range(len(execMerger.reference_freq))]
                 
