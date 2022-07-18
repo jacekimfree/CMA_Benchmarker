@@ -44,15 +44,15 @@ coord_type = ["Nattys", "Redundant"]
 # paths = ['/1_Closed_Shell','/2_Open_Shell']
 
 paths = ['/1*','/2*']
-# job_list = ["1.71"]
+# job_list = ["1.79"]
 
 # Various output control statements
 n = 0                    # Number of CMA2 corrections (n = 0 -> CMA0)
 cma1 = False             # Run CMA1 instead of CMA0
 # cma1 = True             # Run CMA1 instead of CMA0
 csv = True               # Generate database .csv file
-# SI = False                # Generate LaTeX SI file
-SI = True               # Generate LaTeX SI file
+SI = False                # Generate LaTeX SI file
+# SI = True               # Generate LaTeX SI file
 # compute_all = False       # run calculations for all or a select few
 compute_all = True       # run calculations for all or a select few
 off_diag_bands = False   # (CMA2/3 ONLY) If set to true, "n" off-diag bands selected, if false, "n" largest fc will be selected
@@ -212,6 +212,7 @@ print("\n")
 
 # Initialize frames for pandas database
 frame = []
+framez = []
 if n > 0:
     frame2 = []
 
@@ -235,8 +236,10 @@ def execute():
         mol = Molecule(job)
         basename = return_path_base(job) 
         d = {'Molecule' : None}     # Ensures molecule is first column
+        z = {'Molecule' : None}     # Ensures molecule is first column
         if n > 0: 
             d2 = {'Molecule' : None}
+            # z2 = {'Molecule' : None}
 
         if i in path_ind:
             print(f"Currently running jobs in {paths[path_ind.index(i)]}\n")
@@ -288,6 +291,7 @@ def execute():
                     execMerger = Merger()
                      
                     #Specify options for Merger
+                    sym_sort = np.array([])
                     if coord == "Nattys":
                         execMerger.options.man_proj = True
                         execMerger.options.coords = 'Custom'
@@ -299,6 +303,12 @@ def execute():
                         project_obj = foo.Projection(None)
                         project_obj.run()
                         Proj = copy.copy(project_obj.Proj)
+                        try:
+                            sym_sort = copy.copy(project_obj.sym_sort)
+                        except:
+                            pass
+                        # finally:
+                            # continue
                         mol.proj = Proj
                         mol.get_nattys(combo)
                     
@@ -314,31 +324,40 @@ def execute():
                     execMerger.options.off_diag = off_diag_bands
                 
                     # Run CMA
-                    execMerger.run(execMerger.options, Proj)
+                    execMerger.run(execMerger.options, Proj, sym_sort=sym_sort)
                 
                     # Collect data
                     if coord_type.index(coord) == 0:
                         d[f'Ref ({combo[0]})'] = execMerger.reference_freq
+                        z[f'Ref ({combo[0]})'] = np.sum(execMerger.reference_freq)/(2*349.7550881133)
                         mol.freqs[f'Ref ({combo[0]})'] = execMerger.reference_freq
                         d[f'Ref ({combo[1]})'] = execMerger.ref_init
+                        z[f'Ref ({combo[1]})'] = np.sum(execMerger.ref_init)/(2*349.7550881133)
                         mol.freqs[f'Ref ({combo[1]})'] = execMerger.ref_init
                         
 
                         # Number the modes
                         d['Molecule'] = [f"{mol.name} ({mol.ID}) mode {i+1}" for i in range(len(execMerger.reference_freq))]
+                        z['Molecule'] = [f"{mol.name} ({mol.ID})"]
                 
                     if coord == "Nattys":
                         d[f'Natty ({combo[1]})'] = execMerger.Freq_custom
+                        z[f'Natty ({combo[1]})'] = np.sum(execMerger.Freq_custom)/(2*349.7550881133)
                         d[f'Ref - Nat ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_custom)
+                        z[f'Ref - Nat ({combo[1]})'] = np.sum(execMerger.reference_freq)/(2*349.7550881133) - np.sum(execMerger.Freq_custom)/(2*349.7550881133)
                         mol.freqs[f'Natty ({combo[1]})'] = execMerger.Freq_custom
                     if coord == "Redundant":
                         if 'Linear' not in job:
                             d[f'Red ({combo[1]})'] = execMerger.Freq_redundant
+                            z[f'Red ({combo[1]})'] = np.sum(execMerger.Freq_redundant)/(2*349.7550881133)
                             d[f'Ref - Red ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_redundant)
+                            z[f'Ref - Red ({combo[1]})'] = np.sum(execMerger.reference_freq)/(2*349.7550881133) - np.sum(execMerger.Freq_redundant)/(2*349.7550881133)
                             mol.freqs[f'Red ({combo[1]})'] = execMerger.Freq_redundant
                         else:
                             d[f'Red ({combo[1]})'] = execMerger.Freq_custom
+                            z[f'Red ({combo[1]})'] = np.sum(execMerger.Freq_custom)/(2*349.7550881133)
                             d[f'Ref - Red ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_custom)
+                            z[f'Ref - Red ({combo[1]})'] = np.sum(execMerger.reference_freq)/(2*349.7550881133) - np.sum(execMerger.Freq_custom)/(2*349.7550881133)
                             mol.freqs[f'Red ({combo[1]})'] = execMerger.Freq_custom
                 
                     # Collect data for CMA2
@@ -425,6 +444,7 @@ def execute():
                     execMerger.options.n_cma2 = n
                     execMerger.options.off_diag = off_diag_bands
                     execMerger.options.deriv_level = deriv_level
+                    sym_sort = np.array([])
                     if coord == "Nattys":
                         try: 
                             shutil.copyfile(job + combo[0] + "/zmat", job + "zmat")
@@ -445,6 +465,15 @@ def execute():
                         project_obj.run()
                         Proj = copy.copy(project_obj.Proj)
                         mol.proj = Proj
+                        np.set_printoptions(precision=4,threshold=sys.maxsize,linewidth=500)
+                        # print("Unsorted Proj:")
+                        # print(Proj)
+                        try:
+                            sym_sort = copy.copy(project_obj.sym_sort)
+                        except:
+                            pass
+                        # finally:
+                            # pass
                         mol.get_nattys(combo)
                 
                     else:
@@ -467,8 +496,8 @@ def execute():
                         if 'Linear' in job:
                             execMerger.options.coords = 'Custom'
                         # print(cma1_energy_regexes)
-                    execMerger.run(execMerger.options,Proj,energy_regex=cma1_energy_regexes[countt],success_regex=cma1_success_regexes[countt],cma1_coord=cma1_coord)
-                    # raise RuntimeError
+                    execMerger.run(execMerger.options,Proj,energy_regex=cma1_energy_regexes[countt],success_regex=cma1_success_regexes[countt],cma1_coord=cma1_coord, sym_sort=sym_sort)
+                    # execMerger.run(execMerger.options,Proj,energy_regex=cma1_energy_regexes[countt],success_regex=cma1_success_regexes[countt],cma1_coord=cma1_coord)
                     # Run the thing
                     #execMerger.run(execMerger.options, Proj)
 
@@ -479,25 +508,33 @@ def execute():
                     if coord_type.index(coord) == 1:
                         # print("Is this thing on?")
                         d[f'Ref ({combo[0]})'] = execMerger.reference_freq
+                        z[f'Ref ({combo[0]})'] = np.sum(execMerger.reference_freq)/(2*349.7550881133)
                         # print(execMerger.reference_freq)
                         mol.freqs[f'Ref ({combo[0]})'] = execMerger.reference_freq
                         
                         # Number the modes
                         d['Molecule'] = [f"{mol.name} ({mol.ID}) mode {i+1}" for i in range(len(execMerger.reference_freq))]
+                        z['Molecule'] = [f"{mol.name} ({mol.ID})"]
                         # print(d['Molecule'])
                     
                     if coord == "Nattys":
                         d[f'Natty ({combo[1]})'] = execMerger.Freq_custom
+                        z[f'Natty ({combo[1]})'] = np.sum(execMerger.Freq_custom)/(2*349.7550881133)
                         d[f'Ref - Nat ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_custom)
+                        z[f'Ref - Nat ({combo[1]})'] = np.sum(execMerger.reference_freq)/(2*349.7550881133) - np.sum(execMerger.Freq_custom)/(2*349.7550881133)
                         mol.freqs[f'Natty ({combo[1]})'] = execMerger.Freq_custom
                     if coord == "Redundant":
                         if 'Linear' not in job:
                             d[f'Red ({combo[1]})'] = execMerger.Freq_redundant
+                            z[f'Red ({combo[1]})'] = np.sum(execMerger.Freq_redundant)/(2*349.7550881133)
                             d[f'Ref - Red ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_redundant)
+                            z[f'Ref - Red ({combo[1]})'] = np.sum(execMerger.reference_freq)/(2*349.7550881133) - np.sum(execMerger.Freq_redundant)/(2*349.7550881133)
                             mol.freqs[f'Red ({combo[1]})'] = execMerger.Freq_redundant
                         else:
                             d[f'Red ({combo[1]})'] = execMerger.Freq_custom
+                            z[f'Red ({combo[1]})'] = np.sum(execMerger.Freq_custom)/(2*349.7550881133)
                             d[f'Ref - Red ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_custom)
+                            z[f'Ref - Red ({combo[1]})'] = np.sum(execMerger.reference_freq)/(2*349.7550881133) - np.sum(execMerger.Freq_custom)/(2*349.7550881133)
                             mol.freqs[f'Red ({combo[1]})'] = execMerger.Freq_custom
                     
                     #Collect data for CMA2
@@ -561,9 +598,11 @@ def execute():
             # Add to pandas dataframe
             if csv:
                 df = pd.DataFrame(data=d)
+                zf = pd.DataFrame(data=z)
                 # print(df)
                 # print()
                 frame.append(df)
+                framez.append(zf)
             
             if n > 0:
                 # d2 ={'Ref_Redundant' : cma2_dict[key],
@@ -582,7 +621,9 @@ execute()
 os.chdir(hq)
 if csv:
     megaframe = pd.concat(frame)
+    megaframez = pd.concat(framez)
     megaframe.to_csv('CoordDep.csv', index=False, float_format="%.2f")
+    megaframez.to_csv('ZPVE.csv', index=False, float_format="%.8f")
     if n > 0:
         megaframe2 = pd.concat(frame2)
         megaframe2.to_csv('CMA2_Convergent.csv', index=False, float_format="%.2f")

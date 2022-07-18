@@ -50,7 +50,8 @@ class Merger(object):
         self.options = options_obj 
         self.cma1_path = cma1_path
     #function that returns diagonal fc matrix + n-largest off-diagonal elements
-    def run(self, opts, Proj, energy_regex=None, success_regex=None, cma1_coord=None):
+    def run(self, opts, Proj, energy_regex=None, success_regex=None, cma1_coord=None, sym_sort=None):
+    # def run(self, opts, Proj, energy_regex=None, success_regex=None, cma1_coord=None):
 
         print("You have imported the merger script!")
         
@@ -73,7 +74,8 @@ class Merger(object):
         rootdir = os.getcwd()
         zmat_obj = Zmat(options)
         zmat_obj.run()
-                
+        # raise RuntimeError
+
         # Build manual projection matrix here.
         np.set_printoptions(edgeitems=60,linewidth=1000)
         #if options.man_proj: 
@@ -96,8 +98,11 @@ class Merger(object):
         s_vec = SVectors(
             zmat_obj, options, zmat_obj.variable_dictionary_init
         )
-        print('this is proj, check for this when redundants executed')
-        print(self.Proj)
+        if len(np.shape(self.Proj)) > 2:
+            print('this is proj that has been manually sorted by symmetry irrep')
+        else:
+            print('this is proj, check for this when redundants executed')
+            print(self.Proj)
         s_vec.run(zmat_obj.cartesians_init, True, proj=self.Proj)
                 
         TED_obj = TED(s_vec.proj, zmat_obj)
@@ -318,6 +323,8 @@ class Merger(object):
                 )
                 f_conv_obj.N = len(fc_init.FC)
                 f_conv_obj.print_const(fc_name="fc_int_"+cma1_coord+".dat")
+                print("Force Constants saved at:")
+                print(self.cma1_path)
                 shutil.move(os.getcwd() + "/fc_int_"+cma1_coord+".dat", os.getcwd()+"/.." + self.cma1_path +"/fc_int_"+cma1_coord+".dat")
 
                 # if os.path.exists(os.getcwd() + '/auxiliary'):
@@ -341,13 +348,57 @@ class Merger(object):
         else:
             F = fc_init.FC
         self.options.deriv_level = 0
+        
         if options.coords != "ZMAT" and not init_bool:
             F = np.dot(TED_obj.proj.T, np.dot(F, TED_obj.proj))
+        
         if options.coords != "ZMAT":
             g_mat.G = np.dot(TED_obj.proj.T, np.dot(g_mat.G, TED_obj.proj))
         
         TED_obj.run(np.eye(TED_obj.proj.shape[1]),np.zeros(TED_obj.proj.shape[1]))
-                
+        
+        print("sym_sort:")
+        print(sym_sort)
+        if len(sym_sort) > 1:
+            Fbuff1 = np.array([])
+            Fbuff2 = {}
+            Gbuff1 = np.array([])
+            Gbuff2 = {}
+            for i in range(len(sym_sort)):
+                Fbuff1 = F.copy()
+                Fbuff1 = Fbuff1[sym_sort[i]]
+                Fbuff1 = np.array([Fbuff1[:,sym_sort[i]]])
+                Fbuff2[str(i)] = Fbuff1.copy()
+                Gbuff1 = g_mat.G.copy()
+                Gbuff1 = Gbuff1[sym_sort[i]]
+                Gbuff1 = np.array([Gbuff1[:,sym_sort[i]]])
+                Gbuff2[str(i)] = Gbuff1.copy()
+            Fbuff3 = Fbuff2[str(0)][0].copy()
+            Gbuff3 = Gbuff2[str(0)][0].copy()
+            for i in range(len(sym_sort)-1):
+                Fbuff3 = np.block([
+                    [Fbuff3,                                        np.zeros((len(Fbuff3),len(Fbuff2[str(i+1)][0])))],
+                    [np.zeros((len(Fbuff2[str(i+1)][0]),len(Fbuff3))), Fbuff2[str(i+1)][0]]
+                    ])
+                Gbuff3 = np.block([
+                    [Gbuff3,                                        np.zeros((len(Gbuff3),len(Gbuff2[str(i+1)][0])))],
+                    [np.zeros((len(Gbuff2[str(i+1)][0]),len(Gbuff3))), Gbuff2[str(i+1)][0]]
+                    ])
+            # print(Fbuff3.shape)
+            # print("Elephant F")
+            # Fbuff3[np.abs(Fbuff3) < 1.0e-5] = 0 
+            # print(Fbuff3)
+            # print(Gbuff3.shape)
+            # print("Elephant G")
+            # Gbuff3[np.abs(Gbuff3) < 1.0e-10] = 0 
+            # print(Gbuff3)
+            # F[np.abs(F) > 1.0e-5] = 1 
+            # print(F)
+            # raise RuntimeError
+            
+            F = Fbuff3
+            g_mat.G = Gbuff3
+
         print("Initial Frequencies:")
         init_GF = GFMethod(
             g_mat.G.copy(),
@@ -421,6 +472,12 @@ class Merger(object):
         g_mat = GMatrix(zmat_obj2, s_vec, options)
         g_mat.run()
         
+        if len(sym_sort) > 1:
+            flat_sym_sort = np.array([])
+            for i in range(len(sym_sort)):
+                flat_sym_sort = np.append(flat_sym_sort,sym_sort[i])
+            flat_sym_sort = flat_sym_sort.astype(int)
+        
         G = g_mat.G.copy()
         Gtz = G.copy()
         init_bool = False
@@ -446,11 +503,29 @@ class Merger(object):
             F = f_conv_obj.F
         else:
             F = fc_init.FC
+        
+        
+        
         # redundant basis 
         G = np.dot(np.dot(TED_obj.proj.T,G),TED_obj.proj)
+        if len(sym_sort) > 1:
+            G = G[flat_sym_sort]
+            G = G[:,flat_sym_sort]
+        print("Giraffe G")
+        G[np.abs(G) < 1.0e-10] = 0 
+        print(G)
         G = np.dot(np.dot(eig_inv, G), eig_inv.T)
         # G[np.abs(G) < options.tol] = 0
         F = np.dot(np.dot(TED_obj.proj.T,F),TED_obj.proj)
+        if len(sym_sort) > 1:
+            F = F[flat_sym_sort]
+            F = F[:,flat_sym_sort]
+        # print(flat_sym_sort)
+        print("Giraffe F")
+        # print(F)
+        F[np.abs(F) < 1.0e-5] = 0 
+        print(F)
+        # raise RuntimeError
         F = np.dot(np.dot(inv(eig_inv).T, F), inv(eig_inv))
         #We shouldn't be zeroing out parts of the FC matrix just because they're small
         #F[np.abs(F) < options.tol] = 0
@@ -556,6 +631,8 @@ class Merger(object):
             self.Freq_zmat = init_GF.freq
         else:
             pass
+        
+        self.Freq_cma2 = init_GF.freq
         #print('merger needs to delete stuff as well')
         #print(dir())
         #everything below this line pertains to CMA2 off-diag elements being included in the GF matrix computation, its not an optimal setup, obviously
@@ -640,4 +717,3 @@ class Merger(object):
             init_GF.run()
             print('CMA2 including ' + str(z + 1) + ' off-diagonal bands/elements for ' + str(options.coords) + ' coordinates')
             print(init_GF.freq) 
-            self.Freq_cma2 = init_GF.freq
