@@ -157,6 +157,7 @@ class Molecule(object):
         
         # Combine proj and zmat 
         nics = []
+        # print(self.proj.T)
         for coord in self.proj.T:
             tmp = coord/np.abs(coord)[coord!=0].min()
             tmp = np.rint(tmp)
@@ -168,16 +169,19 @@ class Molecule(object):
 
         self.nics = nics
 
-    def build_latex_output(self):
-        txt = f"\\subsection{{\\ce{{{self.name}}}}}\n\n"
+    def build_latex_output(self,cma1=False):
+        txt = f"\\subsection{{\ \ \ \\ce{{{self.name}}}}}\n\n"
 
         # Geometries
-        txt += ("\\begin{table}[h!]\n"
-                "\\subsubsection*{Geometries}\n"
-                "\\begin{multicols}{2}\n"
-                "\\centering\n") 
+        # txt += ("\\begin{table}[h!]\n"
+        txt += ("\\subsubsection*{Geometries}\n")
+                # "\\begin{table}[h!]\n"
+                # "\\subsubsection*{Geometries}\n"
+                # "\\begin{multicols}{2}\n"
+                # "\\centering\n") 
         for i, g in enumerate(self.geoms):
-
+            txt += ("\\begin{table}[h!]\n"
+                    "\\centering\n")
             if g == "CCSD_T_TZ":
                 cap = "CCSD(T)/cc-pVTZ"
             elif g == "CCSD_T_DZ":
@@ -188,25 +192,38 @@ class Molecule(object):
                 cap = g
     
             txt += (f"\\caption{{{cap} Cartesian Coordinates (Bohr)}}\n"
-                     "\\begin{tabular}{llrrr}\n"
-                     "\\toprule\n")
+                    "\\begin{tabular}{llrrr}\n")
+                    # "\\begin{tabular}{llrrr}\n"
+            # txt += ("\\begin{tabular}{llrrr}\n"
+                    # f"\\caption{{{cap} Cartesian Coordinates (Bohr)}}\n"
+                     # "\\hline\n")
+                     # "\\vrule\n")
+                     # "\\toprule\n")
             for j, line in enumerate(self.geoms[g]):
                 txt += f"{j+1:<2} & {line[0]:<2} & ${float(line[1]):>11.8f}$ & ${float(line[2]):>11.8f}$ & ${float(line[3]):>11.8f}$ \\\\\n"
-            txt += ("\\bottomrule\n"
-                    "\\end{tabular}\n")
-            if i%2 == 1:
-                txt += ("\\end{multicols}\n"
-                        "\\end{table}\n\n"
-                        "\\begin{table}[h]\n")
-                if i < len(self.geoms)-2:
-                    txt += ("\\begin{multicols}{2}\n")
-                txt += "\\centering\n"
+            # txt += ("\\bottomrule\n"
+            txt += ("\\end{tabular}\n")
+            # txt += ("\\vrule\n"
+            # txt += ("\\hline\n"
+                    # "\\end{tabular}\n")
+            # if i%2 == 1:
+                # txt += ("\\end{multicols}\n"
+                # txt += ("\\end{table}\n")
+                # txt += ("\\end{table}\n\n"
+                        # "\\end{table}\n\n"
+                        # "\\begin{table}[h]\n")
+                # if i < len(self.geoms)-2:
+                    # txt += ("\\begin{multicols}{2}\n")
+                # txt += "\\centering\n"
         
-        txt += "\\end{table}\n\n"
+            txt += "\\end{table}\n\n"
 
+        txt += "\\clearpage\n\n"
         # Frequencies
-        txt += ("\\begin{table}[h!]\n"
-                "\\subsubsection*{Frequencies}\n"
+        # txt += ("\\begin{table}[h!]\n"
+        txt += ("\\subsubsection*{Frequencies}\n"
+                "\\begin{table}[h!]\n"
+                # "\\subsubsection*{Frequencies}\n"
                 "\\centering\n")
         
         labels = [("Reference","CCSD(T)/","cc-pVTZ")]
@@ -216,19 +233,39 @@ class Molecule(object):
             if key == "Ref (B3LYP_6-31G_2df,p_)":
                 labels.append(("Reference","B3LYP/","6-31G(2df,p)"))
             if key == "Natty (CCSD_T_DZ)":
-                labels.append(("CMA0","NICs","TZ/DZ"))
+                # labels.append(("CMA0","NCs","TZ/DZ"))
+                if cma1:
+                    labels.append(("CMA-0A","NCs","TZ/DZ"))
+                else:
+                    labels.append(("CMA-0B","NCs","TZ/DZ"))
             if key == "Red (CCSD_T_DZ)":
-                labels.append(("CMA0"," Redundant","TZ/DZ"))
+                # labels.append(("CMA0","DCs","TZ/DZ"))
+                if cma1:
+                    labels.append(("CMA-0A","DCs","TZ/DZ"))
+                else:
+                    labels.append(("CMA-0B","DCs","TZ/DZ"))
             if key == "Natty (B3LYP_6-31G_2df,p_)":
-                labels.append(("CMA0","NICs","TZ/DFT"))
+                # labels.append(("CMA0","NCs","TZ/DFT"))
+                if cma1:
+                    labels.append(("CMA-0A","NCs","TZ/DFT"))
+                else:
+                    labels.append(("CMA-0B","NCs","TZ/DFT"))
             if key == "Red (B3LYP_6-31G_2df,p_)":
-                labels.append(("CMA0","Redundant","TZ/DFT"))
+                # labels.append(("CMA0","DCs","TZ/DFT"))
+                if cma1:
+                    labels.append(("CMA-0A","DCs","TZ/DFT"))
+                else:
+                    labels.append(("CMA-0B","DCs","TZ/DFT"))
         ind = pd.MultiIndex.from_tuples(labels)       
         fdf = pd.DataFrame(data=self.freqs)
         fdf.columns = ind
         fdf.index += 1
-
+        
         txt += "\\caption{Harmonic frequencies for reference and CMA0 data.}\n"
+        # if cma1:
+            # txt += "\\caption{Harmonic frequencies for reference and CMA1 data.}\n"
+        # else:
+            # txt += "\\caption{Harmonic frequencies for reference and CMA0 data.}\n"
         txt += fdf.to_latex(float_format="%.2f",column_format="c"*(len(self.freqs)+1),multicolumn_format="c")
         txt += "\\end{table}\n\n"
 
@@ -259,40 +296,49 @@ class Molecule(object):
                             " & $")
             tmp += "$ \\\\\n"
 
-        txt += ("\\begin{table}[h!]\n"
-                "\\subsubsection*{Natural Internal Coordinates}\n"
+        txt += "\\clearpage\n\n"
+        # txt += ("\\begin{table}[h!]\n"
+        txt += ("\\subsubsection*{Natural Internal Coordinates}\n"
+                "\\begin{table}[h!]\n"
+                # "\\subsubsection*{Natural Internal Coordinates}\n"
                 "\\centering\n"
-               f"\\caption{{Natural internal coordinates for \\ce{{{self.name}}}.}}\n")
+               f"\\caption{{Symmetrized, unnormalized natural internal coordinates for \\ce{{{self.name}}}.}}\n")
 
         if len(tmp) >= 40:
             txt += "\\small\n"
 
-        txt += ("\\begin{tabular}{ll}\n"
-                "\\toprule\n")
+        txt += ("\\begin{tabular}{ll}\n")
+        # txt += ("\\begin{tabular}{ll}\n"
+                # "\\hline\n")
+                # "\\vrule\n")
+                # "\\toprule\n")
 
         txt += tmp
 
-        txt += ("\\bottomrule\n"
-                "\\end{tabular}\n"
+        # txt += ("\\bottomrule\n"
+        # txt += ("\\vrule\n"
+        # txt += ("\\hline\n"
+                # "\\end{tabular}\n"
+        txt += ("\\end{tabular}\n"
                 "\\end{table}\n\n")
 
         # TED
-        txt += ("\\begin{table}\n"
-                "\\subsection*{Total Energy Distribution}\n"
-                "\\centering")
+        # txt += ("\\begin{table}\n"
+                # "\\subsection*{Total Energy Distribution}\n"
+                # "\\centering")
 
-        for ted in self.ted:
-            if ted[1] == "CCSD_T_DZ":
-                l = "CCSD(T)/cc-pVDZ"
-            elif ted[1] == "B3LYP_6-31G_2df,p_":
-                l = "B3LYLP/6-31G(2df,p)"
-            txt += f"\\caption{{Total energy distribution for CCSD(T)/cc-pVTZ frequencies on the {l} modes.}}\n"
-            tdf = pd.DataFrame(data=self.ted[ted])
-            tdf.columns = [f"{i:.1f}" for i in self.freqs[f"Natty ({ted[1]})"]]
-            tdf.index += 1
-            txt += tdf.to_latex(float_format="%.1f", column_format="l"+"r"*len(tdf.columns))
+        # for ted in self.ted:
+            # if ted[1] == "CCSD_T_DZ":
+                # l = "CCSD(T)/cc-pVDZ"
+            # elif ted[1] == "B3LYP_6-31G_2df,p_":
+                # l = "B3LYLP/6-31G(2df,p)"
+            # txt += f"\\caption{{Total energy distribution for CCSD(T)/cc-pVTZ frequencies on the {l} modes.}}\n"
+            # tdf = pd.DataFrame(data=self.ted[ted])
+            # tdf.columns = [f"{i:.1f}" for i in self.freqs[f"Natty ({ted[1]})"]]
+            # tdf.index += 1
+            # txt += tdf.to_latex(float_format="%.1f", column_format="l"+"r"*len(tdf.columns))
 
-        txt += "\\end{table}\n\n"
+        # txt += "\\end{table}\n\n"
 
         txt += "\\clearpage\n\n"
         return txt
@@ -311,7 +357,7 @@ class ZCoord(object):
         if len(ind) == 3:
             self.ind = ",".join(ind)
             self.coord_out = f"\u03b8({self.ind})"
-            self.latex_out = f"\\theta_{{{self.ind}}}"
+            self.latex_out = f"\\phi_{{{self.ind}}}"
         if len(ind) == 5:
             if ind[-1] == "T":
                 self.ind = ",".join(ind[:-1])
@@ -331,11 +377,11 @@ class ZCoord(object):
             if ind[-1] == "Lx":
                 self.ind = ",".join(ind[:-1])
                 self.coord_out = f"\u03b8x({self.ind})"
-                self.latex_out = f"\\theta x_{{{self.ind}}}"
+                self.latex_out = f"\\alpha^x_{{{self.ind}}}"
             # Liny bends
             if ind[-1] == "Ly":
                 self.ind = ",".join(ind[:-1])
                 self.coord_out = f"\u03b8y({self.ind})"
-                self.latex_out = f"\\theta y_{{{self.ind}}}"
+                self.latex_out = f"\\alpha^y_{{{self.ind}}}"
 
 

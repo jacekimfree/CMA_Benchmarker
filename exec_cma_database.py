@@ -44,15 +44,15 @@ coord_type = ["Nattys", "Redundant"]
 # paths = ['/1_Closed_Shell','/2_Open_Shell']
 
 paths = ['/1*','/2*']
-# job_list = ["1.79"]
+# job_list = ["1.82"]
 
 # Various output control statements
 n = 0                    # Number of CMA2 corrections (n = 0 -> CMA0)
 cma1 = False             # Run CMA1 instead of CMA0
 # cma1 = True             # Run CMA1 instead of CMA0
 csv = True               # Generate database .csv file
-SI = False                # Generate LaTeX SI file
-# SI = True               # Generate LaTeX SI file
+# SI = False                # Generate LaTeX SI file
+SI = True               # Generate LaTeX SI file
 # compute_all = False       # run calculations for all or a select few
 compute_all = True       # run calculations for all or a select few
 off_diag_bands = False   # (CMA2/3 ONLY) If set to true, "n" off-diag bands selected, if false, "n" largest fc will be selected
@@ -257,10 +257,6 @@ def execute():
  
             if not cma1:
                 # Copy the necessary files with correct names
-                shutil.copyfile(job + combo[1] + "/zmat", job + "zmat")
-                shutil.copyfile(job + combo[1] + "/fc.dat", job + "fc.dat")
-                shutil.copyfile(job + combo[0] + "/zmat", job + "zmat2")
-                shutil.copyfile(job + combo[0] + "/fc.dat", job + "fc2.dat")       
                 
                 # Run for each coord type
                 for coord in coord_type:
@@ -293,6 +289,10 @@ def execute():
                     #Specify options for Merger
                     sym_sort = np.array([])
                     if coord == "Nattys":
+                        shutil.copyfile(job + combo[1] + "/zmat", job + "zmat")
+                        shutil.copyfile(job + combo[1] + "/fc.dat", job + "fc.dat")
+                        shutil.copyfile(job + combo[0] + "/zmat", job + "zmat2")
+                        shutil.copyfile(job + combo[0] + "/fc.dat", job + "fc2.dat")       
                         execMerger.options.man_proj = True
                         execMerger.options.coords = 'Custom'
                 
@@ -313,11 +313,17 @@ def execute():
                         mol.get_nattys(combo)
                     
                     else:
+                        shutil.copyfile(job + combo[1] + "/zmat_red", job + "zmat")
+                        shutil.copyfile(job + combo[1] + "/fc.dat", job + "fc.dat")
+                        shutil.copyfile(job + combo[0] + "/fc.dat", job + "fc2.dat")       
                         execMerger.options.man_proj = False
                         execMerger.options.coords = coord
                         Proj = None
                         if 'Linear' in job:
+                            shutil.copyfile(job + combo[0] + "/zmat_cma1", job + "zmat2")
                             execMerger.options.coords = 'Custom'
+                        else:
+                            shutil.copyfile(job + combo[0] + "/zmat", job + "zmat2")
                             
                 
                     execMerger.options.n_cma2 = n
@@ -575,7 +581,7 @@ def execute():
             # Print molecule information
             mol.run()
             if SI:
-                si.write(mol.build_latex_output())
+                si.write(mol.build_latex_output(cma1=cma1))
             
             # Clean up job directory
             if not cma1:

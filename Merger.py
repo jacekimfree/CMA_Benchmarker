@@ -178,7 +178,8 @@ class Merger(object):
                 init_disp.run()
                 prog_init = options.program_init
                 prog_name_init = prog_init.split("@")[0]
-
+                
+                # options.calc_init = False
                 if options.calc_init:
                     # print("We don't want to compute anything here, change your calc_init keyword to false.")
                     # raise RuntimeError
@@ -234,6 +235,10 @@ class Merger(object):
                         sub = Submit(disp_list, options)
                         sub.run()
 
+                # options.dir_reap = True
+                # os.chdir(rootdir + "/DispsInit")
+                # print("dir_rep in Merger")
+                # print(options.dir_reap)
                 reap_obj_init = Reap(
                     prog_name_init,
                     zmat_obj,
@@ -267,11 +272,17 @@ class Merger(object):
                 if options.calc_init:
                     # print(os.getcwd())
                     # raise RuntimeError
+                    # options.dir_reap = True
+                    # if options.dir_reap:
+                    # os.chdir("DispsInit")
                     reap_obj_init.run()
                     os.chdir("..")
                 else:
-                    reap_obj_init.options.dir_reap = False
+                    os.chdir("DispsInit")
+                    # reap_obj_init.options.dir_reap = False
+                    # reap_obj_init.options.dir_reap = True
                     reap_obj_init.run()
+                    os.chdir("..")
                 # if os.path.exists(os.getcwd() + '/auxiliary'):
                     # shutil.move(os.getcwd() + '/auxiliary', os.getcwd()+'/..' + self.cma1_path +'/auxiliary')
                 
