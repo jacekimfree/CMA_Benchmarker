@@ -23,7 +23,7 @@ from concordantmodes.reap import Reap
 from concordantmodes.s_vectors import SVectors
 from concordantmodes.submit import Submit
 from concordantmodes.ted import TED
-from concordantmodes.trans_disp import TransDisp
+from concordantmodes.transf_disp import TransfDisp
 from concordantmodes.vulcan_template import VulcanTemplate
 from concordantmodes.zmat import Zmat
 
