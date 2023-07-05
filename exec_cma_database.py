@@ -25,36 +25,38 @@ np.set_printoptions(precision=4)
 
 # High and low levels of theory
 # Available: "CCSD_T_TZ", "CCSD_T_DZ", "B3LYP_6-31G_2df,p_"
-h_theory = ["CCSD_T_TZ"]
-l_theory = ["CCSD_T_DZ", "B3LYP_6-31G_2df,p_"]
+h_theory = ["CCSD_T_aTZ"]
+l_theory = ["CCSD_T_aDZ"]
 combos = list(product(h_theory,l_theory))
-
+cma1_gradient_regex = ["\s*virial=\S\S+\.\d+E\S\d+\S\>\s+"]
 cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)","Grab this energy (\-\d+\.\d+)"]
+#cma1_energy_regexes = ["\!MP2\stotal\senergy\s+(\-\d+\.\d+)","Grab this energy (\-\d+\.\d+)"]
 # cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)",[r"Total Gradient",r"tstop"]]
 cma1_success_regexes = ["Variable memory released","beer"]
 
 # Coordinates types to use
 # Available: "Nattys", "Redundant", "ZMAT" (not yet tho)
-coord_type = ["Nattys", "Redundant"]
+coord_type = ["Redundant"]
 
 # Specify paths to grab data from
 # Options: '/1_Closed_Shell', '/1_Linear', '/1*', '/2_Open_Shell', '/2_Linear', '/2*'
 #paths = ['/2_Open_Shell']
 # paths = ['/1_Closed_Shell']
-# paths = ['/1_Closed_Shell','/2_Open_Shell']
+#paths = ['/1_Closed_Shell','/2_Open_Shell']
 
-paths = ['/1*','/2*']
+# paths = ['/3_Dimers/2_formic_acid']
 # job_list = ["1.82"]
+job_list = ["3.3"]
 
 # Various output control statements
 n = 0                    # Number of CMA2 corrections (n = 0 -> CMA0)
-cma1 = False             # Run CMA1 instead of CMA0
-# cma1 = True             # Run CMA1 instead of CMA0
+#cma1 = False             # Run CMA1 instead of CMA0
+cma1 = True             # Run CMA1 instead of CMA0
 csv = True               # Generate database .csv file
-# SI = False                # Generate LaTeX SI file
-SI = True               # Generate LaTeX SI file
-# compute_all = False       # run calculations for all or a select few
-compute_all = True       # run calculations for all or a select few
+SI = False                # Generate LaTeX SI file
+#SI = True               # Generate LaTeX SI file
+compute_all = False       # run calculations for all or a select few
+# compute_all = True       # run calculations for all or a select few
 off_diag_bands = False   # (CMA2/3 ONLY) If set to true, "n" off-diag bands selected, if false, "n" largest fc will be selected
 deriv_level = 0         # (CMA1) if 0, compute initial hessian by singlepoints. If 1, compute initial hessian with findif of gradients
 
@@ -126,54 +128,7 @@ print(
 """
 )
 
-
-print("""
-.............................................................................,............
-........................................................;+..,,,:::::::::,,,,..;;..........
-......................................................:?S%*?*?%%%%SSSS%%%%?*++##?:........
-...................................................,:?SS%%S#S%%?*******??%SSS###@#*,......
-...................................................;??%%S#@%,.............,:#@@@@#@S;.....
-......................................................,,,:::...............,;;;::,,,,.....
-..........................................................................................
-.................................................................,,,,,,,,,,,,.............
-................................................................:::,,....,,:::............
-...............................................................:;::,.,,,,,,:;+;...........
-..............................................................,++;;:::::::;;++*,..........
-..............................................................:*+*++++;;;++****,..........
-..............................................................,+??????**?????%+...........
-...............................................................,+%SSSSSSSSSS%+,...........
-.................................................................:+%#@#@S%?+,.............
-...................................................................:###S:,................
-...................................................................+SS#?..................
-...................................................................?SS#+..................
-..................................................................,SSS#:..................
-................................................................,.:SSSS,..................
-................,*+...............................................+#S#?...................
-.............,:*%#%...........................................,,,,?SS#+...................
-...........,;?%?%#S,......................................,:;+*??%%%%S?*+:,...............
-...........,;*?*?##:.................................,,.,;*%%%%%%%%%%%%%%%?+:.............
-............,%S#?;*:...................................:?%%%%%%%%%%%%%%%%%%%%+,,..........
-............+SS#;............,,.......................+%%%%%%%%%%%%%%%%%%%%%%S?,..........
-............%S#%..,......,,,,,,,,,,,.................;S%%%%%%?*?%%%%%%?*?%%%%%S*,.........
-...........,SS#*.....,.,::,,.....,::;,..............,?S%%%%%%%%%%%%%%%%%%%%%SSSS:.........
-...........:SS#+......,;;;:,,,,,,,::++;;;;;+++++*****SSSSS%%%%%%%%%%%%%%%%%SSSSS;.........
-...........:#S#+......:++;::::::::;;**%SSSSSSSSSSSSSS#SSSSSSS%%%%%%%%%SSSSSSSSS#;.........
-...........,SS#?......;**+++;;;;+++*???????***+++;;;:*#SSSSSSSSSSSSSSSSSSSSSSSS%,.........
-............?#SS,...,.,*%??*****??????:..............,?#SSSSSSSSSSSSSSSSSSSSS#S:..........
-............:#SS%%*,...,*%%SSSSSSSS%?:................,*##SSSS###############%:...........
-...........;S@@#@@?......:+?%SSSS%*;,...................;?S################%+,.,..........
-...........,;%@@@@;.........,,,,,.........................:*%S####@@@##S%*;,..............
-.............,;%@#,..........................................,:;+++++;:,..................
-................;+,.......................................................................
-..........................................................................................
-..........................................................................................
-..........................................................................................
-..........................................................................................
-..........................................................................................
-..........................................................................................
-""")
-
-print("Authors: The Dorktor, Nathaniel Kitzpapi, the other one")
+print("Authors: Dr. Mitchell Lahm, Nathaniel Kitzmiller, Dr. Henry Mull")
 print()
 print("Combinations of levels of theory (high, low): ", end="")
 print(*combos, sep=", ")
@@ -419,6 +374,7 @@ def execute():
                 os.chdir(f"{job}/")
                 # Add your code here
                 print(f"I am in {os.getcwd()} and I can see {os.listdir()}")
+                print(job + combo[0]) 
                 
                 # raise RuntimeError
 
@@ -438,13 +394,18 @@ def execute():
                     from Merger import Merger
                     execMerger = Merger(cma1_path= "/" + combo[0]+"/Disps_" + combo[1])
                     if os.path.exists(os.getcwd() + "/" + combo[0]+"/Disps_" + combo[1] + "/templateInit.dat"):
+                        #change to True if you need the displacements generated
                         execMerger.options.calc_init = True
                    
-                    if combo[1] == "CCSD_T_DZ":
-                        execMerger.options.cart_insert_init = 9
-                    elif combo[1] == "B3LYP_6-31G_2df,p_":
-                        execMerger.options.cart_insert_init = 4
+                    #if combo[1] == "CCSD_T_DZ":
+                       # execMerger.options.cart_insert_init = 9
+                    #elif combo[1] == "B3LYP_6-31G_2df,p_":
+                        # execMerger.options.cart_insert_init = 4
                         # execMerger.options.cart_insert_init = 315
+                    if combo[1] != "B3LYP_6-31G_2df,p_": 
+                        execMerger.options.cart_insert_init = 7 
+                    else:
+                        execMerger.options.cart_insert_init = 4
                         execMerger.options.program_init = "psi4@master"
                     execMerger.options.coords = coord
                     execMerger.options.n_cma2 = n
@@ -455,7 +416,7 @@ def execute():
                         try: 
                             shutil.copyfile(job + combo[0] + "/zmat", job + "zmat")
                             shutil.copyfile(job + combo[0] + "/zmat", job + "zmat2")
-                            shutil.copyfile(job + combo[0] + "/fc.dat", job + "fc2.dat")       
+                            shutil.copyfile(job + combo[0] + "/fc.dat", job + "fc2.dat")      
                         except:
                             print('Once again, the directory does not contain the sufficient files for the specified job')
                             mol.direc_complete = False
@@ -483,10 +444,13 @@ def execute():
                         mol.get_nattys(combo)
                 
                     else:
+                        print(job + combo[0]) 
                         try: 
-                            shutil.copyfile(job + combo[0] + "/zmat_cma1", job + "zmat")
-                            shutil.copyfile(job + combo[0] + "/zmat_cma1_Final", job + "zmat2")
+                            shutil.copyfile(job + combo[0] + "/zmat", job + "zmat")
+                            shutil.copyfile(job + combo[0] + "/zmat", job + "zmat2")
                             shutil.copyfile(job + combo[0] + "/fc.dat", job + "fc2.dat")       
+                            #shutil.copyfile(job + combo[0] + "/zmat_cma1", job + "zmat")
+                            #shutil.copyfile(job + combo[0] + "/zmat_cma1_Final", job + "zmat2")
                         except:
                             print('Once again, the directory does not contain the sufficient files for the specified job')
                             mol.direc_complete = False
@@ -498,6 +462,7 @@ def execute():
                             # shutil.copy(os.getcwd() + "/" + combo[0]+"/Disps_" + combo[1] + "/templateInit.dat",os.getcwd() + "/" + combo[0]+ "/templateInit.dat")
                         execMerger.options.man_proj = False
                         execMerger.options.coords = coord
+                        execMerger.options.gradient_regex = cma1_gradient_regex
                         Proj = None
                         if 'Linear' in job:
                             execMerger.options.coords = 'Custom'
