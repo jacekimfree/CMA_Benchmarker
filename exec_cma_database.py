@@ -36,7 +36,7 @@ cma1_success_regexes = ["Variable memory released","beer"]
 
 # Coordinates types to use
 # Available: "Nattys", "Redundant", "ZMAT" (not yet tho)
-coord_type = ["Redundant"]
+coord_type = ["Nattys"]
 
 # Specify paths to grab data from
 # Options: '/1_Closed_Shell', '/1_Linear', '/1*', '/2_Open_Shell', '/2_Linear', '/2*'
@@ -46,13 +46,13 @@ coord_type = ["Redundant"]
 
 # paths = ['/3_Dimers/2_formic_acid']
 # job_list = ["1.82"]
-job_list = ["3.3"]
+job_list = ["3.1"]
 
 # Various output control statements
 n = 0                    # Number of CMA2 corrections (n = 0 -> CMA0)
 #cma1 = False             # Run CMA1 instead of CMA0
 cma1 = True             # Run CMA1 instead of CMA0
-csv = True               # Generate database .csv file
+csv = False               # Generate database .csv file
 SI = False                # Generate LaTeX SI file
 #SI = True               # Generate LaTeX SI file
 compute_all = False       # run calculations for all or a select few
@@ -396,6 +396,7 @@ def execute():
                     if os.path.exists(os.getcwd() + "/" + combo[0]+"/Disps_" + combo[1] + "/templateInit.dat"):
                         #change to True if you need the displacements generated
                         execMerger.options.calc_init = True
+
                    
                     #if combo[1] == "CCSD_T_DZ":
                        # execMerger.options.cart_insert_init = 9
