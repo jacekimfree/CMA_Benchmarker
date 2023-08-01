@@ -163,7 +163,7 @@ class Merger(object):
                 else:
                     indices = np.arange(len(eigs_init))
 
-                init_disp = TransDisp(
+                init_disp = TransfDisp(
                     s_vec,
                     zmat_obj,
                     options.disp,
@@ -247,6 +247,7 @@ class Merger(object):
                     init_disp.n_coord,
                     eigs_init,
                     indices,
+                    options.gradient_regex,
                     options.energy_regex_init,
                     options.success_regex_init,
                     deriv_level = self.options.deriv_level
