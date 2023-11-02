@@ -25,36 +25,52 @@ np.set_printoptions(precision=4)
 
 # High and low levels of theory
 # Available: "CCSD_T_TZ", "CCSD_T_DZ", "B3LYP_6-31G_2df,p_"
+# h_theory = ["CCSD_T_aTZ"]
 h_theory = ["CCSD_T_TZ"]
-l_theory = ["CCSD_T_DZ", "B3LYP_6-31G_2df,p_"]
+# l_theory = ["MP2_haDZ"]
+# l_theory = ["MP2_aTZ"]
+# l_theory = ["CCSD_T_haDZ"]
+# l_theory = ["CCSD_T_aDZ"]
+l_theory = ["CCSD_T_DZ"]
+# l_theory = ["CCSD_T_DZ", "B3LYP_6-31G_2df,p_"]
 combos = list(product(h_theory,l_theory))
 
-cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)","Grab this energy (\-\d+\.\d+)"]
+# cma1_energy_regexes = ["MP2\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
+cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
+# cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)","Grab this energy (\-\d+\.\d+)"]
 # cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)",[r"Total Gradient",r"tstop"]]
-cma1_success_regexes = ["Variable memory released","beer"]
+# cma1_success_regexes = ["Variable memory released","beer"]
+cma1_success_regexes = ["Variable memory released"]
 
 # Coordinates types to use
 # Available: "Nattys", "Redundant", "ZMAT" (not yet tho)
-coord_type = ["Nattys", "Redundant"]
+# coord_type = ["Nattys", "Redundant"]
+# coord_type = ["Redundant"]
+coord_type = ["Nattys"]
 
 # Specify paths to grab data from
 # Options: '/1_Closed_Shell', '/1_Linear', '/1*', '/2_Open_Shell', '/2_Linear', '/2*'
-#paths = ['/2_Open_Shell']
-# paths = ['/1_Closed_Shell']
+# paths = ['/2_Open_Shell']
+# paths = ['/4_G3_99']
+# paths = ['/3_Dimers']
 # paths = ['/1_Closed_Shell','/2_Open_Shell']
 
-paths = ['/1*','/2*']
-# job_list = ["1.82"]
+# paths = ['/1*','/2*']
+# job_list = ["4.17"]
+job_list = ["4.31"]
 
 # Various output control statements
 n = 0                    # Number of CMA2 corrections (n = 0 -> CMA0)
-cma1 = False             # Run CMA1 instead of CMA0
-# cma1 = True             # Run CMA1 instead of CMA0
-csv = True               # Generate database .csv file
-# SI = False                # Generate LaTeX SI file
-SI = True               # Generate LaTeX SI file
-# compute_all = False       # run calculations for all or a select few
-compute_all = True       # run calculations for all or a select few
+# n = 15                    # Number of CMA2 corrections (n = 0 -> CMA0)
+# n = 10                    # Number of CMA2 corrections (n = 0 -> CMA0)
+# cma1 = False             # Run CMA1 instead of CMA0
+cma1 = True             # Run CMA1 instead of CMA0
+csv = False               # Generate database .csv file
+# csv = True               # Generate database .csv file
+SI = False                # Generate LaTeX SI file
+# SI = True               # Generate LaTeX SI file
+compute_all = False       # run calculations for all or a select few
+# compute_all = True       # run calculations for all or a select few
 off_diag_bands = False   # (CMA2/3 ONLY) If set to true, "n" off-diag bands selected, if false, "n" largest fc will be selected
 deriv_level = 0         # (CMA1) if 0, compute initial hessian by singlepoints. If 1, compute initial hessian with findif of gradients
 
@@ -173,7 +189,7 @@ print("""
 ..........................................................................................
 """)
 
-print("Authors: The Dorktor, Nathaniel Kitzpapi, the other one")
+print("Authors: Dr. Mitchell Lahm, Nathaniel Kitzmiller, Dr. Henry Mull")
 print()
 print("Combinations of levels of theory (high, low): ", end="")
 print(*combos, sep=", ")
@@ -278,11 +294,6 @@ def execute():
                     print("="*50)
                     print()
                 
-                    # Skip redundants if linear molecule
-                    # if 'Linear' in job and coord == 'Redundant':
-                        # print("What kind of idiot would use redundants for a linear molecule")
-                        # continue
-
                     from Merger import Merger
                     execMerger = Merger()
                      
@@ -307,8 +318,6 @@ def execute():
                             sym_sort = copy.copy(project_obj.sym_sort)
                         except:
                             pass
-                        # finally:
-                            # continue
                         mol.proj = Proj
                         mol.get_nattys(combo)
                     
@@ -411,19 +420,13 @@ def execute():
             # Mitchell's playground
             #======================
             elif not mol.direc_complete:
-                #cma1 = False 
                 continue
             
             elif cma1:
                 # move into directory with higher level geom, fc.dat, and Disp directories
                 os.chdir(f"{job}/")
-                # Add your code here
                 print(f"I am in {os.getcwd()} and I can see {os.listdir()}")
                 
-                # raise RuntimeError
-
-                # In the future we can use this coord loop if we want to 
-                # But for now we will stick with redundants
                 for coord in coord_type:
                     print()
                     print("="*50)
@@ -440,11 +443,13 @@ def execute():
                     if os.path.exists(os.getcwd() + "/" + combo[0]+"/Disps_" + combo[1] + "/templateInit.dat"):
                         execMerger.options.calc_init = True
                    
+                    # execMerger.options.calc_init = False
+                    # execMerger.options.gen_disps_init = False
+                    execMerger.options.cart_insert_init = 9
                     if combo[1] == "CCSD_T_DZ":
                         execMerger.options.cart_insert_init = 9
                     elif combo[1] == "B3LYP_6-31G_2df,p_":
                         execMerger.options.cart_insert_init = 4
-                        # execMerger.options.cart_insert_init = 315
                         execMerger.options.program_init = "psi4@master"
                     execMerger.options.coords = coord
                     execMerger.options.n_cma2 = n
@@ -452,6 +457,8 @@ def execute():
                     execMerger.options.deriv_level = deriv_level
                     sym_sort = np.array([])
                     if coord == "Nattys":
+                        print("Where are the zmats coming from?")
+                        print(combo[0])
                         try: 
                             shutil.copyfile(job + combo[0] + "/zmat", job + "zmat")
                             shutil.copyfile(job + combo[0] + "/zmat", job + "zmat2")
@@ -460,7 +467,6 @@ def execute():
                             print('Once again, the directory does not contain the sufficient files for the specified job')
                             mol.direc_complete = False
                             break 
-                        # print("No Nattys :(")
                         cma1_coord = "nat"
                         execMerger.options.man_proj = True
                         execMerger.options.coords = 'Custom'
@@ -472,56 +478,41 @@ def execute():
                         Proj = copy.copy(project_obj.Proj)
                         mol.proj = Proj
                         np.set_printoptions(precision=4,threshold=sys.maxsize,linewidth=500)
-                        # print("Unsorted Proj:")
-                        # print(Proj)
                         try:
                             sym_sort = copy.copy(project_obj.sym_sort)
                         except:
                             pass
-                        # finally:
-                            # pass
                         mol.get_nattys(combo)
                 
                     else:
                         try: 
-                            shutil.copyfile(job + combo[0] + "/zmat_cma1", job + "zmat")
-                            shutil.copyfile(job + combo[0] + "/zmat_cma1_Final", job + "zmat2")
+                            shutil.copyfile(job + combo[0] + "/zmat_red", job + "zmat")
+                            shutil.copyfile(job + combo[0] + "/zmat_red", job + "zmat2")
                             shutil.copyfile(job + combo[0] + "/fc.dat", job + "fc2.dat")       
                         except:
                             print('Once again, the directory does not contain the sufficient files for the specified job')
                             mol.direc_complete = False
                             break 
                         cma1_coord = "red"
-                        # Import Merger
-                        # print(os.getcwd())
-                        # raise RuntimeError
-                            # shutil.copy(os.getcwd() + "/" + combo[0]+"/Disps_" + combo[1] + "/templateInit.dat",os.getcwd() + "/" + combo[0]+ "/templateInit.dat")
                         execMerger.options.man_proj = False
                         execMerger.options.coords = coord
                         Proj = None
                         if 'Linear' in job:
                             execMerger.options.coords = 'Custom'
-                        # print(cma1_energy_regexes)
                     execMerger.run(execMerger.options,Proj,energy_regex=cma1_energy_regexes[countt],success_regex=cma1_success_regexes[countt],cma1_coord=cma1_coord, sym_sort=sym_sort)
-                    # execMerger.run(execMerger.options,Proj,energy_regex=cma1_energy_regexes[countt],success_regex=cma1_success_regexes[countt],cma1_coord=cma1_coord)
-                    # Run the thing
-                    #execMerger.run(execMerger.options, Proj)
 
                     # Collect the data in dictionary d to add it to the database
                     # e.g. d[f"Ref {combo[0]}"] = execMerger.reference_freq
                     # d[f"CMA1 {combo[1]}"] = execMerger.Freq_redundant
                     # Collect data
                     if coord_type.index(coord) == 1:
-                        # print("Is this thing on?")
                         d[f'Ref ({combo[0]})'] = execMerger.reference_freq
                         z[f'Ref ({combo[0]})'] = np.sum(execMerger.reference_freq)/(2*349.7550881133)
-                        # print(execMerger.reference_freq)
                         mol.freqs[f'Ref ({combo[0]})'] = execMerger.reference_freq
                         
                         # Number the modes
                         d['Molecule'] = [f"{mol.name} ({mol.ID}) mode {i+1}" for i in range(len(execMerger.reference_freq))]
                         z['Molecule'] = [f"{mol.name} ({mol.ID})"]
-                        # print(d['Molecule'])
                     
                     if coord == "Nattys":
                         d[f'Natty ({combo[1]})'] = execMerger.Freq_custom
@@ -590,23 +581,16 @@ def execute():
                 os.remove("zmat")
                 os.remove("zmat2")
                 os.remove("fc2.dat")
-                # os.remove("templateInit.dat")
             except:
                 print('These are not the files you are looking for') 
             
             sys.path.remove(job)
             del mol
 
-            # Skip dataframe if linear molecule
-            # if 'Linear' in job:
-                # continue
-
             # Add to pandas dataframe
             if csv:
                 df = pd.DataFrame(data=d)
                 zf = pd.DataFrame(data=z)
-                # print(df)
-                # print()
                 frame.append(df)
                 framez.append(zf)
             
