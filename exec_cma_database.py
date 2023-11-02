@@ -25,13 +25,13 @@ np.set_printoptions(precision=4)
 
 # High and low levels of theory
 # Available: "CCSD_T_TZ", "CCSD_T_DZ", "B3LYP_6-31G_2df,p_"
-# h_theory = ["CCSD_T_aTZ"]
-h_theory = ["CCSD_T_TZ"]
+h_theory = ["CCSD_T_aTZ"]
+# h_theory = ["CCSD_T_TZ"]
 # l_theory = ["MP2_haDZ"]
-# l_theory = ["MP2_aTZ"]
+l_theory = ["MP2_aTZ"]
 # l_theory = ["CCSD_T_haDZ"]
 # l_theory = ["CCSD_T_aDZ"]
-l_theory = ["CCSD_T_DZ"]
+# l_theory = ["CCSD_T_DZ"]
 # l_theory = ["CCSD_T_DZ", "B3LYP_6-31G_2df,p_"]
 combos = list(product(h_theory,l_theory))
 
@@ -57,11 +57,11 @@ coord_type = ["Nattys"]
 
 # paths = ['/1*','/2*']
 # job_list = ["4.17"]
-job_list = ["4.31"]
+job_list = ["3.9"]
 
 # Various output control statements
-n = 0                    # Number of CMA2 corrections (n = 0 -> CMA0)
-# n = 15                    # Number of CMA2 corrections (n = 0 -> CMA0)
+# n = 0                    # Number of CMA2 corrections (n = 0 -> CMA0)
+n = 15                    # Number of CMA2 corrections (n = 0 -> CMA0)
 # n = 10                    # Number of CMA2 corrections (n = 0 -> CMA0)
 # cma1 = False             # Run CMA1 instead of CMA0
 cma1 = True             # Run CMA1 instead of CMA0
