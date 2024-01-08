@@ -27,16 +27,19 @@ np.set_printoptions(precision=4)
 # Available: "CCSD_T_TZ", "CCSD_T_DZ", "B3LYP_6-31G_2df,p_"
 h_theory = ["CCSD_T_aTZ"]
 # h_theory = ["CCSD_T_TZ"]
-# l_theory = ["MP2_haDZ"]
-l_theory = ["MP2_aTZ"]
-# l_theory = ["CCSD_T_haDZ"]
+# l_theory = ["MP2_haTZ"]
+# l_theory = ["MP2_aDZ"]
+l_theory = ["CCSD_T_haDZ"]
 # l_theory = ["CCSD_T_aDZ"]
+# l_theory = ["CCSD_haTZ"]
+# l_theory = ["CCSD_T_TZ"]
 # l_theory = ["CCSD_T_DZ"]
 # l_theory = ["CCSD_T_DZ", "B3LYP_6-31G_2df,p_"]
 combos = list(product(h_theory,l_theory))
 
 # cma1_energy_regexes = ["MP2\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
 cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
+# cma1_energy_regexes = ["CCSD\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
 # cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)","Grab this energy (\-\d+\.\d+)"]
 # cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)",[r"Total Gradient",r"tstop"]]
 # cma1_success_regexes = ["Variable memory released","beer"]
@@ -45,8 +48,8 @@ cma1_success_regexes = ["Variable memory released"]
 # Coordinates types to use
 # Available: "Nattys", "Redundant", "ZMAT" (not yet tho)
 # coord_type = ["Nattys", "Redundant"]
-# coord_type = ["Redundant"]
-coord_type = ["Nattys"]
+coord_type = ["Redundant"]
+# coord_type = ["Nattys"]
 
 # Specify paths to grab data from
 # Options: '/1_Closed_Shell', '/1_Linear', '/1*', '/2_Open_Shell', '/2_Linear', '/2*'
@@ -56,12 +59,14 @@ coord_type = ["Nattys"]
 # paths = ['/1_Closed_Shell','/2_Open_Shell']
 
 # paths = ['/1*','/2*']
-# job_list = ["4.17"]
-job_list = ["3.9"]
+# job_list = ["4.31"]
+# job_list = ["1.104"]
+job_list = ["3.12"]
 
 # Various output control statements
 # n = 0                    # Number of CMA2 corrections (n = 0 -> CMA0)
-n = 15                    # Number of CMA2 corrections (n = 0 -> CMA0)
+n = 36                    # Number of CMA2 corrections (n = 0 -> CMA0)
+# n = 15                    # Number of CMA2 corrections (n = 0 -> CMA0)
 # n = 10                    # Number of CMA2 corrections (n = 0 -> CMA0)
 # cma1 = False             # Run CMA1 instead of CMA0
 cma1 = True             # Run CMA1 instead of CMA0
@@ -442,10 +447,15 @@ def execute():
                     execMerger = Merger(cma1_path= "/" + combo[0]+"/Disps_" + combo[1])
                     if os.path.exists(os.getcwd() + "/" + combo[0]+"/Disps_" + combo[1] + "/templateInit.dat"):
                         execMerger.options.calc_init = True
-                   
+
                     # execMerger.options.calc_init = False
                     # execMerger.options.gen_disps_init = False
                     execMerger.options.cart_insert_init = 9
+                    execMerger.options.other_F_matrix = ''
+                    # execMerger.options.other_F_matrix = 'CCSD_aTZ'
+                    if len(execMerger.options.other_F_matrix):
+                        if os.path.exists(os.getcwd()+"/"+combo[0]+"/Disps_"+execMerger.options.other_F_matrix+"/fc_int_nat.dat"):
+                            shutil.copyfile(os.getcwd()+"/"+combo[0]+"/Disps_"+execMerger.options.other_F_matrix+"/fc_int_nat.dat",os.getcwd()+"/inter_fc.dat")
                     if combo[1] == "CCSD_T_DZ":
                         execMerger.options.cart_insert_init = 9
                     elif combo[1] == "B3LYP_6-31G_2df,p_":
@@ -581,6 +591,7 @@ def execute():
                 os.remove("zmat")
                 os.remove("zmat2")
                 os.remove("fc2.dat")
+                os.remove("inter_fc.dat")
             except:
                 print('These are not the files you are looking for') 
             

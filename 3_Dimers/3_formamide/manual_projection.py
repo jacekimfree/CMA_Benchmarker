@@ -48,7 +48,7 @@ class Projection(object):
         [1,  1, -1, -1],
         ]).T
 
-        Proj = block_diag(Asym_Str1,Asym_Str1,Asym_Str2,Asym_Str1,Unc,Asym_Str1,Asym_Bend1,Asym_Bend2,Asym_Str1,Asym_Tors,Unc,Asym_Str1)
+        Proj = block_diag(Asym_Str1,Asym_Str1,Asym_Str2,Asym_Str1,Unc,Asym_Str1,Asym_Bend1,Asym_Bend2,Asym_Str1,Asym_Tors,Unc,Asym_Str1,Asym_Str1,Asym_Str1)
         Proj = 1/norm(Proj,axis=0)*Proj
 
         self.Proj = Proj
