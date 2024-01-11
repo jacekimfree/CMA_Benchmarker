@@ -15,9 +15,7 @@ class Projection(object):
 
     def run(self):
     
-        unc = normalize(np.array([
-        [1],
-        ]).T)
+        unc = np.eye(1)
         
         ch3_str = normalize(np.array([
         [1, 1, 1],
