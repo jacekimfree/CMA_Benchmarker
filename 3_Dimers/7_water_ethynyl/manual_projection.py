@@ -22,8 +22,11 @@ class Projection(object):
         [1, 1],
         [1,-1],
         ]).T
+        Sym_tors = np.array([
+        [1, 1],
+        ]).T
 
-        Proj = block_diag(Unc,Anti_sym,Anti_sym,Unc,Unc,Unc,Unc,Unc,Unc,Anti_sym,Anti_sym)
+        Proj = block_diag(Unc,Anti_sym,Anti_sym,Unc,Unc,Unc,Sym_tors,Unc,Unc,Anti_sym,Anti_sym)
         Proj = 1/norm(Proj,axis=0)*Proj
 
         self.Proj = Proj

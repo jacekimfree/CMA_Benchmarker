@@ -581,17 +581,36 @@ class Merger(object):
                 #82_ccsd extras = [[14,15]]
                 #70_ccsd extras = [[10,11],[0,1]]
                 #85_ccsd extras = [[1,4],[3,5]]
-                extras = [[0,1],[0,2],[0,3],[0,4],[0,5],[1,2],[1,3],[1,4],[1,5],[2,3],[2,4],[2,5],[3,4],[3,5],[4,5]]
+                extras = [[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[1,2],[1,3],[1,4],[1,5],[1,6],[1,7],[1,8],[2,3],[2,4],[2,5],[2,6],[2,7],[2,8],[3,4],[3,5],[3,6],[3,7],[3,8],[4,5],[4,6],[4,7],[4,8],[5,6],[5,7],[5,8],[6,7],[6,8],[7,8]]
+                # extras = [[0,1],[0,2],[0,3],[0,4],[0,5],[1,2],[1,3],[1,4],[1,5],[2,3],[2,4],[2,5],[3,4],[3,5],[4,5]]
+                # print(np.array(extras).shape)
                 # extras = [[0,1],[0,2],[0,3],[0,4],[1,2],[1,3],[1,4],[2,3],[2,4],[3,4]]
                 #extras = [[17,19]]
                 #extras = [[0,2]]
                 print('extras')
                 print(extras)
+                # raise RuntimeError
                 temp = copy.copy(Fdiag)
-                for z, extra in enumerate(extras):
-                    element = F[extra[0], extra[1]] 
-                    temp[extra[0], extra[1]] = element
-                    temp[extra[1], extra[0]] = element
+                if len(self.options.other_F_matrix) and os.path.exists(os.getcwd() + "/inter_fc.dat"):
+                    print(os.getcwd())
+                    f_read_obj_inter = FcRead("inter_fc.dat")
+                    f_read_obj_inter.run()
+                    F_inter = f_read_obj_inter.fc_mat
+                    F_inter = np.dot(np.dot(inv(eig_inv).T, F_inter), inv(eig_inv))
+                    print("F_inter:")
+                    print(F_inter)
+                    print("F_A:")
+                    print(F)
+                    # raise RuntimeError
+                    for z, extra in enumerate(extras):
+                        element = F_inter[extra[0], extra[1]] 
+                        temp[extra[0], extra[1]] = element
+                        temp[extra[1], extra[0]] = element
+                else:
+                    for z, extra in enumerate(extras):
+                        element = F[extra[0], extra[1]] 
+                        temp[extra[0], extra[1]] = element
+                        temp[extra[1], extra[0]] = element
                 print('CMA2 FC matrix')
                 print(temp) 
             #if options.coords == 'Redundant':
