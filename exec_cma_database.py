@@ -48,8 +48,8 @@ cma1_success_regexes = ["Variable memory released"]
 # Coordinates types to use
 # Available: "Nattys", "Redundant", "ZMAT" (not yet tho)
 # coord_type = ["Nattys", "Redundant"]
-coord_type = ["Redundant"]
-# coord_type = ["Nattys"]
+# coord_type = ["Redundant"]
+coord_type = ["Nattys"]
 
 # Specify paths to grab data from
 # Options: '/1_Closed_Shell', '/1_Linear', '/1*', '/2_Open_Shell', '/2_Linear', '/2*'
