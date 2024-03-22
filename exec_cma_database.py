@@ -28,22 +28,71 @@ np.set_printoptions(precision=4)
 h_theory = ["CCSD_T_aTZ"]
 # h_theory = ["CCSD_T_TZ"]
 # l_theory = ["MP2_haTZ"]
+# l_theory = ["MP2_haDZ"]
+# l_theory = ["MP2_aTZ"]
+# l_theory = ["MP2_TZ"]
 # l_theory = ["MP2_aDZ"]
-l_theory = ["CCSD_T_haDZ"]
-# l_theory = ["CCSD_T_aDZ"]
+# l_theory = ["MP2_DZ"]
+# l_theory = ["CCSD_T_haTZ"]
+# l_theory = ["CCSD_T_haDZ"]
+l_theory = ["CCSD_T_aDZ"]
 # l_theory = ["CCSD_haTZ"]
 # l_theory = ["CCSD_T_TZ"]
 # l_theory = ["CCSD_T_DZ"]
+# l_theory = [
+# # "CCSD_aTZ",
+# # "CCSD_haTZ",
+# "CCSD_T_aDZ",
+# "CCSD_T_DZ",
+# "CCSD_T_haDZ",
+# "CCSD_T_haTZ",
+# "CCSD_T_TZ",
+# "MP2_aDZ",
+# "MP2_aTZ",
+# "MP2_DZ",
+# "MP2_haDZ",
+# "MP2_haTZ",
+# "MP2_TZ"]
+
 # l_theory = ["CCSD_T_DZ", "B3LYP_6-31G_2df,p_"]
 combos = list(product(h_theory,l_theory))
 
 # cma1_energy_regexes = ["MP2\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
 cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
+# cma1_energy_regexes = [
+# # "CCSD_aTZ",
+# # "CCSD_haTZ",
+# "CCSD_T_aDZ",
+# "CCSD_T_DZ",
+# "CCSD_T_haDZ",
+# "CCSD_T_haTZ",
+# "CCSD_T_TZ",
+# "MP2_aDZ",
+# "MP2_aTZ",
+# "MP2_DZ",
+# "MP2_haDZ",
+# "MP2_haTZ",
+# "MP2_TZ"]
+
 # cma1_energy_regexes = ["CCSD\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
 # cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)","Grab this energy (\-\d+\.\d+)"]
 # cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)",[r"Total Gradient",r"tstop"]]
 # cma1_success_regexes = ["Variable memory released","beer"]
 cma1_success_regexes = ["Variable memory released"]
+# cma1_success_regexes = [
+# # "CCSD_aTZ",
+# # "CCSD_haTZ",
+# "CCSD_T_aDZ",
+# "CCSD_T_DZ",
+# "CCSD_T_haDZ",
+# "CCSD_T_haTZ",
+# "CCSD_T_TZ",
+# "MP2_aDZ",
+# "MP2_aTZ",
+# "MP2_DZ",
+# "MP2_haDZ",
+# "MP2_haTZ",
+# "MP2_TZ"]
 
 # Coordinates types to use
 # Available: "Nattys", "Redundant", "ZMAT" (not yet tho)
@@ -61,11 +110,11 @@ coord_type = ["Nattys"]
 # paths = ['/1*','/2*']
 # job_list = ["4.31"]
 # job_list = ["1.104"]
-job_list = ["3.12"]
+job_list = ["3.5"]
 
 # Various output control statements
-# n = 0                    # Number of CMA2 corrections (n = 0 -> CMA0)
-n = 36                    # Number of CMA2 corrections (n = 0 -> CMA0)
+n = 0                    # Number of CMA2 corrections (n = 0 -> CMA0)
+# n = 36                    # Number of CMA2 corrections (n = 0 -> CMA0)
 # n = 15                    # Number of CMA2 corrections (n = 0 -> CMA0)
 # n = 10                    # Number of CMA2 corrections (n = 0 -> CMA0)
 # cma1 = False             # Run CMA1 instead of CMA0
@@ -78,6 +127,9 @@ compute_all = False       # run calculations for all or a select few
 # compute_all = True       # run calculations for all or a select few
 off_diag_bands = False   # (CMA2/3 ONLY) If set to true, "n" off-diag bands selected, if false, "n" largest fc will be selected
 deriv_level = 0         # (CMA1) if 0, compute initial hessian by singlepoints. If 1, compute initial hessian with findif of gradients
+second_order = True    # If True, read in cartesian gradient and force constant info to be converted to internal coordinates.
+# second_order = False    # If False, generate displacements to manually compute the CMA-0A internal coord force constants.
+
 
 # =====================
 # Some useful functions
@@ -254,7 +306,7 @@ def execute():
         options = None
 
         # Initialize objects
-        mol = Molecule(job)
+        mol = Molecule(job,h_theory)
         basename = return_path_base(job) 
         d = {'Molecule' : None}     # Ensures molecule is first column
         z = {'Molecule' : None}     # Ensures molecule is first column
@@ -452,7 +504,7 @@ def execute():
                     # execMerger.options.gen_disps_init = False
                     execMerger.options.cart_insert_init = 9
                     execMerger.options.other_F_matrix = ''
-                    # execMerger.options.other_F_matrix = 'CCSD_aTZ'
+                    # execMerger.options.other_F_matrix = 'MP2_haTZ'
                     if len(execMerger.options.other_F_matrix):
                         if os.path.exists(os.getcwd()+"/"+combo[0]+"/Disps_"+execMerger.options.other_F_matrix+"/fc_int_nat.dat"):
                             shutil.copyfile(os.getcwd()+"/"+combo[0]+"/Disps_"+execMerger.options.other_F_matrix+"/fc_int_nat.dat",os.getcwd()+"/inter_fc.dat")
@@ -465,10 +517,19 @@ def execute():
                     execMerger.options.n_cma2 = n
                     execMerger.options.off_diag = off_diag_bands
                     execMerger.options.deriv_level = deriv_level
+                    execMerger.options.second_order = second_order
                     sym_sort = np.array([])
                     if coord == "Nattys":
-                        print("Where are the zmats coming from?")
-                        print(combo[0])
+                        # print("Where are the zmats coming from?")
+                        # print(combo[0])
+                        if second_order:
+                            try:
+                                shutil.copyfile(job + combo[0] + "/Disps_" + combo[1] + "/fc.dat", job + "fc.dat")
+                                shutil.copyfile(job + combo[0] + "/Disps_" + combo[1] + "/fc.grad", job + "fc.grad")
+                            except:
+                                print('Once again, the directory does not contain the sufficient files for the specified job')
+                                mol.direc_complete = False
+                                break 
                         try: 
                             shutil.copyfile(job + combo[0] + "/zmat", job + "zmat")
                             shutil.copyfile(job + combo[0] + "/zmat", job + "zmat2")
@@ -495,6 +556,14 @@ def execute():
                         mol.get_nattys(combo)
                 
                     else:
+                        if second_order:
+                            try:
+                                shutil.copyfile(job + combo[0] + "/Disps_" + combo[1] + "/fc.dat", job + "fc.dat")
+                                shutil.copyfile(job + combo[0] + "/Disps_" + combo[1] + "/fc.grad", job + "fc.grad")
+                            except:
+                                print('Once again, the directory does not contain the sufficient files for the specified job')
+                                mol.direc_complete = False
+                                break 
                         try: 
                             shutil.copyfile(job + combo[0] + "/zmat_red", job + "zmat")
                             shutil.copyfile(job + combo[0] + "/zmat_red", job + "zmat2")
@@ -580,7 +649,6 @@ def execute():
         # end of combo loop
         if mol.direc_complete: 
             # Print molecule information
-            mol.run()
             if SI:
                 si.write(mol.build_latex_output(cma1=cma1))
             
@@ -590,11 +658,14 @@ def execute():
             try: 
                 os.remove("zmat")
                 os.remove("zmat2")
+                if second_order:
+                    os.remove("fc.dat")
                 os.remove("fc2.dat")
                 os.remove("inter_fc.dat")
             except:
                 print('These are not the files you are looking for') 
             
+            mol.run()
             sys.path.remove(job)
             del mol
 

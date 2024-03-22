@@ -15,8 +15,6 @@ class Projection(object):
 
     def run(self):
     
-	unc = np.eye(1)
-        
         ch_2str = normalize(np.array([
         [1, 1],
         [1,-1]
@@ -28,20 +26,21 @@ class Projection(object):
         [0, 1,-1]
         ]).T)
         
-        ch3_ang = normalize(np.array([
-        [1, 1, 1,-1,-1,-1],
-        [2,-1,-1, 0, 0, 0],
-        [0, 1,-1, 0, 0, 0],
-        [0, 0, 0, 2,-1,-1],
-        [0, 0, 0, 0, 1,-1]
-        ]).T)
-        
-        ch3_lin = normalize(np.array([
+        ch3_plane_ang = normalize(np.array([
         [2,-1,-1],
         [0, 1,-1],
         ]).T)
+
+        ch_ang = normalize(np.array([
+        [1, 1, 1,-1,-1,-1],
+        [2,-1,-1, 2,-1,-1],
+        [2,-1,-1,-2, 1, 1],
+        [0, 1,-1, 0, 1,-1],
+        [0, 1,-1, 0,-1, 1],
+        ]).T)
         
-        Proj = block_diag(ch_2str, ch_3str, ch3_ang, ch3_lin)
+        
+        Proj = block_diag(ch_2str, ch_3str, ch3_plane_ang, ch_ang)
 
         self.Proj = Proj
 

@@ -14,6 +14,24 @@ class Projection(object):
         self.options = options
 
     def run(self):
+        HA_str = normalize(np.array([
+        [1, 1, 1, 1, 1, 1],
+        [1,-1, 1,-1, 1,-1],
+        [2, 1,-1,-2,-1, 1],
+        [0, 1, 1, 0,-1,-1],
+        [2,-1,-1, 2,-1,-1],
+        [0, 1,-1, 0, 1,-1],
+        ]).T)
+        HA_ang = normalize(np.array([
+        [1,-1, 1,-1, 1,-1],
+        [2,-1,-1, 2,-1,-1],
+        [0, 1,-1, 0, 1,-1],
+        ]).T)
+        tor = normalize(np.array([
+        [ 1,-1, 1,-1, 1,-1],
+        [ 1, 0,-1, 1, 0,-1],
+        [-1, 2,-1,-1, 2,-1],
+        ]).T) 
 
         # Three_anti_sym_str = np.array([
         # [1, 1, 1, 1, 1, 1],
@@ -50,7 +68,7 @@ class Projection(object):
         [0, 0, 1, 1,-1,-1],
         ]).T
 
-        Proj = block_diag(Anti_sym_str,Anti_sym_str,Anti_sym_str,Three_str,Unc,Unc,Unc,Three_anti_sym,Three_str,Three_twist)
+        Proj = block_diag(HA_str,Unc,Unc,Unc,Anti_sym_str,Anti_sym_str,Anti_sym_str,HA_ang,tor)
         Proj = 1/norm(Proj,axis=0)*Proj
 
         self.Proj = Proj

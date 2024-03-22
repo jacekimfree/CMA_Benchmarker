@@ -18,6 +18,7 @@ from concordantmodes.f_read import FcRead
 from concordantmodes.force_constant import ForceConstant
 from concordantmodes.gf_method import GFMethod
 from concordantmodes.g_matrix import GMatrix
+from concordantmodes.g_read import GrRead
 from concordantmodes.int2cart import Int2Cart
 from concordantmodes.options import Options
 from concordantmodes.reap import Reap
@@ -59,6 +60,7 @@ class Merger(object):
         self.Proj = Proj 
         options = opts 
         #options = options_obj
+        # options.cart_insert_init = 26
         options.cart_insert_init = 9
         rootdir = os.getcwd()
         zmat_obj = Zmat(options)
@@ -75,15 +77,24 @@ class Merger(object):
         else:
             print('this is proj, check for this when redundants executed')
             print(self.Proj)
-        s_vec.run(zmat_obj.cartesians_init, True, proj=self.Proj)
+        s_vec.run(zmat_obj.cartesians_init, True, proj=self.Proj, second_order=options.second_order)
                 
         TED_obj = TED(s_vec.proj, zmat_obj)
+        print("TED PROJ:")
+        print(TED_obj.proj)
         
         g_mat = GMatrix(zmat_obj, s_vec, options)
         g_mat.run()
         
         G = g_mat.G.copy()
         
+        if os.path.exists(rootdir + "/fc.grad"):
+            print('FC GRAD EXISTS')
+            # raise RuntimeError
+            g_read_obj = GrRead("fc.grad")
+            g_read_obj.run(zmat_obj.cartesians_init)
+
+
         init_bool = False
         if os.path.exists(rootdir + "/fc.dat"):
             f_read_obj = FcRead("fc.dat")
@@ -120,7 +131,7 @@ class Merger(object):
                     indices = np.array(indices).T
                 else:
                     indices = np.arange(len(eigs_init))
-
+                
                 init_disp = TransfDisp(
                     s_vec,
                     zmat_obj,
@@ -276,9 +287,12 @@ class Merger(object):
                 False,
                 TED_obj,
                 options.units,
-                False
+                options.second_order
             )
-            f_conv_obj.run()
+            if options.second_order:
+                f_conv_obj.run(grad=g_read_obj.cart_grad)
+            else:
+                f_conv_obj.run()
             F = f_conv_obj.F
         else:
             F = fc_init.FC
