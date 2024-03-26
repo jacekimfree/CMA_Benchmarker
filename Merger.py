@@ -201,11 +201,7 @@ class Merger(object):
                 print("deriv_level:")
                 print(self.options.deriv_level)
                 reap_obj_init = Reap(
-                    prog_name_init,
-                    zmat_obj,
-                    init_disp.disp_cart,
                     options,
-                    init_disp.n_coord,
                     eigs_init,
                     indices,
                     options.energy_regex_init,
