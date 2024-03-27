@@ -35,9 +35,9 @@ h_theory = ["CCSD_T_aTZ"]
 # l_theory = ["MP2_DZ"]
 # l_theory = ["CCSD_T_haTZ"]
 # l_theory = ["CCSD_T_haDZ"]
-l_theory = ["CCSD_T_aDZ"]
+# l_theory = ["CCSD_T_aDZ"]
 # l_theory = ["CCSD_haTZ"]
-# l_theory = ["CCSD_T_TZ"]
+l_theory = ["CCSD_T_TZ"]
 # l_theory = ["CCSD_T_DZ"]
 # l_theory = [
 # # "CCSD_aTZ",
@@ -110,7 +110,7 @@ coord_type = ["Nattys"]
 # paths = ['/1*','/2*']
 # job_list = ["4.31"]
 # job_list = ["1.104"]
-job_list = ["3.5"]
+job_list = ["3.4"]
 
 # Various output control statements
 n = 0                    # Number of CMA2 corrections (n = 0 -> CMA0)
