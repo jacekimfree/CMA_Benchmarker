@@ -75,6 +75,7 @@ cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
 # "MP2_TZ"]
 
 # cma1_energy_regexes = ["CCSD\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
+# cma1_gradient_regex = ["\s*virial=\S\S+\.\d+E\S\d+\S\>\s+"]
 # cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)","Grab this energy (\-\d+\.\d+)"]
 # cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)",[r"Total Gradient",r"tstop"]]
 # cma1_success_regexes = ["Variable memory released","beer"]
@@ -246,7 +247,7 @@ print("""
 ..........................................................................................
 """)
 
-print("Authors: Dr. Mitchell Lahm, Nathaniel Kitzmiller, Dr. Henry Mull")
+print("Contributors: Dr. Mitchell Lahm, Nathaniel Kitzmiller, Dr. Henry Mull, Laura Olive, Jace Jin")
 print()
 print("Combinations of levels of theory (high, low): ", end="")
 print(*combos, sep=", ")
@@ -483,6 +484,7 @@ def execute():
                 # move into directory with higher level geom, fc.dat, and Disp directories
                 os.chdir(f"{job}/")
                 print(f"I am in {os.getcwd()} and I can see {os.listdir()}")
+                print(job + combo[0]) 
                 
                 for coord in coord_type:
                     print()
@@ -498,6 +500,7 @@ def execute():
                     from Merger import Merger
                     execMerger = Merger(cma1_path= "/" + combo[0]+"/Disps_" + combo[1])
                     if os.path.exists(os.getcwd() + "/" + combo[0]+"/Disps_" + combo[1] + "/templateInit.dat"):
+                        #change to True if you need the displacements generated
                         execMerger.options.calc_init = True
 
                     # execMerger.options.calc_init = False
@@ -533,7 +536,7 @@ def execute():
                         try: 
                             shutil.copyfile(job + combo[0] + "/zmat", job + "zmat")
                             shutil.copyfile(job + combo[0] + "/zmat", job + "zmat2")
-                            shutil.copyfile(job + combo[0] + "/fc.dat", job + "fc2.dat")       
+                            shutil.copyfile(job + combo[0] + "/fc.dat", job + "fc2.dat")      
                         except:
                             print('Once again, the directory does not contain the sufficient files for the specified job')
                             mol.direc_complete = False
@@ -568,6 +571,8 @@ def execute():
                             shutil.copyfile(job + combo[0] + "/zmat_red", job + "zmat")
                             shutil.copyfile(job + combo[0] + "/zmat_red", job + "zmat2")
                             shutil.copyfile(job + combo[0] + "/fc.dat", job + "fc2.dat")       
+                            #shutil.copyfile(job + combo[0] + "/zmat_cma1", job + "zmat")
+                            #shutil.copyfile(job + combo[0] + "/zmat_cma1_Final", job + "zmat2")
                         except:
                             print('Once again, the directory does not contain the sufficient files for the specified job')
                             mol.direc_complete = False
@@ -575,6 +580,7 @@ def execute():
                         cma1_coord = "red"
                         execMerger.options.man_proj = False
                         execMerger.options.coords = coord
+                        execMerger.options.gradient_regex = cma1_gradient_regex
                         Proj = None
                         if 'Linear' in job:
                             execMerger.options.coords = 'Custom'

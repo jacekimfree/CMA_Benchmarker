@@ -204,6 +204,7 @@ class Merger(object):
                     options,
                     eigs_init,
                     indices,
+                    options.gradient_regex,
                     options.energy_regex_init,
                     None,
                     options.success_regex_init,
