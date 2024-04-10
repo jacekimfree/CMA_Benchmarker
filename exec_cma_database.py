@@ -58,7 +58,8 @@ l_theory = ["CCSD_T_DZ"]
 combos = list(product(h_theory,l_theory))
 
 # cma1_energy_regexes = ["MP2\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
-cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
+cma1_energy_regexes = ["CCSD\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
+# cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
 # cma1_energy_regexes = [
 # # "CCSD_aTZ",
 # # "CCSD_haTZ",
@@ -112,7 +113,7 @@ coord_type = ["Nattys"]
 # paths = ['/1*','/2*']
 # job_list = ["4.31"]
 # job_list = ["1.104"]
-job_list = ["0.1"]
+job_list = ["4.76"]
 
 # Various output control statements
 n = 0                    # Number of CMA2 corrections (n = 0 -> CMA0)
@@ -506,7 +507,7 @@ def execute():
 
                     # execMerger.options.calc_init = False
                     # execMerger.options.gen_disps_init = False
-                    execMerger.options.cart_insert_init = 9
+                    execMerger.options.cart_insert_init = 7
                     execMerger.options.other_F_matrix = ''
                     # execMerger.options.other_F_matrix = 'MP2_haTZ'
                     if len(execMerger.options.other_F_matrix):

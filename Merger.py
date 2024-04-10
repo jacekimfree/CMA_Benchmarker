@@ -61,7 +61,7 @@ class Merger(object):
         options = opts 
         #options = options_obj
         # options.cart_insert_init = 26
-        options.cart_insert_init = 9
+        options.cart_insert_init = 7
         rootdir = os.getcwd()
         zmat_obj = Zmat(options)
         zmat_obj.run()
