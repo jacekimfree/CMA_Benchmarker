@@ -113,7 +113,7 @@ coord_type = ["Nattys"]
 # paths = ['/1*','/2*']
 # job_list = ["4.31"]
 # job_list = ["1.104"]
-job_list = ["4.76"]
+job_list = ["4.05"]
 
 # Various output control statements
 n = 0                    # Number of CMA2 corrections (n = 0 -> CMA0)
@@ -720,4 +720,3 @@ if csv:
 if SI:
     si.write(footer)
     si.close()
-
