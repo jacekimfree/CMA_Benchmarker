@@ -18,6 +18,10 @@ class Projection(object):
         Proj = np.eye(4)
 
         self.Proj = Proj
+        self.sym_sort = np.array([
+            [0,1],
+            [2,3],
+            ],dtype=object)
 
 def normalize(mat):
     return 1/norm(mat,axis=0)*mat

@@ -29,6 +29,10 @@ class Projection(object):
             [0, 1,-1],
         ]).T)
         
+        CH_ang_mat = 1/np.sqrt(2) * np.array([
+            [1],
+            [-1]
+        ])
         # CH_ang_mat = np.array([
             # [ 2/np.sqrt(6), 0           ],
             # [-1/np.sqrt(6), 1/np.sqrt(2)],
@@ -42,11 +46,15 @@ class Projection(object):
         
         oop_mat = np.eye(2)
         
-        Proj = block_diag(CC_mat,CX_mat,CH_mat,CX_ang_mat,CX_ang_mat,tor_mat,oop_mat)
+        Proj = block_diag(CC_mat,CX_mat,CH_mat,CC_mat,CH_ang_mat,CX_ang_mat,tor_mat,oop_mat)
         # Proj = block_diag(CC_mat,CX_mat,CH_mat,CX_ang_mat,CH_ang_mat,tor_mat,oop_mat)
         
         
         self.Proj = Proj                     
+        self.sym_sort = np.array([
+            [0,1,2,3,4,5,6,7,8],
+            [9,10,11],
+            ],dtype=object)
 
 def normalize(mat):
     return 1/norm(mat,axis=0)*mat

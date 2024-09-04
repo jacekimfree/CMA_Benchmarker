@@ -50,8 +50,8 @@ class Projection(object):
         [0, 1,-1, 0, 0, 0, 0,-1, 1, 0, 0, 0],
         [0, 0, 0, 2,-1,-1, 0, 0, 0, 2,-1,-1],
         [0, 0, 0, 2,-1,-1, 0, 0, 0,-2, 1, 1],
-        [0, 0, 0, 0, 1,-1, 0, 0, 0, 0,-1, 1],
         [0, 0, 0, 0, 1,-1, 0, 0, 0, 0, 1,-1],
+        [0, 0, 0, 0, 1,-1, 0, 0, 0, 0,-1, 1],
         ]).T)
 
         tor1 = np.eye(1)
@@ -66,6 +66,10 @@ class Projection(object):
         Proj = block_diag(HA_str1,HA_str2,CH_str,HA_ang1,HA_ang2,HA_ang3,CH_ang1,tor1,tor2,oop)
 
         self.Proj = Proj
+        self.sym_sort = np.array([
+            [0,1,2,3,5,7,9,11,12,15,17,19,21,23,27,28,29],
+            [4,6,8,10,13,14,16,18,20,22,24,25,26],
+            ],dtype=object)
 
 def normalize(mat):
     return 1/norm(mat,axis=0)*mat

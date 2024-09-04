@@ -30,10 +30,13 @@ class Projection(object):
 
         tor = normalize(np.array([
         [ 1, 1],
-        [ 1,-1],
         ]).T)
 
-        Proj = block_diag(stretch,HA_stretch,angles,tor)
+        Proj = block_diag(stretch,HA_stretch,angles,tor,np.eye(1))
+        self.sym_sort = np.array([
+            [0,1,2,3,4,5,6],
+            [7,8],
+            ],dtype=object)
 
 
         self.Proj = Proj

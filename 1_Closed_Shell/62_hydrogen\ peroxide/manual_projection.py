@@ -21,3 +21,7 @@ class Projection(object):
         
         Proj = block_diag(np.eye(1),mix_mat,mix_mat,np.eye(1))
         self.Proj = Proj                     
+        self.sym_sort = np.array([
+            [0,1,3,5],
+            [2,4],
+            ],dtype=object)
