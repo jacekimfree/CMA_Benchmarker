@@ -45,7 +45,7 @@ h_theory = ["CCSD_T_TZ"]
 # l_theory = ["HF_TZ"]
 # l_theory = ["MP2_aDZ"]
 # l_theory = ["MP2_DZ"]
-l_theory = ["MP2_TZ","CCSD_T_DZ","B3LYP_6-31G_2df,p_"]
+#l_theory = ["MP2_TZ","CCSD_T_DZ","B3LYP_6-31G_2df,p_"]
 # l_theory = ["df_MP2_TZ"]
 # l_theory = ["MP2_TZ"]
 # l_theory = ["CCSD_T_haTZ"]
@@ -56,7 +56,7 @@ l_theory = ["MP2_TZ","CCSD_T_DZ","B3LYP_6-31G_2df,p_"]
 # l_theory = ["CCSD_DZ"]
 # l_theory = ["CCSD_T_TZ"]
 # l_theory = ["HF_DZ"]
-# l_theory = ["CCSD_T_DZ"]
+l_theory = ["CCSD_T_DZ"]
 # l_theory = ["CCSD_TZ"]
 # l_theory = ["HF_6-31G_2df,p_"]
 # l_theory = ["B3LYP_6-31G_2df,p_"]
@@ -95,9 +95,9 @@ combos = list(product(h_theory,l_theory))
 # cma1_energy_regexes = ["!RHF STATE 1.\d+ Energy\s+(\-\d+\.\d+)","!RHF STATE 1.\d+ Energy\s+(\-\d+\.\d+)"]
 # cma1_energy_regexes = ["!RHF STATE 1.\d+ Energy\s+(\-\d+\.\d+)"]
 # cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)","MP2\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
-# cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
+cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
 # cma1_energy_regexes = ["Grab this energy\s+(\-\d+\.\d+)"]
-cma1_energy_regexes = ["Grab this energy\s+(\-\d+\.\d+)","",""]
+# cma1_energy_regexes = ["Grab this energy\s+(\-\d+\.\d+)","",""]
 # cma1_energy_regexes = [
 # # "CCSD_aTZ",
 # # "CCSD_haTZ",
@@ -122,12 +122,12 @@ cma1_gradient_regex = []
 # cma1_success_regexes = ["!MP2\s*t?o?t?a?l?\s*energy\s+\-\d+\.\d+"]
 # cma1_success_regexes = ["total\s*energy\s+\-\d+\.\d+"]
 # cma1_success_regexes = ["Variable memory released","Variable memory released"]
-# cma1_success_regexes = ["Variable memory released"]
+cma1_success_regexes = ["Variable memory released"]
 
 # CMA2 Stat Theories
 # cma1_success_regexes = ["Variable memory released","beer","a","beer","a","a","a","Variable memory released"]
 
-cma1_success_regexes = ["beer","",""]
+# cma1_success_regexes = ["beer","",""]
 # cma1_success_regexes = ["beer"]
 # cma1_success_regexes = [
 # # "CCSD_aTZ",
@@ -157,20 +157,20 @@ coord_type = ["Nattys"]
 # paths = ['/3_Dimers']
 # paths = ['/1_Closed_Shell','/2_Open_Shell']
 
-paths = ['/1*','/2*']
+# paths = ['/1*','/2*']
 # paths = ['/2*']
 # job_list = ["3.4"]
-# job_list = ["4.31"]
+job_list = ["4.31"]
 # job_list = ["2.18"]
 # job_list = ["1.102"]
 # exclude_list = ["1.91","1.57"]
-exclude_list = ["1.91"]
-# exclude_list = []
+# exclude_list = ["1.91"]
+exclude_list = []
 
 
 # Various output control statements
-n = 1                    # Number of CMA2 corrections (n = 0 -> CMA0)
-# n = 0                    # Number of CMA2 corrections (n = 0 -> CMA0)
+# n = 1                    # Number of CMA2 corrections (n = 0 -> CMA0)
+n = 0                    # Number of CMA2 corrections (n = 0 -> CMA0)
 # n = 36                    # Number of CMA2 corrections (n = 0 -> CMA0)
 # n = 15                    # Number of CMA2 corrections (n = 0 -> CMA0)
 # n = 10                    # Number of CMA2 corrections (n = 0 -> CMA0)
@@ -178,18 +178,18 @@ n = 1                    # Number of CMA2 corrections (n = 0 -> CMA0)
 xi_tol = [0.02]    # Xi value for cutoff in determining CMA2 off diags
 # cma1 = False             # Run CMA1 instead of CMA0
 cma1 = True             # Run CMA1 instead of CMA0
-# csv = False               # Generate database .csv file
-csv = True               # Generate database .csv file
-# SI = False                # Generate LaTeX SI file
-SI = True               # Generate LaTeX SI file
-# compute_all = False       # run calculations for all or a select few
-compute_all = True       # run calculations for all or a select few
+csv = False               # Generate database .csv file
+# csv = True               # Generate database .csv file
+SI = False                # Generate LaTeX SI file
+# SI = True               # Generate LaTeX SI file
+compute_all = False       # run calculations for all or a select few
+# compute_all = True       # run calculations for all or a select few
 off_diag_bands = False   # (CMA2/3 ONLY) If set to true, "n" off-diag bands selected, if false, "n" largest fc will be selected
 deriv_level = 0         # (CMA1) if 0, compute initial hessian by singlepoints. If 1, compute initial hessian with findif of gradients
-# second_order = True    # If True, read in cartesian gradient and force constant info to be converted to internal coordinates.
-second_order = False    # If False, generate displacements to manually compute the CMA-0A internal coord force constants.
-# coord_type_init = "cartesian" # Toggle this for type of coordinate used in inital force constant computations
-coord_type_init = "internal" # Toggle this for type of coordinate used in inital force constant computations
+second_order = True    # If True, read in cartesian gradient and force constant info to be converted to internal coordinates.
+# second_order = False    # If False, generate displacements to manually compute the CMA-0A internal coord force constants.
+coord_type_init = "cartesian" # Toggle this for type of coordinate used in inital force constant computations
+# coord_type_init = "internal" # Toggle this for type of coordinate used in inital force constant computations
 
 # =====================
 # Some useful functions
@@ -566,7 +566,7 @@ def execute():
                                 shutil.copyfile(job + combo[0] + "/Disps_" + combo[1] + "/fc_cart.grad", job + "fc.grad")
                             except:
                                 print('Once again, the directory does not contain the sufficient files for the specified job')
-                                mol.direc_complete = False
+                                # mol.direc_complete = False
                                 # break 
                         try: 
                             shutil.copyfile(job + combo[0] + "/zmat", job + "zmat")
