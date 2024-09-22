@@ -69,17 +69,13 @@ class Projection(object):
 
         Proj = block_diag(ch3_str, unc, unc, ch_2str, ch_2str, ch3_str, unc, cc3_plain_ang, ch_ang,
                           ch2c_ang, ch2c_ang, ch3_ang, ccc3_rot, ch2_rot, ch2_rot, ch3_rot, cc3_plain_oop, unc, unc, unc)
-
-        projBuff = Proj.copy()
-        projBuff = np.append(projBuff[:,:14],oop,axis=1)
-        Proj = np.append(projBuff,Proj[:,14:-1],axis=1)
+'''
         self.sym_sort = np.array([
             [0, 1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 13,],
             [4, 12, 14, 15, 16, 17, 18]
             ],dtype=object)
-
+'''
         self.Proj = Proj
-        np.set_printoptions(edgeitems=60,linewidth=1000)
 
 def normalize(mat):
     return 1/norm(mat, axis=0)*mat

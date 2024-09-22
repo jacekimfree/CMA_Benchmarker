@@ -16,29 +16,47 @@ class Projection(object):
 
     def run(self):
 
-        unc = np.eye(1)
+        # 0
+        str_c2c4 = np.eye(1)
 
-        ch_2str = normalize(np.array([
+        # 1
+        str_c4c6 = np.eye(1)
+
+        # 2
+        str_c6c8 = np.eye(1)
+
+        # 3
+        str_c4h7 = np.eye(1)
+
+        # 4-5
+        str_ch2_c8 = normalize(np.array([
             [1, 1],
             [1, -1]
         ]).T)
 
-        ch3_str = normalize(np.array([
+        # 6-8
+        str_ch3_c2 = normalize(np.array([
             [1, 1, 1],
             [2, -1, -1],
             [0, 1, -1]
         ]).T)
 
-        ch_ang = normalize(np.array([
+        # 9
+        ang_c2c4c6 = np.eye(1)
+
+        # 10
+        ang_ch_c4 = normalize(np.array([
             [1, -1]
         ]).T)
 
-        ch2c_ang = normalize(np.array([
+        # 11-12
+        ang_ch2_c8 = normalize(np.array([
             [2, -1, -1],
             [0, 1, -1]
         ]).T)
 
-        ch3_ang = normalize(np.array([
+        # 13-17
+        ang_ch3_c2 = normalize(np.array([
             [1, 1, 1, -1, -1, -1],
             [2, -1, -1, 0, 0, 0],
             [0, 1, -1, 0, 0, 0],
@@ -46,27 +64,38 @@ class Projection(object):
             [0, 0, 0, 0, 1, -1]
         ]).T)
 
-        ch2_rot = normalize(np.array([
+        # 18
+        rot_ch2_c8 = normalize(np.array([
             [1, 1]
         ]).T)
 
-        ch3_rot = normalize(np.array([
+        # 19
+        rot_ch3_c2 = normalize(np.array([
             [1, 1, 1]
         ]).T)
 
-        Proj = block_diag(unc, unc, unc, unc, ch_2str, ch3_str, unc,
-                          ch_ang, ch2c_ang, ch3_ang, ch2_rot, ch3_rot, unc, unc, unc, unc)
+        # 20
+        oop_c8 = np.eye(1)
 
-        projBuff = Proj.copy()
-        projBuff = np.append(projBuff[:,:14],oop,axis=1)
-        Proj = np.append(projBuff,Proj[:,14:-1],axis=1)
-        self.sym_sort = np.array([
-            [0, 2, 3, 5, 6, 8, 9, 11],
-            [1, 4, 7, 10, 12, 13, 14]
-            ],dtype=object)
+        # 21
+        oop_c4 = np.eye(1)
+
+        # 22
+        linx_c4 = np.eye(1)
+
+        # 23
+        liny_c4 = np.eye(1)
+
+        Proj = block_diag(str_c2c4, str_c4c6, str_c6c8, str_c4h7, str_ch2_c8, str_ch3_c2, ang_c2c4c6,
+                          ang_ch_c4, ang_ch2_c8, ang_ch3_c2, rot_ch2_c8, rot_ch3_c2, oop_c8, oop_c4, linx_c4, liny_c4)
 
         self.Proj = Proj
-        np.set_printoptions(edgeitems=60,linewidth=1000)
+
+        self.sym_sort = np.array([
+            [0, 1, 2, 3, 4, 6, 7, 9, 10, 11, 13, 14, 16, 20, 22],
+            [5, 8, 12, 15, 17, 18, 19, 21, 23]
+        ], dtype=object)
+
 
 def normalize(mat):
     return 1/norm(mat, axis=0)*mat
