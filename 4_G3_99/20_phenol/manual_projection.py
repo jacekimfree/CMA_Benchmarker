@@ -18,9 +18,6 @@ class Projection(object):
 
         unc = np.eye(1)
 
-        a, b = np.cos(144*np.pi/180), np.cos(72*np.pi/180)
-        c, d = np.sin(144*np.pi/180), np.sin(72*np.pi/180)
-
         cc_6str = normalize(np.array([
             [1, 1, 1, 1, 1, 1],
             [1, -1, 1, -1, 1, -1],
