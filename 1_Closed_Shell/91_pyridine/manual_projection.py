@@ -95,12 +95,15 @@ class Projection(object):
 
         self.Proj = Proj
 
+        # This is the official symmetry
         self.sym_sort = np.array([
             [0,2,4,6,8,10,11,12,14,16],
             [21,23,25],
             [19,20,22,24,26],
             [1,3,5,7,9,13,15,17,18]
             ],dtype=object)
+        
+        
         # self.sym_sort = np.array([
             # [0,3,4,6,8,10,11,12,14,16],
             # [21,23,25],

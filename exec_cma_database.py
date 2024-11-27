@@ -43,14 +43,16 @@ h_theory = ["CCSD_T_TZ"]
 # l_theory = ["CCSD_T_DZ","MP2_TZ"]
 # l_theory = ["HF_DZ","HF_TZ"]
 # l_theory = ["HF_TZ"]
-# l_theory = ["MP2_aDZ"]
 # l_theory = ["MP2_DZ"]
-l_theory = ["MP2_TZ","CCSD_T_DZ","B3LYP_6-31G_2df,p_"]
+# l_theory = ["MP2_aDZ"]
+# l_theory = ["MP2_aDZ"]
+# l_theory = ["MP2_TZ","CCSD_T_DZ","B3LYP_6-31G_2df,p_"]
 # l_theory = ["df_MP2_TZ"]
-# l_theory = ["MP2_TZ"]
+l_theory = ["MP2_TZ"]
 # l_theory = ["CCSD_T_haTZ"]
 # l_theory = ["CCSD_T_haDZ"]
 # l_theory = ["CCSD_T_aDZ"]
+# l_theory = ["CCSD_T_aTZ"]
 # l_theory = ["CCSD_haTZ"]
 # l_theory = ["CCD_TZ"]
 # l_theory = ["CCSD_DZ"]
@@ -86,6 +88,9 @@ combos = list(product(h_theory,l_theory))
 # cma1_energy_regexes = ["RMP2 energy\s+(\-\d+\.\d+)","Grab this energy\s+(\-\d+\.\d+)","a","Grab this energy\s+(\-\d+\.\d+)","a","a","a","!RHF STATE 1.\d+ Energy\s+(\-\d+\.\d+)"]
 
 # cma1_energy_regexes = ["!CCSD\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
+# cma1_energy_regexes = ["!RHF-UCCSD\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
+# cma1_energy_regexes = ["CCSD\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
+# cma1_energy_regexes = ["\s+MP2\s*t?o?t?a?l?\s*energy:\s+(\-\d+\.\d+)"]
 # cma1_energy_regexes = ["!MP2\s*t?o?t?a?l?\s*energy\s+(\-\d+\.\d+)"]
 # cma1_energy_regexes = ["MP4\(SDTQ\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
 # cma1_energy_regexes = ["MP3\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
@@ -93,11 +98,11 @@ combos = list(product(h_theory,l_theory))
 # cma1_energy_regexes = ["!UMP2 STATE 1.\d+ Energy\s+(\-\d+\.\d+)"]
 # cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)","!RMP2 STATE 1.\d+ Energy\s+(\-\d+\.\d+)"]
 # cma1_energy_regexes = ["!RHF STATE 1.\d+ Energy\s+(\-\d+\.\d+)","!RHF STATE 1.\d+ Energy\s+(\-\d+\.\d+)"]
-# cma1_energy_regexes = ["!RHF STATE 1.\d+ Energy\s+(\-\d+\.\d+)"]
+cma1_energy_regexes = ["!RHF STATE 1.\d+ Energy\s+(\-\d+\.\d+)"]
 # cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)","MP2\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
 # cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
 # cma1_energy_regexes = ["Grab this energy\s+(\-\d+\.\d+)"]
-cma1_energy_regexes = ["Grab this energy\s+(\-\d+\.\d+)","",""]
+# cma1_energy_regexes = ["Grab this energy\s+(\-\d+\.\d+)","",""]
 # cma1_energy_regexes = [
 # # "CCSD_aTZ",
 # # "CCSD_haTZ",
@@ -108,8 +113,7 @@ cma1_energy_regexes = ["Grab this energy\s+(\-\d+\.\d+)","",""]
 # "CCSD_T_TZ",
 # "MP2_aDZ",
 # "MP2_aTZ",
-# "MP2_DZ",
-# "MP2_haDZ",
+
 
 
 # cma1_energy_regexes = ["CCSD\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
@@ -122,12 +126,12 @@ cma1_gradient_regex = []
 # cma1_success_regexes = ["!MP2\s*t?o?t?a?l?\s*energy\s+\-\d+\.\d+"]
 # cma1_success_regexes = ["total\s*energy\s+\-\d+\.\d+"]
 # cma1_success_regexes = ["Variable memory released","Variable memory released"]
-# cma1_success_regexes = ["Variable memory released"]
+cma1_success_regexes = ["Variable memory released"]
 
 # CMA2 Stat Theories
 # cma1_success_regexes = ["Variable memory released","beer","a","beer","a","a","a","Variable memory released"]
 
-cma1_success_regexes = ["beer","",""]
+# cma1_success_regexes = ["beer","",""]
 # cma1_success_regexes = ["beer"]
 # cma1_success_regexes = [
 # # "CCSD_aTZ",
@@ -157,34 +161,46 @@ coord_type = ["Nattys"]
 # paths = ['/3_Dimers']
 # paths = ['/1_Closed_Shell','/2_Open_Shell']
 
-paths = ['/1*','/2*']
+# paths = ['/1*','/2*']
 # paths = ['/2*']
 # job_list = ["3.4"]
-# job_list = ["4.31"]
+# job_list = ["4.10"]
 # job_list = ["2.18"]
-# job_list = ["1.102"]
+job_list = ["1.91"]
+# job_list = ["0.2"]
 # exclude_list = ["1.91","1.57"]
-exclude_list = ["1.91"]
-# exclude_list = []
+# exclude_list = ["1.91","1.57","2.14"]
+# exclude_list = ["1.91"]
+exclude_list = []
 
 
 # Various output control statements
-n = 1                    # Number of CMA2 corrections (n = 0 -> CMA0)
-# n = 0                    # Number of CMA2 corrections (n = 0 -> CMA0)
+# n = 1                    # Number of CMA2 corrections (n = 0 -> CMA0)
+n = 0                    # Number of CMA2 corrections (n = 0 -> CMA0)
 # n = 36                    # Number of CMA2 corrections (n = 0 -> CMA0)
 # n = 15                    # Number of CMA2 corrections (n = 0 -> CMA0)
-# n = 10                    # Number of CMA2 corrections (n = 0 -> CMA0)
+# n = 3                    # Number of CMA2 corrections (n = 0 -> CMA0)
 # xi_tol = [100.0,10.0,9.0,8.0,7.0,6.0,5.0,4.0,3.0,2.0,1.0,0.2,0.18,0.16,0.14,0.12,0.10,0.08,0.075,0.07,0.065,0.06,0.055,0.05,0.045,0.04,0.036,0.032,0.028,0.024,0.02,0.018,0.016,0.014,0.012,0.011,0.01,0.009,0.008,0.007,0.006,0.005,0.004,0.003,0.002,0.001,0.0]    # Xi value for cutoff in determining CMA2 off diags
-xi_tol = [0.02]    # Xi value for cutoff in determining CMA2 off diags
-# cma1 = False             # Run CMA1 instead of CMA0
-cma1 = True             # Run CMA1 instead of CMA0
-# csv = False               # Generate database .csv file
-csv = True               # Generate database .csv file
-# SI = False                # Generate LaTeX SI file
-SI = True               # Generate LaTeX SI file
-# compute_all = False       # run calculations for all or a select few
-compute_all = True       # run calculations for all or a select few
-off_diag_bands = False   # (CMA2/3 ONLY) If set to true, "n" off-diag bands selected, if false, "n" largest fc will be selected
+# xi_tol = [100,0.2,0.18,0.16,0.14,0.12,0.1,0.08,0.06,0.04,0.02,0.01,0.005]    # Xi value for cutoff in determining CMA2 off diags
+# xi_tol = [10.0, 0.5, 0.2, 0.1, 0.05, 0.04, 0.033, 0.028, 0.0245, 0.021, 0.019, 0.017, 0.01, 0.005, 0.001, 0.0001, 1e-05, 1e-06, 1e-07, 1e-08, 1e-09]    # Xi values for MP2/TZ fig
+# xi_tol = [10.0, 0.5, 0.2, 0.1, 0.047, 0.036, 0.03, 0.025, 0.021, 0.019, 0.017, 0.01, 0.0075, 0.0062, 0.005, 0.0035, 0.0025, 0.0017, 0.001, 0.00075, 0.0005, 0.00025, 0.0001, 7.5e-05, 5e-05, 2.5e-05, 1e-05, 1e-06, 1e-07, 1e-08, 1e-09]    # Xi values for (T)/DZ fig
+# xi_tol = [10.0, 3.0, 2.0, 0.20, 0.07, 0.04, 0.03, 0.025, 0.022, 0.018, 0.01, 0.005, 0.004, 0.003, 0.0002, 0.0001, 1e-05, 1e-06, 1e-07, 1e-08, 1e-09]    # Xi values for B3LYP/6-31G(2df,p) fig
+# xi_tol = []    # Xi value for cutoff in determining CMA2 off diags
+xi_tol = [0.04]    # Xi value for cutoff in determining CMA2 off diags
+od_inds = [[16,17]]         # Contains a list of lists, where the sublists contain off-diagonal elements to be computed in CMA-1
+# cmaA = False             # Run CMA1 instead of CMA0
+cmaA = True             # Run CMA1 instead of CMA0
+csv = False               # Generate database .csv file
+# csv = True               # Generate database .csv file
+SI = False                # Generate LaTeX SI file
+# SI = True               # Generate LaTeX SI file
+compute_all = False       # run calculations for all or a select few
+# compute_all = True       # run calculations for all or a select few
+# off_diag_bands = False   # (CMA2/3 ONLY) If set to true, "n" off-diag bands selected, if false, "n" largest fc will be selected
+                           # off_diag_bands is now an obsolete option
+# off_diag = 0   # Set this option for CMA0
+# off_diag = 1   # Set this option for CMA1. Additional off-diagonal elements will need to be specified using ___.
+off_diag = 2   # Set this option for CMA2. Off-diags will be auto generated, but an aux hessian will need be specified using ___.
 deriv_level = 0         # (CMA1) if 0, compute initial hessian by singlepoints. If 1, compute initial hessian with findif of gradients
 # second_order = True    # If True, read in cartesian gradient and force constant info to be converted to internal coordinates.
 second_order = False    # If False, generate displacements to manually compute the CMA-0A internal coord force constants.
@@ -337,7 +353,8 @@ def execute():
         d = {'Molecule' : None}     # Ensures molecule is first column
         z = {'Molecule' : None}     # Ensures molecule is first column
         m = {'Molecule' : None}     # Ensures molecule is first column
-        if n > 0: 
+        if off_diag > 0: 
+        # if n > 0: 
             d2 = {'Molecule' : None}
             d2e = {'Molecule' : None}
             d2m = {'Molecule' : None}
@@ -357,7 +374,7 @@ def execute():
             if not mol.direc_complete:
                 break
  
-            if not cma1:
+            if not cmaA:
                 # Copy the necessary files with correct names
                 
                 # Run for each coord type
@@ -422,7 +439,8 @@ def execute():
                             
                 
                     execMerger.options.n_cma2 = n
-                    execMerger.options.off_diag = off_diag_bands
+                    execMerger.options.off_diag = off_diag
+                    # execMerger.options.off_diag = off_diag_bands
                 
                     # Run CMA
                     execMerger.run(execMerger.options, Proj, sym_sort=sym_sort, coord_type_init=coord_type_init)
@@ -508,7 +526,7 @@ def execute():
             elif not mol.direc_complete:
                 continue
             
-            elif cma1:
+            elif cmaA:
                 # move into directory with higher level geom, fc.dat, and Disp directories
                 os.chdir(f"{job}/")
                 print(f"I am in {os.getcwd()} and I can see {os.listdir()}")
@@ -530,6 +548,7 @@ def execute():
                     if os.path.exists(os.getcwd() + "/" + combo[0]+"/Disps_" + combo[1] + "/templateInit.dat"):
                         #change to True if you need the displacements generated
                         execMerger.options.calc_init = True
+                    # execMerger.options.calc_init = False
 
                     if os.path.exists(os.getcwd() + "/" + combo[0]+"/Disps_" + combo[1] + "/DispsInit"):
                         execMerger.options.calc_init = False
@@ -555,7 +574,8 @@ def execute():
                         execMerger.options.program_init = "psi4@master"
                     execMerger.options.coords = coord
                     execMerger.options.n_cma2 = n
-                    execMerger.options.off_diag = off_diag_bands
+                    # execMerger.options.off_diag = off_diag_bands
+                    execMerger.options.off_diag = off_diag
                     execMerger.options.deriv_level = deriv_level
                     execMerger.options.second_order = second_order
                     sym_sort = np.array([])
@@ -566,7 +586,7 @@ def execute():
                                 shutil.copyfile(job + combo[0] + "/Disps_" + combo[1] + "/fc_cart.grad", job + "fc.grad")
                             except:
                                 print('Once again, the directory does not contain the sufficient files for the specified job')
-                                mol.direc_complete = False
+                                # mol.direc_complete = False
                                 # break 
                         try: 
                             shutil.copyfile(job + combo[0] + "/zmat", job + "zmat")
@@ -619,31 +639,20 @@ def execute():
                         Proj = None
                         if 'Linear' in job:
                             execMerger.options.coords = 'Custom'
-                    execMerger.run(execMerger.options,Proj,energy_regex=cma1_energy_regexes[countt],success_regex=cma1_success_regexes[countt],cma1_coord=cma1_coord, sym_sort=sym_sort, xi_tol=xi_tol, coord_type_init=coord_type_init)
-
+                    execMerger.run(execMerger.options,Proj,energy_regex=cma1_energy_regexes[countt],success_regex=cma1_success_regexes[countt],cma1_coord=cma1_coord, sym_sort=sym_sort, xi_tol=xi_tol, coord_type_init=coord_type_init, od_inds=od_inds)
                     # Collect the data in dictionary d to add it to the database
                     # e.g. d[f"Ref {combo[0]}"] = execMerger.reference_freq
                     # d[f"CMA1 {combo[1]}"] = execMerger.Freq_redundant
                     
-                    # Use this line to toggle excluding non mixing modes by symmetry
-                    # execMerger.exclude = np.array([])
-
                     ref_freq = execMerger.reference_freq.copy()
                     freq_indices = [i for i in range(len(ref_freq))]
                     freq_indices = np.array(freq_indices)
-                    # if len(execMerger.exclude):
-                        # ref_freq = np.delete(ref_freq,execMerger.exclude)
-                        # freq_indices = np.delete(freq_indices,execMerger.exclude)
-                    # raise RuntimeError
                     
                     # Collect data
                     if coord_type.index(coord) == 0:
                     # if coord_type.index(coord) == 1:
                         ref_freq = execMerger.reference_freq.copy()
                         ref_freq_init = execMerger.ref_init.copy()
-                        # if len(execMerger.exclude):
-                            # ref_freq = np.delete(ref_freq,execMerger.exclude)
-                            # ref_freq_init = np.delete(ref_freq_init,execMerger.exclude)
                         
                         # raise RuntimeError
                         d[f'Ref ({combo[0]})'] = ref_freq
@@ -652,11 +661,12 @@ def execute():
                         mol.freqs[f'Ref ({combo[0]})'] = ref_freq
                         
                         d[f'Ref ({combo[1]})'] = ref_freq_init
-                        d[f'Ref - Ref ({combo[1]})'] = freq_diff(ref_freq, ref_freq_init)
+                        d[f'Pure - Ref ({combo[1]})'] = freq_diff(ref_freq, ref_freq_init)
+                        d[f'ABS Pure - Ref ({combo[1]})'] = np.abs(freq_diff(ref_freq, ref_freq_init))
                         z[f'Ref ({combo[1]})'] = np.sum(ref_freq_init)/2
-                        z[f'Ref - Ref ({combo[1]})'] = np.sum(ref_freq_init)/2 - np.sum(ref_freq)/2
+                        z[f'Pure - Ref ({combo[1]})'] = np.sum(ref_freq_init)/2 - np.sum(ref_freq)/2
                         # z[f'Ref ({combo[1]})'] = np.sum(ref_freq_init)/(2*349.7550881133)
-                        m[f'Ref - Ref ({combo[1]})'] = np.max(np.abs(freq_diff(ref_freq, ref_freq_init)))
+                        m[f'Pure - Ref ({combo[1]})'] = np.max(np.abs(freq_diff(ref_freq, ref_freq_init)))
                         mol.freqs[f'Initial ({combo[1]})'] = ref_freq_init
                         
                         # Number the modes
@@ -668,14 +678,13 @@ def execute():
                         z['Molecule'] = [f"{mol.name} ({mol.ID})"]
                         m['Molecule'] = [f"{mol.name} ({mol.ID})"]
                         custom_freq = execMerger.Freq_CMA0.copy()
-                        # if len(execMerger.exclude):
-                            # custom_freq = np.delete(custom_freq,execMerger.exclude)
                         d[f'Natty ({combo[1]})'] = custom_freq
                         # d[f'Natty ({combo[1]})'] = execMerger.Freq_custom
                         z[f'Natty ({combo[1]})'] = np.sum(custom_freq)/2
                         # z[f'Natty ({combo[1]})'] = np.sum(execMerger.Freq_custom)/2
                         # z[f'Natty ({combo[1]})'] = np.sum(execMerger.Freq_custom)/(2*349.7550881133)
                         d[f'Ref - Nat ({combo[1]})'] = freq_diff(ref_freq, custom_freq)
+                        d[f'ABS Ref - Nat ({combo[1]})'] = np.abs(freq_diff(ref_freq, custom_freq))
                         # d[f'Ref - Nat ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_custom)
                         z[f'Ref - Nat ({combo[1]})'] = np.sum(custom_freq)/2 - np.sum(ref_freq)/2
                         # z[f'Ref - Nat ({combo[1]})'] = np.sum(execMerger.reference_freq)/2 - np.sum(execMerger.Freq_custom)/2
@@ -686,8 +695,6 @@ def execute():
                     if coord == "Redundant":
                         if 'Linear' not in job:
                             red_freq = execMerger.Freq_redundant.copy()
-                            # if len(execMerger.exclude):
-                                # red_freq = np.delete(red_freq,execMerger.exclude)
 
                             d[f'Red ({combo[1]})'] = red_freq
                             # d[f'Red ({combo[1]})'] = execMerger.Freq_redundant
@@ -695,6 +702,7 @@ def execute():
                             # z[f'Red ({combo[1]})'] = np.sum(execMerger.Freq_redundant)/2
                             # z[f'Red ({combo[1]})'] = np.sum(execMerger.Freq_redundant)/(2*349.7550881133)
                             d[f'Ref - Red ({combo[1]})'] = freq_diff(ref_freq, red_freq)
+                            d[f'ABS Ref - Red ({combo[1]})'] = np.abs(freq_diff(ref_freq, red_freq))
                             # d[f'Ref - Red ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_redundant)
                             z[f'Ref - Red ({combo[1]})'] = np.sum(ref_freq)/2 - np.sum(red_freq)/2
                             # z[f'Ref - Red ({combo[1]})'] = np.sum(execMerger.reference_freq)/2 - np.sum(execMerger.Freq_redundant)/2
@@ -705,14 +713,13 @@ def execute():
                             # mol.freqs[f'Red ({combo[1]})'] = execMerger.Freq_redundant
                         else:
                             cust_freq = execMerger.Freq_CMA0.copy()
-                            # if len(execMerger.exclude):
-                                # cust_freq = np.delete(cust_freq,execMerger.exclude)
                             d[f'Red ({combo[1]})'] = cust_freq
                             # d[f'Red ({combo[1]})'] = execMerger.Freq_custom
                             # z[f'Red ({combo[1]})'] = np.sum(execMerger.Freq_custom)/(2*349.7550881133)
                             z[f'Red ({combo[1]})'] = np.sum(cust_freq)/2
                             # z[f'Red ({combo[1]})'] = np.sum(execMerger.Freq_custom)/2
                             d[f'Ref - Red ({combo[1]})'] = freq_diff(ref_freq, cust_freq)
+                            d[f'ABS Ref - Red ({combo[1]})'] = np.abs(freq_diff(ref_freq, cust_freq))
                             # d[f'Ref - Red ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_custom)
                             z[f'Ref - Red ({combo[1]})'] = np.sum(ref_freq)/2 - np.sum(cust_freq)/2
                             # z[f'Ref - Red ({combo[1]})'] = np.sum(execMerger.reference_freq)/2 - np.sum(execMerger.Freq_custom)/2
@@ -723,7 +730,8 @@ def execute():
                             # mol.freqs[f'Red ({combo[1]})'] = execMerger.Freq_custom
                     
                     #Collect data for CMA2
-                    if n > 0:
+                    if off_diag > 0:
+                    # if n > 0:
 
                         if coord == "Nattys":
                             d2['Molecule'] = [f"{mol.name} ({mol.ID}) mode {i+1}" for i in range(len(ref_freq))]
@@ -734,17 +742,29 @@ def execute():
                             # d2[f"Ref {combo[0]}"] = execMerger.reference_freq
                             d2[f'Natty ({combo[1]})'] = custom_freq
                             # d2[f'Natty ({combo[1]})'] = execMerger.Freq_custom
-                            cma2_freqs_natty = execMerger.Freq_cma2.copy()
-                            for i in range(len(xi_tol)):
-                                mol.freqs[f'Natty CMA2 ({combo[1]}) xi ({xi_tol[i]})'] = cma2_freqs_natty[i]
-                                d2[f'Natty CMA2 ({combo[1]}) xi ({xi_tol[i]})'] = cma2_freqs_natty[i] 
+                            # cma2_freqs_natty = execMerger.Freq_cma2.copy()
+                            if off_diag == 1:
+                                cma1_freqs_natty = execMerger.Freq_cma1.copy()
+                                mol.freqs[f'Natty CMA1 ({combo[1]})'] = cma1_freqs_natty
+                                d2[f'Natty CMA1 ({combo[1]})'] = cma1_freqs_natty
                                 # d2[f'Ref - Natty ({combo[1]})'] = freq_diff(ref_freq, custom_freq)
                                 # d2[f'Ref - Natty ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_custom)
-                                d2[f'Ref - Natty CMA2 ({combo[1]}) xi ({xi_tol[i]})'] = freq_diff(ref_freq, cma2_freqs_natty[i])
-                                d2e[f'Natty CMA2 eta_num ({combo[1]}) xi ({xi_tol[i]})'] = execMerger.eta_num[i]
-                                d2e[f'Natty CMA2 eta_denom ({combo[1]}) xi ({xi_tol[i]})'] = execMerger.eta_denom[i]
-                                d2e[f'Natty CMA2 tot_off_diags ({combo[1]}) xi ({xi_tol[i]})'] = execMerger.total_off_diags[i]
-                                d2m[f'Ref - Natty CMA2 ({combo[1]}) xi ({xi_tol[i]})'] = np.max(np.abs(freq_diff(ref_freq, cma2_freqs_natty[i])))
+                                d2[f'Ref - Natty CMA1 ({combo[1]})'] = freq_diff(ref_freq, cma1_freqs_natty)
+                                d2[f'ABS Ref - Natty CMA1 ({combo[1]})'] = np.abs(freq_diff(ref_freq, cma1_freqs_natty))
+                                d2m[f'Ref - Natty CMA1 ({combo[1]})'] = np.max(np.abs(freq_diff(ref_freq, cma1_freqs_natty)))
+                            elif off_diag == 2:
+                                cma2_freqs_natty = execMerger.Freq_cma2.copy()
+                                for i in range(len(xi_tol)):
+                                    mol.freqs[f'Natty CMA2 ({combo[1]}) xi ({xi_tol[i]})'] = cma2_freqs_natty[i]
+                                    d2[f'Natty CMA2 ({combo[1]}) xi ({xi_tol[i]})'] = cma2_freqs_natty[i] 
+                                    # d2[f'Ref - Natty ({combo[1]})'] = freq_diff(ref_freq, custom_freq)
+                                    # d2[f'Ref - Natty ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_custom)
+                                    d2[f'Ref - Natty CMA2 ({combo[1]}) xi ({xi_tol[i]})'] = freq_diff(ref_freq, cma2_freqs_natty[i])
+                                    d2[f'ABS Ref - Natty CMA2 ({combo[1]}) xi ({xi_tol[i]})'] = np.abs(freq_diff(ref_freq, cma2_freqs_natty[i]))
+                                    d2e[f'Natty CMA2 eta_num ({combo[1]}) xi ({xi_tol[i]})'] = execMerger.eta_num[i]
+                                    d2e[f'Natty CMA2 eta_denom ({combo[1]}) xi ({xi_tol[i]})'] = execMerger.eta_denom[i]
+                                    d2e[f'Natty CMA2 tot_off_diags ({combo[1]}) xi ({xi_tol[i]})'] = execMerger.total_off_diags[i]
+                                    d2m[f'Ref - Natty CMA2 ({combo[1]}) xi ({xi_tol[i]})'] = np.max(np.abs(freq_diff(ref_freq, cma2_freqs_natty[i])))
                                 # d2[f'Ref - Natty CMA2 ({combo[1]})'] = freq_diff(execMerger.reference_freq, cma2_freqs_natty)
                         # raise RuntimeError
                         if coord == "Redundant":
@@ -757,18 +777,19 @@ def execute():
                                 d2[f'Red ({combo[1]})'] = red_freq
                                 # d2[f'Red ({combo[1]})'] = execMerger.Freq_redundant
                                 d2[f'Ref - Red ({combo[1]})'] = freq_diff(ref_freq, red_freq)
+                                d2[f'ABS Ref - Red ({combo[1]})'] = np.abs(freq_diff(ref_freq, red_freq))
                                 # d2[f'Ref - Red ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_redundant)
                             else:
                                 # d2[f'Red ({combo[1]})'] = execMerger.Freq_custom
                                 d2[f'Red ({combo[1]})'] = cust_freq
                                 d2[f'Ref - Red ({combo[1]})'] = freq_diff(ref_freq, cust_freq)
+                                d2[f'ABS Ref - Red ({combo[1]})'] = np.abs(freq_diff(ref_freq, cust_freq))
                                 # d2[f'Ref - Red ({combo[1]})'] = freq_diff(execMerger.reference_freq, execMerger.Freq_custom)
                             cma2_freqs_red = execMerger.Freq_cma2 
-                            if len(execMerger.exclude):
-                                cma2_freqs_red = np.delete(cma2_freqs_red,execMerger.exclude)
                           
                             d2[f'Natty CMA2 ({combo[1]})'] = cma2_freqs_red 
                             d2[f'Ref - Red CMA2 ({combo[1]})'] = freq_diff(ref_freq, cma2_freqs_red)
+                            d2[f'ABS Ref - Red CMA2 ({combo[1]})'] = np.abs(freq_diff(ref_freq, cma2_freqs_red))
                             # d2[f'Ref - Red CMA2 ({combo[1]})'] = freq_diff(execMerger.reference_freq, cma2_freqs_red)
 
 
@@ -779,13 +800,15 @@ def execute():
             countt += 1
 
         # end of combo loop
+        # print("begin:")
         if mol.direc_complete: 
             # Print molecule information
+            print("begin:")
             if SI:
                 si.write(mol.build_latex_output(cma1=cma1,combos=combos,xi_tol=xi_tol,sym_sort=sym_sort))
             
             # Clean up job directory
-            if not cma1:
+            if not cmaA:
                 os.remove("fc.dat")
             try: 
                 os.remove("zmat")
@@ -799,6 +822,7 @@ def execute():
                 print('These are not the files you are looking for') 
             
             if coord_type[0] == 'Nattys':
+                print("end:")
                 mol.run()
             sys.path.remove(job)
             del mol
@@ -845,22 +869,22 @@ if csv:
     # print(np.array(megaframe.loc[:,"Ref - Nat (MP2_TZ)"]))
     for combo in combos:
         print(f'MAD ({combo[1]}):')
-        print(np.mean(np.abs(np.array(megaframe.loc[:,f'Ref - Ref ({combo[1]})']))))
+        print(np.mean(np.abs(np.array(megaframe.loc[:,f'Pure - Ref ({combo[1]})']))))
         print(f'mean ({combo[1]}):')
-        print(np.mean(np.array(megaframe.loc[:,f'Ref - Ref ({combo[1]})'])))
+        print(np.mean(np.array(megaframe.loc[:,f'Pure - Ref ({combo[1]})'])))
         # Need the lower case max value printout here
         print(f'mean e_max Ref ({combo[1]}):')
-        print(np.mean(np.array(megaframem.loc[:,f'Ref - Ref ({combo[1]})'])))
+        print(np.mean(np.array(megaframem.loc[:,f'Pure - Ref ({combo[1]})'])))
         print(f'stdev ({combo[1]}):')
-        print(np.std(np.array(megaframe.loc[:,f'Ref - Ref ({combo[1]})'])))
+        print(np.std(np.array(megaframe.loc[:,f'Pure - Ref ({combo[1]})'])))
         print(f'MAX ({combo[1]}):')
-        print(np.max(np.abs(np.array(megaframe.loc[:,f'Ref - Ref ({combo[1]})']))))
+        print(np.max(np.abs(np.array(megaframe.loc[:,f'Pure - Ref ({combo[1]})']))))
         print(f'MAD ZPVE ({combo[1]}):')
-        print(np.mean(np.abs(np.array(megaframez.loc[:,f'Ref - Ref ({combo[1]})']))))
+        print(np.mean(np.abs(np.array(megaframez.loc[:,f'Pure - Ref ({combo[1]})']))))
         print(f'mean ZPVE ({combo[1]}):')
-        print(np.mean(np.array(megaframez.loc[:,f'Ref - Ref ({combo[1]})'])))
+        print(np.mean(np.array(megaframez.loc[:,f'Pure - Ref ({combo[1]})'])))
         print(f'stdev ZPVE ({combo[1]}):')
-        print(np.std(np.array(megaframez.loc[:,f'Ref - Ref ({combo[1]})'])))
+        print(np.std(np.array(megaframez.loc[:,f'Pure - Ref ({combo[1]})'])))
 
 
 
@@ -885,6 +909,8 @@ if csv:
             Eta_tab = np.array([])
             OD_tab = np.array([])
             MAD_tab = np.array([])
+            RMSD_tab = np.array([])
+            e_max_tab = np.array([])
             for i in range(len(xi_tol)):
                 megaframe2 = pd.concat(frame2)
                 megaframe2e = pd.concat(frame2e)
@@ -893,9 +919,11 @@ if csv:
                 # megaframe2.to_csv('CMA2_Convergent.csv', index=False, float_format='%.2f')
                 # megaframe2e.to_csv('CMA2_e_max.csv', index=False, float_format='%.2f')
                 print(f'Xi: {xi_tol[i]}')
-                print(f'Eta ({combo[1]}):')
+                print('Total modes in set:')
                 sum_num = np.sum(np.array(megaframe2e.loc[:,f'Natty CMA2 eta_num ({combo[1]}) xi ({xi_tol[i]})']))
                 sum_denom = np.sum(np.array(megaframe2e.loc[:,f'Natty CMA2 eta_denom ({combo[1]}) xi ({xi_tol[i]})']))
+                print(sum_denom)
+                print(f'Eta ({combo[1]}):')
                 eta = (sum_num/sum_denom)*100
                 print(eta)
                 Eta_tab = np.append(Eta_tab,eta)
@@ -909,8 +937,12 @@ if csv:
                 mad = np.mean(np.abs(CMA2dat))
                 print(mad)
                 MAD_tab = np.append(MAD_tab,mad)
+                print(f'RMSD CMA2 ({combo[1]}):')
+                print(np.sqrt(np.sum(CMA2dat**2)/len(CMA2dat)))
+                RMSD_tab = np.append(RMSD_tab,np.sqrt(np.sum(CMA2dat**2)/len(CMA2dat)))
                 print(f'Mean e_max CMA2 ({combo[1]}):')
                 print(np.mean(np.array(megaframe2m.loc[:,f'Ref - Natty CMA2 ({combo[1]}) xi ({xi_tol[i]})'])))
+                e_max_tab = np.append(e_max_tab,np.mean(np.array(megaframe2m.loc[:,f'Ref - Natty CMA2 ({combo[1]}) xi ({xi_tol[i]})'])))
                 # print(f'mean CMA2 ({combo[1]}):')
                 # print(np.mean(CMA2dat))
                 # Need the lower case max value printout here
@@ -929,6 +961,10 @@ if csv:
             print(OD_tab.tolist())
             print("MAD values:")
             print(MAD_tab.tolist())
+            print("RMSD values:")
+            print(RMSD_tab.tolist())
+            print("e_max values:")
+            print(e_max_tab.tolist())
 
 
 # Ends SI file 
