@@ -330,7 +330,6 @@ class Merger(object):
                     ref_en_init,
                     self.options,
                     indices,
-                    reap_obj_init,
                     deriv_level=self.options.deriv_level,
                     coord_type_init=coord_type_init
                 )
@@ -350,7 +349,6 @@ class Merger(object):
                         ref_en_init,
                         self.options,
                         indices,
-                        reap_obj_init,
                         deriv_level=1
                     )
                     grad_init.run()
