@@ -154,6 +154,8 @@ class Molecule(object):
                 read = False
                 break
             if re.search(r"\d+", line):
+                if not re.match(r"^\d", line.strip()):
+                    continue
                 if re.search(r";", line):
                     line = line.split(";")[1:]
                     if len(line) == 4:

@@ -90,12 +90,12 @@ class Projection(object):
                           ang_ch_c4, ang_ch2_c8, ang_ch3_c2, rot_ch2_c8, rot_ch3_c2, oop_c8, oop_c4, linx_c4, liny_c4)
 
         self.Proj = Proj
-
+'''
         self.sym_sort = np.array([
             [0, 1, 2, 3, 4, 6, 7, 9, 10, 11, 13, 14, 16, 20, 22],
             [5, 8, 12, 15, 17, 18, 19, 21, 23]
         ], dtype=object)
-
+'''
 
 def normalize(mat):
     return 1/norm(mat, axis=0)*mat

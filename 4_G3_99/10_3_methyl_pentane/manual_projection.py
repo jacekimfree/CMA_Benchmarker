@@ -111,14 +111,14 @@ class Projection(object):
                           cc_2ang, c4h_ang, ch3_ang, ch2_2ang, ch3_2ang, cc_2tor, ch3_rot, ch3_2rot)
 
         self.Proj = Proj
-
+'''
         self.sym_sort = np.array([
             [0, 1, 3, 5, 6, 8, 9, 11, 13, 15, 17, 19, 20, 22, 24, 26,
                 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 50, 53],
             [2, 4, 7, 10, 12, 14, 16, 18, 21, 23, 25, 28, 30,
                 32, 34, 36, 38, 40, 42, 44, 46, 48, 49, 51, 52]
         ], dtype=object)
-
+'''
 
 def normalize(mat):
     return 1/norm(mat, axis=0)*mat
