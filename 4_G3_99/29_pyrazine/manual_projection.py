@@ -17,7 +17,8 @@ class Projection(object):
     def run(self):
 
         unc = np.eye(1)
-
+        
+        #0-5
         cc_6str = normalize(np.array([
             [1, 1, 1, 1, 1, 1],
             [1, -1, 1, -1, 1, -1],
@@ -26,7 +27,8 @@ class Projection(object):
             [2, -1, -1, 2, -1, -1],
             [0, 1, -1, 0, 1, -1],
         ]).T)
-
+        
+        #6-9
         ch_4str = normalize(np.array([
             [1, 1, 1, 1],
             [1, 1, -1, -1],
@@ -34,30 +36,35 @@ class Projection(object):
             [1, -1, -1, 1]
         ]).T)
 
+        #10-12
         cyc_6ang = normalize(np.array([
             [1, -1, 1, -1, 1, -1],
             [2, -1, -1, 2, -1, -1],
             [0, 1, -1, 0, 1, -1],
         ]).T)
 
+        #13-16
         ch_4ang = normalize(np.array([
             [1, -1, 1, -1, 1, -1, 1, -1],
             [1, -1, 1, -1, -1, 1, -1, 1],
-            [1, 1, -1, 1, 1, -1, -1, 1],
+            [1, -1, -1, 1, 1, -1, -1, 1],
             [1, -1, -1, 1, -1, 1, 1, -1]
         ]).T)
 
+        #17-19
         cyc_6tor = normalize(np.array([
             [1, -1, 1, -1, 1, -1],
             [1, 0, -1, 1, 0, -1],
             [-1, 2, -1, -1, 2, -1],
         ]).T)
 
+        #20-21
         cc_2tor = normalize(np.array([
             [1, 1],
             [1, -1]
         ]).T)
 
+        #22-22
         ch_4oop_sym = normalize(np.array([
             [1, 1, 1, 1],
             [1, 1, -1, -1]
@@ -67,8 +74,18 @@ class Projection(object):
                           ch_4ang, cyc_6tor, cc_2tor, ch_4oop_sym)
 
         self.Proj = Proj
-
-
+'''
+        self.sym_sort = np.array([
+            [0,4,6,11,13],
+            [5,9,12],
+            [],
+            [],
+            [],
+            [],
+            [1,2,8],
+            [3,7,10,14]
+        ],dtype=object)
+'''
 def normalize(mat):
     return 1/norm(mat, axis=0)*mat
 

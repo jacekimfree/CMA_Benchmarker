@@ -53,7 +53,7 @@ class Projection(object):
         ch_4ang = normalize(np.array([
             [1, -1, 1, -1, 1, -1, 1, -1],
             [1, -1, 1, -1, -1, 1, -1, 1],
-            [1, 1, -1, 1, 1, -1, -1, 1],
+            [1, -1, -1, 1, 1, -1, -1, 1],
             [1, -1, -1, 1, -1, 1, 1, -1]
         ]).T)
 
@@ -63,20 +63,20 @@ class Projection(object):
             [2, -1, -1, 2, -1, -1]
         ]).T)
 
-	cc_2tor = normalize(np.array([
+        cc_2tor = normalize(np.array([
             [1, 1],
-            [1,-1]
-        ]).T)	
+            [1, -1]
+        ]).T)
 
         ch_2oop = normalize(np.array([
             [1, 1],
             [1, -1],
         ]).T)
 
-	ch_4oop_sym = normalize(np.array([
+        ch_4oop_sym = normalize(np.array([
             [1, 1, 1, 1],
-            [1, 1,-1,-1]
-        ]).T)i
+            [1, 1, -1, -1]
+        ]).T)
 
         Proj = block_diag(cc_6str, cc_2str, cc_4str, cyc_6ang, ch_2ang,
                           ch_4ang, cyc_6tor, cc_2tor, ch_2oop, ch_4oop_sym)

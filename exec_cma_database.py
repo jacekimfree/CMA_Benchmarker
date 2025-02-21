@@ -135,7 +135,7 @@ coord_type = ["Nattys"]
 # job_list = ["3.4"]
 # job_list = ["4.10"]
 # job_list = ["2.18"]
-job_list = ["4.20"]
+job_list = ["4.24"]
 # job_list = ["0.2"]
 # exclude_list = ["1.91","1.57"]
 # exclude_list = ["1.91","1.57","2.14"]
@@ -156,7 +156,7 @@ n = 0                    # Number of CMA2 corrections (n = 0 -> CMA0)
 # xi_tol = [10.0, 3.0, 2.0, 0.20, 0.07, 0.04, 0.03, 0.025, 0.022, 0.018, 0.01, 0.005, 0.004, 0.003, 0.0002, 0.0001, 1e-05, 1e-06, 1e-07, 1e-08, 1e-09]    # Xi values for B3LYP/6-31G(2df,p) fig
 # xi_tol = []    # Xi value for cutoff in determining CMA2 off diags
 xi_tol = [0.04]    # Xi value for cutoff in determining CMA2 off diags
-od_inds = [[1,3]]         # Contains a list of lists, where the sublists contain off-diagonal elements to be computed in CMA-1
+od_inds = [[6,8],[6,9],[8,9],[9,12],[18,23],[26,28]]         # Contains a list of lists, where the sublists contain off-diagonal elements to be computed in CMA-1
 # cmaA = False             # Run CMA1 instead of CMA0
 cmaA = True             # Run CMA1 instead of CMA0
 csv = False               # Generate database .csv file
