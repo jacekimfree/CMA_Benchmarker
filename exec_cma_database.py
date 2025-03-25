@@ -24,129 +24,15 @@ np.set_printoptions(precision=4)
 # =======================
 
 # High and low levels of theory
-# Available: "CCSD_T_TZ", "CCSD_T_DZ", "B3LYP_6-31G_2df,p_"
-# h_theory = ["CCSD_T_aTZ"]
-# h_theory = ["B3LYP_6-31G_2df,p_"]
-h_theory = ["CCSD_T_TZ"]
-# l_theory = ["MP2_haTZ"]
-# l_theory = ["MP2_haDZ"]
-# l_theory = ["MP2_aTZ"]
-# l_theory = ["GFN2"]
-# l_theory = ["MP2_TZ"]
-# l_theory = ["MP4_DZ"]
-# l_theory = ["MP4_TZ"]
-# l_theory = ["MP3_TZ"]
+h_theory = ["CCSD_T_aTZ"]
+l_theory = ["CCSD_T_aTZ"]
 
-# CMA2 Stat Theories
-# l_theory = ["MP2_TZ","df_MP2_TZ","HF_TZ","B3LYP_6-31G_2df,p_","CCSD_T_DZ","CCSD_DZ","MP2_DZ","HF_DZ"]
-
-# l_theory = ["CCSD_T_DZ","MP2_TZ"]
-# l_theory = ["HF_DZ","HF_TZ"]
-# l_theory = ["HF_TZ"]
-# l_theory = ["MP2_DZ"]
-# l_theory = ["MP2_aDZ"]
-# l_theory = ["MP2_aDZ"]
-# l_theory = ["MP2_TZ","CCSD_T_DZ","B3LYP_6-31G_2df,p_"]
-# l_theory = ["df_MP2_TZ"]
-l_theory = ["MP2_TZ"]
-# l_theory = ["CCSD_T_haTZ"]
-# l_theory = ["CCSD_T_haDZ"]
-# l_theory = ["CCSD_T_aDZ"]
-# l_theory = ["CCSD_T_aTZ"]
-# l_theory = ["CCSD_haTZ"]
-# l_theory = ["CCD_TZ"]
-# l_theory = ["CCSD_DZ"]
-# l_theory = ["CCSD_T_TZ"]
-# l_theory = ["HF_DZ"]
-# l_theory = ["CCSD_T_DZ"]
-# l_theory = ["CCSD_TZ"]
-# l_theory = ["HF_6-31G_2df,p_"]
-# l_theory = ["B3LYP_6-31G_2df,p_"]
-# l_theory = [
-# # "CCSD_aTZ",
-# # "CCSD_haTZ",
-# "CCSD_T_aDZ",
-# "CCSD_T_DZ",
-# "CCSD_T_haDZ",
-# "CCSD_T_haTZ",
-# "CCSD_T_TZ",
-# "MP2_aDZ",
-# "MP2_aTZ",
-# "MP2_DZ",
-# "MP2_haDZ",
-# "MP2_haTZ",
-# "MP2_TZ"]
-
-# l_theory = ["CCSD_T_DZ", "B3LYP_6-31G_2df,p_"]
 combos = list(product(h_theory,l_theory))
 
-# cma1_energy_regexes = ["!CCD\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
-# cma1_energy_regexes = ["CCSD\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
-# cma1_energy_regexes = ["\sMP2\s*t?o?t?a?l? energy:\s+(\-\d+\.\d+)"]
-
-# CMA2 Stat Theories
-# cma1_energy_regexes = ["RMP2 energy\s+(\-\d+\.\d+)","Grab this energy\s+(\-\d+\.\d+)","a","Grab this energy\s+(\-\d+\.\d+)","a","a","a","!RHF STATE 1.\d+ Energy\s+(\-\d+\.\d+)"]
-
-# cma1_energy_regexes = ["!CCSD\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
-# cma1_energy_regexes = ["!RHF-UCCSD\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
-# cma1_energy_regexes = ["CCSD\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
-# cma1_energy_regexes = ["\s+MP2\s*t?o?t?a?l?\s*energy:\s+(\-\d+\.\d+)"]
-# cma1_energy_regexes = ["!MP2\s*t?o?t?a?l?\s*energy\s+(\-\d+\.\d+)"]
-# cma1_energy_regexes = ["MP4\(SDTQ\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
-# cma1_energy_regexes = ["MP3\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
-# cma1_energy_regexes = ["!RMP2 STATE 1.\d+ Energy\s+(\-\d+\.\d+)"]
-# cma1_energy_regexes = ["!UMP2 STATE 1.\d+ Energy\s+(\-\d+\.\d+)"]
-# cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)","!RMP2 STATE 1.\d+ Energy\s+(\-\d+\.\d+)"]
-# cma1_energy_regexes = ["!RHF STATE 1.\d+ Energy\s+(\-\d+\.\d+)","!RHF STATE 1.\d+ Energy\s+(\-\d+\.\d+)"]
-cma1_energy_regexes = ["!RHF STATE 1.\d+ Energy\s+(\-\d+\.\d+)"]
-# cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)","MP2\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
-# cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
-# cma1_energy_regexes = ["Grab this energy\s+(\-\d+\.\d+)"]
-# cma1_energy_regexes = ["Grab this energy\s+(\-\d+\.\d+)","",""]
-# cma1_energy_regexes = [
-# # "CCSD_aTZ",
-# # "CCSD_haTZ",
-# "CCSD_T_aDZ",
-# "CCSD_T_DZ",
-# "CCSD_T_haDZ",
-# "CCSD_T_haTZ",
-# "CCSD_T_TZ",
-# "MP2_aDZ",
-# "MP2_aTZ",
-
-
-
-# cma1_energy_regexes = ["CCSD\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
+cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
 cma1_gradient_regex = []
-# cma1_gradient_regex = ["\s*virial=\S\S+\.\d+E\S\d+\S\>\s+"]
-# cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)","Grab this energy (\-\d+\.\d+)"]
-# cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)",[r"Total Gradient",r"tstop"]]
-# cma1_success_regexes = ["Variable memory released","beer"]
-# cma1_success_regexes = ["Molpro calculation terminated"]
-# cma1_success_regexes = ["!MP2\s*t?o?t?a?l?\s*energy\s+\-\d+\.\d+"]
-# cma1_success_regexes = ["total\s*energy\s+\-\d+\.\d+"]
-# cma1_success_regexes = ["Variable memory released","Variable memory released"]
-cma1_success_regexes = ["Variable memory released"]
+cma1_success_regexes = ["Molpro calculation terminated"]
 
-# CMA2 Stat Theories
-# cma1_success_regexes = ["Variable memory released","beer","a","beer","a","a","a","Variable memory released"]
-
-# cma1_success_regexes = ["beer","",""]
-# cma1_success_regexes = ["beer"]
-# cma1_success_regexes = [
-# # "CCSD_aTZ",
-# # "CCSD_haTZ",
-# "CCSD_T_aDZ",
-# "CCSD_T_DZ",
-# "CCSD_T_haDZ",
-# "CCSD_T_haTZ",
-# "CCSD_T_TZ",
-# "MP2_aDZ",
-# "MP2_aTZ",
-# "MP2_DZ",
-# "MP2_haDZ",
-# "MP2_haTZ",
-# "MP2_TZ"]
 
 # Coordinates types to use
 # Available: "Nattys", "Redundant", "ZMAT" (not yet tho)
@@ -155,37 +41,17 @@ cma1_success_regexes = ["Variable memory released"]
 coord_type = ["Nattys"]
 
 # Specify paths to grab data from
-# Options: '/1_Closed_Shell', '/1_Linear', '/1*', '/2_Open_Shell', '/2_Linear', '/2*'
 # paths = ['/2_Open_Shell']
-# paths = ['/4_G3_99']
-# paths = ['/3_Dimers']
-# paths = ['/1_Closed_Shell','/2_Open_Shell']
 
 # paths = ['/1*','/2*']
-# paths = ['/2*']
-# job_list = ["3.4"]
-# job_list = ["4.10"]
-# job_list = ["2.18"]
-job_list = ["1.91"]
-# job_list = ["0.2"]
-# exclude_list = ["1.91","1.57"]
+job_list = ["3.16"]
 # exclude_list = ["1.91","1.57","2.14"]
-# exclude_list = ["1.91"]
 exclude_list = []
 
 
 # Various output control statements
 # n = 1                    # Number of CMA2 corrections (n = 0 -> CMA0)
 n = 0                    # Number of CMA2 corrections (n = 0 -> CMA0)
-# n = 36                    # Number of CMA2 corrections (n = 0 -> CMA0)
-# n = 15                    # Number of CMA2 corrections (n = 0 -> CMA0)
-# n = 3                    # Number of CMA2 corrections (n = 0 -> CMA0)
-# xi_tol = [100.0,10.0,9.0,8.0,7.0,6.0,5.0,4.0,3.0,2.0,1.0,0.2,0.18,0.16,0.14,0.12,0.10,0.08,0.075,0.07,0.065,0.06,0.055,0.05,0.045,0.04,0.036,0.032,0.028,0.024,0.02,0.018,0.016,0.014,0.012,0.011,0.01,0.009,0.008,0.007,0.006,0.005,0.004,0.003,0.002,0.001,0.0]    # Xi value for cutoff in determining CMA2 off diags
-# xi_tol = [100,0.2,0.18,0.16,0.14,0.12,0.1,0.08,0.06,0.04,0.02,0.01,0.005]    # Xi value for cutoff in determining CMA2 off diags
-# xi_tol = [10.0, 0.5, 0.2, 0.1, 0.05, 0.04, 0.033, 0.028, 0.0245, 0.021, 0.019, 0.017, 0.01, 0.005, 0.001, 0.0001, 1e-05, 1e-06, 1e-07, 1e-08, 1e-09]    # Xi values for MP2/TZ fig
-# xi_tol = [10.0, 0.5, 0.2, 0.1, 0.047, 0.036, 0.03, 0.025, 0.021, 0.019, 0.017, 0.01, 0.0075, 0.0062, 0.005, 0.0035, 0.0025, 0.0017, 0.001, 0.00075, 0.0005, 0.00025, 0.0001, 7.5e-05, 5e-05, 2.5e-05, 1e-05, 1e-06, 1e-07, 1e-08, 1e-09]    # Xi values for (T)/DZ fig
-# xi_tol = [10.0, 3.0, 2.0, 0.20, 0.07, 0.04, 0.03, 0.025, 0.022, 0.018, 0.01, 0.005, 0.004, 0.003, 0.0002, 0.0001, 1e-05, 1e-06, 1e-07, 1e-08, 1e-09]    # Xi values for B3LYP/6-31G(2df,p) fig
-# xi_tol = []    # Xi value for cutoff in determining CMA2 off diags
 xi_tol = [0.04]    # Xi value for cutoff in determining CMA2 off diags
 od_inds = [[16,17]]         # Contains a list of lists, where the sublists contain off-diagonal elements to be computed in CMA-1
 # cmaA = False             # Run CMA1 instead of CMA0
@@ -198,14 +64,14 @@ compute_all = False       # run calculations for all or a select few
 # compute_all = True       # run calculations for all or a select few
 # off_diag_bands = False   # (CMA2/3 ONLY) If set to true, "n" off-diag bands selected, if false, "n" largest fc will be selected
                            # off_diag_bands is now an obsolete option
-# off_diag = 0   # Set this option for CMA0
+off_diag = 0   # Set this option for CMA0
 # off_diag = 1   # Set this option for CMA1. Additional off-diagonal elements will need to be specified using ___.
-off_diag = 2   # Set this option for CMA2. Off-diags will be auto generated, but an aux hessian will need be specified using ___.
+# off_diag = 2   # Set this option for CMA2. Off-diags will be auto generated, but an aux hessian will need be specified using ___.
 deriv_level = 0         # (CMA1) if 0, compute initial hessian by singlepoints. If 1, compute initial hessian with findif of gradients
-# second_order = True    # If True, read in cartesian gradient and force constant info to be converted to internal coordinates.
-second_order = False    # If False, generate displacements to manually compute the CMA-0A internal coord force constants.
-# coord_type_init = "cartesian" # Toggle this for type of coordinate used in inital force constant computations
-coord_type_init = "internal" # Toggle this for type of coordinate used in inital force constant computations
+second_order = True    # If True, read in cartesian gradient and force constant info to be converted to internal coordinates.
+# second_order = False    # If False, generate displacements to manually compute the CMA-0A internal coord force constants.
+coord_type_init = "cartesian" # Toggle this for type of coordinate used in inital force constant computations
+# coord_type_init = "internal" # Toggle this for type of coordinate used in inital force constant computations
 
 # =====================
 # Some useful functions
@@ -547,8 +413,8 @@ def execute():
                     execMerger = Merger(cma1_path= "/" + combo[0]+"/Disps_" + combo[1])
                     if os.path.exists(os.getcwd() + "/" + combo[0]+"/Disps_" + combo[1] + "/templateInit.dat"):
                         #change to True if you need the displacements generated
-                        execMerger.options.calc_init = True
-                    # execMerger.options.calc_init = False
+                        # execMerger.options.calc_init = True
+                        execMerger.options.calc_init = False
 
                     if os.path.exists(os.getcwd() + "/" + combo[0]+"/Disps_" + combo[1] + "/DispsInit"):
                         execMerger.options.calc_init = False
@@ -560,6 +426,8 @@ def execute():
                         execMerger.options.other_F_matrix = 'HF_DZ'
                     elif combo[1] == "MP2_TZ":
                         execMerger.options.other_F_matrix = 'HF_TZ'
+                    elif combo[1] == "MP2_haTZ":
+                        execMerger.options.other_F_matrix = 'HF_haTZ'
                     else:
                         execMerger.options.other_F_matrix = ''
                     # execMerger.options.other_F_matrix = 'MP2_TZ'

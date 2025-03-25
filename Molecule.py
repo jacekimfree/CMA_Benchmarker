@@ -53,6 +53,17 @@ class Molecule(object):
         df.columns = ind
         print(df.to_string(index=False, float_format="%.2f"))
         print()
+        
+        print("ZPVEs (cm^-1):")
+        print("------------")
+        # Creat multiline index
+        t = [(head.split()[0], head.split()[1]) for head in self.freqs.keys()] 
+        ind = pd.MultiIndex.from_tuples(t)
+        df = pd.DataFrame(data=self.freqs)
+        df.columns = ind
+        dfzpve = df.sum()/2
+        print(dfzpve.to_string(float_format="%.2f"))
+        print()
 
         # Nattys
         print("Nattys:")
