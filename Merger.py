@@ -49,10 +49,10 @@ class Merger(object):
             # "reduced_disp" : True,
             # "cart_insert" : 26,
             # "disp" : 1.0
-            # "disp" : 0.005
+            "disp" : 0.01
             # "disp" : [0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01]
             # "disp" : [0.01,0.01,0.01,0.01,0.02,0.02,0.02,0.02,0.02,0.02,0.04,0.04]
-            # "disp" : [0.01,0.01,0.01,0.01,0.01,0.02,0.02,0.02,0.02,0.04,0.04,0.02]
+            # "disp" : [0.01,0.01,0.01,0.01,0.01,0.02,0.02,0.02,0.02,0.02,0.02,0.02]
             # "disp" : [0.01,0.01,0.01,0.01,0.01,0.02,0.02,0.04,0.04,0.04,0.04,0.04]
         }
         options_obj = Options(**options_kwargs)
@@ -66,10 +66,23 @@ class Merger(object):
         self.Proj = Proj
         
         if len(sym_sort) > 1:
+            print(sym_sort)
             flat_sym_sort = np.array([])
+            flat_sym_sort_inv = np.array([])
             for i in range(len(sym_sort)):
                 flat_sym_sort = np.append(flat_sym_sort,sym_sort[i])
+
             flat_sym_sort = flat_sym_sort.astype(int)
+            
+            print(len(flat_sym_sort))
+            print(flat_sym_sort)
+            for i in range(len(flat_sym_sort)):
+                print(i)
+                flat_sym_sort_inv = np.append(flat_sym_sort_inv,np.where(flat_sym_sort==i)[0][0])
+            # flat_sym_sort_inv = flat_sym_sort_inv[flat_sym_sort]
+            flat_sym_sort_inv = flat_sym_sort_inv.astype(int)
+
+
         
         self.options = opts 
         rootdir = os.getcwd()
@@ -77,6 +90,66 @@ class Merger(object):
         zmat_obj.run()
 
         np.set_printoptions(edgeitems=60,linewidth=1000)
+        
+        
+        # Geom = zmat_obj.cartesians_init
+        # # TR = np.zeros((3*len(Geom),3))
+        # TR = np.zeros((3*len(Geom),6))
+        # # First form the translations
+        # TR[0::3,0] = np.sqrt(zmat_obj.masses) # +X
+        # TR[1::3,1] = np.sqrt(zmat_obj.masses) # +Y
+        # TR[2::3,2] = np.sqrt(zmat_obj.masses) # +Z
+        # print("First TR")
+        # print(TR)
+        
+        # # Now form rotations
+        # i2c = Int2Cart(zmat_obj)
+        # Inert_tens = i2c.InertiaTensor(zmat_obj.cartesians_init, zmat_obj.masses)
+        # print("COM")
+        # print(i2c.COM(zmat_obj.cartesians_init, zmat_obj.masses))
+        # val, vec = LA.eigh(Inert_tens)
+        # # vec[np.abs(vec)<1.0e-10] = 0
+        # print("Big G:")
+        # print(Geom)
+        # # O = vec
+        # O = vec.T
+        # print("Big O:")
+        # print(O)
+        # Rot_buff = Geom.copy()*0.0
+        # print(Rot_buff)
+        # TR = TR.T
+        # print(TR)
+        # for i in range(len(O)):
+            # # mass_12 = np.sqrt(mass)
+            # for j in range(len(Rot_buff)):
+                # mass_12 = np.sqrt(zmat_obj.masses[j])
+                # Rot_buff[j] = mass_12*np.cross(O[i],Geom[j]) 
+            # # print(Rot_buff)
+            # TR[3+i] = Rot_buff.flatten()
+            # # print(TR)
+        # TR = TR.T
+        # # Rotations in the Eckart frame
+        # # for A, mass in enumerate(zmat_obj.masses):
+            # # # mass_12 = np.sqrt(mass)
+            # # mass_12 = mass
+            # # for j in range(3):
+                # # TR[3*A+j,3] = + mass_12 * (Geom[A,1] * O[j,2] - Geom[A,2] * O[j,1]) # + Gy Oz - Gz Oy 
+                # # TR[3*A+j,4] = - mass_12 * (Geom[A,0] * O[j,2] - Geom[A,2] * O[j,0]) # - Gx Oz + Gz Ox 
+                # # TR[3*A+j,5] = + mass_12 * (Geom[A,0] * O[j,1] - Geom[A,1] * O[j,0]) # + Gx Oy - Gy Ox 
+        # print('TR is ')
+        # print(TR)
+        # # Single Value Decomposition      
+        # U, s, V = np.linalg.svd(TR, full_matrices=True)
+        
+        # U[np.abs(U)<1.0e-10] = 0
+        # print(s)
+        # print(U)
+
+        # # The null-space of TR
+        # # vib_proj = U[:,:-6]
+        # vib_proj = U[:,6:]
+        cart_proj = []
+        # cart_proj = vib_proj
         
         # Compute the initial s-vectors
         s_vec = SVectors(
@@ -89,11 +162,26 @@ class Merger(object):
             print(self.Proj)
         
         s_vec.run(zmat_obj.cartesians_init, True, proj=self.Proj, second_order=self.options.second_order)
-                
-        TED_obj = TED(s_vec.proj, zmat_obj)
+        
+        # Trial A-tensor projection to generate cartesian linear combos
+        # B_buff = s_vec.B.copy()
+        # B_buff = np.dot(s_vec.proj.T,B_buff)
+        # G = np.dot(B_buff,B_buff.T)
+        # A_T = np.dot(LA.inv(G), B_buff)
+        # _, eigs, cart_proj = LA.svd(A_T)
+        # print(cart_proj.shape)
+        # cart_proj[np.abs(cart_proj) < 1.0e-10] = 0
+        # print(cart_proj)
+        # print(np.dot(cart_proj.T,cart_proj))
+        # raise RuntimeError
+        
+
+        TED_obj = TED(s_vec.proj, zmat_obj, self.options)
         print("TED PROJ:")
         print(TED_obj.proj)
 
+        # if self.options.second_order:
+            # s_vec.run(zmat_obj.cartesians_init, True, proj=self.Proj, second_order=False)
         g_mat = GMatrix(zmat_obj, s_vec, self.options)
         g_mat.run()
         
@@ -104,19 +192,20 @@ class Merger(object):
             # raise RuntimeError
             g_read_obj = GrRead("fc.grad")
             g_read_obj.run(zmat_obj.cartesians_init)
-            print(zmat_obj.cartesians_init)
+            print(g_read_obj.cart_grad)
+            # print(zmat_obj.cartesians_init)
 
         # Auto sym cart disps test here:
 
-        # indices = np.triu_indices(len(zmat_obj.cartesians_init.flatten()))
-        # indices = np.array(indices).T
-        # # print("Coordinate type is:")
-        # # print(self.coord_type_init)
+        indices = np.triu_indices(len(zmat_obj.cartesians_init.flatten()))
+        indices = np.array(indices).T
+        # print("Coordinate type is:")
+        # print(self.coord_type_init)
         # eigs_init = np.eye(len(s_vec.proj.T))
         # init_disp = TransfDisp(
             # s_vec,
             # zmat_obj,
-            # options.disp,
+            # self.options.disp,
             # eigs_init,
             # True,
             # self.options.disp_tol,
@@ -124,21 +213,21 @@ class Merger(object):
             # self.options,
             # indices,
             # deriv_level = self.options.deriv_level,
-            # coord_type = self.coord_type_init
+            # coord_type = self.coord_type_init,
+            # cart_proj = []
         # )
         # # init_disp.run()
         # A = init_disp.compute_A(
             # s_vec.B, TED_obj.proj, np.eye(len(TED_obj.proj.T)), zmat_obj.mass_weight
         # )
         # A[np.abs(A) < 1e-9] = 0.0
-        # print("A: ")
-        # print(A.shape)
-        # print(A)
-        # for i in A:
-            # print(np.dot(i,i))
-        # print("Transpose:")
-        # for i in A.T:
-            # print(np.dot(i,i))
+        # _, eig_proj, r = LA.svd(s_vec.B)
+        # # _, eig_proj, r = LA.svd(A)
+        # print(eig_proj)
+        # print(_.shape)
+        # cart_proj = r[:,:-6].copy()
+        # cart_proj[np.abs(cart_proj) < 1.0e-8] = 0
+        # cart_proj = []
         # raise RuntimeError
 
         init_bool = False
@@ -184,6 +273,9 @@ class Merger(object):
                     [],
                     [],
                 )
+                print(f_read_obj.fc_mat.shape)
+                print(f_read_obj.fc_mat)
+                raise RuntimeError
                 fc_init.FC =  f_read_obj.fc_mat
                 os.chdir('..')
                 os.chdir('..')
@@ -207,7 +299,11 @@ class Merger(object):
                 else:
                     indices = np.arange(len(eigs_init))
                 if self.options.second_order:
-                    indices = np.triu_indices(len(zmat_obj.cartesians_init.flatten()))
+                    if len(cart_proj):
+                        ll = len(cart_proj.T)
+                    else:
+                        ll = len(zmat_obj.cartesians_init.flatten())
+                    indices = np.triu_indices(ll)
                     indices = np.array(indices).T
                 init_disp = TransfDisp(
                     s_vec,
@@ -220,7 +316,8 @@ class Merger(object):
                     self.options,
                     indices,
                     deriv_level = self.options.deriv_level,
-                    coord_type = self.coord_type_init
+                    coord_type = self.coord_type_init,
+                    cart_proj = cart_proj
                 )
                 init_disp.run()
                 # raise RuntimeError
@@ -356,6 +453,9 @@ class Merger(object):
                     grad_init.run()
                     print("Computed Gradient:")
                     print(grad_init.FC)
+                    if len(cart_proj):
+                        fc_init.FC = np.dot(cart_proj,np.dot(fc_init.FC,cart_proj.T))
+                        grad_init.FC = np.dot(grad_init.FC,cart_proj.T)
                 f_conv_obj = FcConv(
                     fc_init.FC,
                     s_vec,
@@ -405,6 +505,182 @@ class Merger(object):
         
         if not init_bool:
             f_read_obj.run()
+            # F_1 = f_read_obj.fc_mat.copy()
+            
+            
+            # # B_buff = s_vec.B.copy()
+            # # B_buff = np.dot(s_vec.proj.T,B_buff)
+            # # print("Attempting to subtract of transl, rot here:")
+            # # _, eigs, cart_proj = LA.svd(B_buff)
+            # # print(eigs.shape)
+            # # print(eigs)
+            # # # cart_proj = cart_proj.T
+            # # print(cart_proj.shape)
+            # # print(cart_proj)
+            # # rot_transl = cart_proj[-6:]
+            # # print(B_buff.shape)
+            # # print(rot_transl.shape)
+            # # print(rot_transl)
+            # # F_proj = np.dot(np.dot(rot_transl,F_1),rot_transl.T)
+            # # print(F_proj)
+            # # F_proj = np.dot(np.dot(rot_transl.T,F_proj),rot_transl)
+            # # print(F_proj)
+            # # f_read_obj.fc_mat = f_read_obj.fc_mat - F_proj
+            # # raise RuntimeError
+            
+            # # # print(zmat_obj.masses)
+            # u = fractional_matrix_power(np.diag(np.repeat(zmat_obj.masses,3)),-0.5)
+            # # # print(u)
+            # fmw = np.dot(u,np.dot(F_1,u))
+            # # # print(fmw)
+            # # eigs,l = LA.eigh(fmw)
+        
+            # # Final attempt. Explicitly project out translations and rotations
+            # Geom = zmat_obj.cartesians_init
+            # # TR = np.zeros((3*len(Geom),3))
+            # TR = np.zeros((3*len(Geom),6))
+            # # First form the translations
+            # TR[0::3,0] = np.sqrt(zmat_obj.masses) # +X
+            # TR[1::3,1] = np.sqrt(zmat_obj.masses) # +Y
+            # TR[2::3,2] = np.sqrt(zmat_obj.masses) # +Z
+            # print("First TR")
+            # print(TR)
+            
+            # # Now form rotations
+            # i2c = Int2Cart(zmat_obj)
+            # Inert_tens = i2c.InertiaTensor(zmat_obj.cartesians_init, zmat_obj.masses)
+            # print("COM")
+            # print(i2c.COM(zmat_obj.cartesians_init, zmat_obj.masses))
+            # val, vec = LA.eigh(Inert_tens)
+            # # vec[np.abs(vec)<1.0e-10] = 0
+            # print("Big G:")
+            # print(Geom)
+            # # O = vec
+            # O = vec.T
+            # print("Big O:")
+            # print(O)
+            # Rot_buff = Geom.copy()*0.0
+            # print(Rot_buff)
+            # TR = TR.T
+            # print(TR)
+            # for i in range(len(O)):
+                # # mass_12 = np.sqrt(mass)
+                # for j in range(len(Rot_buff)):
+                    # mass_12 = np.sqrt(zmat_obj.masses[j])
+                    # Rot_buff[j] = mass_12*np.cross(O[i],Geom[j]) 
+                # # print(Rot_buff)
+                # TR[3+i] = Rot_buff.flatten()
+                # # print(TR)
+            # TR = TR.T
+            # # Rotations in the Eckart frame
+            # # for A, mass in enumerate(zmat_obj.masses):
+                # # # mass_12 = np.sqrt(mass)
+                # # mass_12 = mass
+                # # for j in range(3):
+                    # # TR[3*A+j,3] = + mass_12 * (Geom[A,1] * O[j,2] - Geom[A,2] * O[j,1]) # + Gy Oz - Gz Oy 
+                    # # TR[3*A+j,4] = - mass_12 * (Geom[A,0] * O[j,2] - Geom[A,2] * O[j,0]) # - Gx Oz + Gz Ox 
+                    # # TR[3*A+j,5] = + mass_12 * (Geom[A,0] * O[j,1] - Geom[A,1] * O[j,0]) # + Gx Oy - Gy Ox 
+            # print('TR is ')
+            # print(TR)
+            # # Single Value Decomposition      
+            # U, s, V = np.linalg.svd(TR, full_matrices=True)
+            
+            # U[np.abs(U)<1.0e-10] = 0
+            # print(s)
+            # print(U)
+
+            # # The null-space of TR
+            # # vib_proj = U[:,:-6]
+            # vib_proj = U[:,6:]
+            # # vib_proj = U[:,3:]
+            # # for i in range(len(TR.T)):
+                # # mag = LA.norm(TR[:,i])
+                # # TR[:,i] /= mag
+            # # print(TR)
+            # # raise RuntimeError
+
+            # eigs,l = LA.eigh(fmw)
+            # # # print(eigs_proj)
+            # eigs = np.sqrt(eigs)
+            # eigs *= 219474.6313708
+            # eigs[np.abs(eigs) < 1.0e-3] = 0
+            # print(eigs)
+
+            # fmw_proj = np.dot(vib_proj.T,np.dot(fmw,vib_proj))
+            # fmw_proj = np.dot(vib_proj,np.dot(fmw_proj,vib_proj.T))
+            # # print(fmw)
+            # # # fmw_proj = np.dot(TR.T,np.dot(fmw,TR))
+            # # # fmw_proj = np.dot(TR,np.dot(fmw_proj,TR.T))
+            # # print(fmw_proj)
+            # # # fmw_proj = fmw - fmw_proj
+            # eigs_proj,l_proj = LA.eigh(fmw_proj)
+            # # # print(eigs_proj)
+            # eigs_proj = np.sqrt(eigs_proj)
+            # eigs_proj *= 219474.6313708
+            # eigs_proj[np.abs(eigs_proj) < 1.0e-3] = 0
+            # print(eigs_proj)
+            # raise RuntimeError
+            # f_read_obj.fc_mat = np.dot(LA.inv(u),np.dot(fmw,LA.inv(u)))
+            # raise RuntimeError
+            # # print("Transformed unweighted force constants:")
+            # # print(np.dot(l.T,np.dot(F_1,l)))
+            # # print(np.dot(l.T,np.dot(fmw,l)))
+            # # raise RuntimeError
+
+            # # Gradient stuff here:
+            # # c_grad = g_read_obj.cart_grad.copy()
+            # # print('SECOND GRADIENT:')
+            # # print(c_grad)
+            # # print("Pre proj evects:")
+            # # print(l)
+            # # # print(eigs)
+            # print(np.sqrt(eigs)*219474.6313708)
+            # l_rt = l.copy()[:,:6]
+            # eigs_rt = np.diag(eigs.copy()[:6])
+            # print('Trans Rot Gradient')
+            # rt_grad = np.dot(c_grad,l_rt)
+            # print(rt_grad)
+            # proj_grad = c_grad - np.dot(l_rt,rt_grad.T)
+            # print('Projected Gradient:')
+            # print(proj_grad)
+            
+            # # print(l_rt)
+            # # print(eigs_rt)
+            # f_rt = np.dot(l_rt,np.dot(eigs_rt,l_rt.T))
+            # # # print(f_rt)
+            # f_proj = fmw - f_rt
+            # eigs_proj,l_proj = LA.eigh(f_proj)
+            # # print(eigs_proj)
+            # eigs_proj_wn = np.sqrt(eigs_proj)*219474.6313708
+            # print("Post proj evects:")
+            # # print(l_proj)
+            # print(eigs_proj_wn)
+            # print(eigs_proj_wn[6:])
+            # raise RuntimeError
+            
+
+            # # u_inv = LA.inv(u)
+            # # F = np.dot(u_inv,np.dot(f_proj,u_inv))
+            # # # f_read_obj.fc_mat = F
+            # # # raise RuntimeError
+            
+            # # BIG TEST BLOCK: I am projecting out the rotations and translations from the cartesian force constants, and trying the transformation from there.
+            # # We'll see how it goes!
+            # u_inv = LA.inv(u)
+            # f_cart_proj = np.dot(u_inv,np.dot(f_proj,u_inv))
+            # # These are the lines to comment out if this drastically fails
+            # g_read_obj.cart_grad = proj_grad
+            # f_read_obj.fc_mat = f_cart_proj
+
+
+
+            # f_read_obj.fc_mat[np.abs(f_read_obj.fc_mat) < 1.0e-6] = 0
+            # F_aJ = f_read_obj.fc_mat.copy()
+            # F_aJ *= 4.3597447222071
+            # F_aJ /= 0.529177210903
+            # print(f_read_obj.fc_mat)
+            # print("F_aJ:")
+            # print(F_aJ)
             f_conv_obj = FcConv(
                 f_read_obj.fc_mat,
                 s_vec,
@@ -412,8 +688,7 @@ class Merger(object):
                 "internal",
                 False,
                 TED_obj,
-                self.options.units,
-                self.options.second_order
+                self.options
             )
             if self.options.second_order:
                 f_conv_obj.run(grad=g_read_obj.cart_grad)
@@ -421,6 +696,7 @@ class Merger(object):
             else:
                 f_conv_obj.run()
             F = f_conv_obj.F
+        
         else:
             F = fc_init.FC
             if self.options.second_order:
@@ -431,25 +707,75 @@ class Merger(object):
         
         if self.options.coords != "ZMAT" and not init_bool:
             F = np.dot(TED_obj.proj.T, np.dot(F, TED_obj.proj))
-            # F[np.abs(F) < 1.0e-6] = 0
+            F[np.abs(F) < 1.0e-6] = 0
+            # F_1_int = F.copy()
             # print("Nat Int force constants:")
             # print(F)
             if self.options.second_order:
                 grad_proj = np.dot(TED_obj.proj.T,f_conv_obj.v_q)
         
+        # F[np.abs(F) < 1.0e-4] = 0
         if self.options.coords != "ZMAT":
             g_mat.G = np.dot(TED_obj.proj.T, np.dot(g_mat.G, TED_obj.proj))
         
-        TED_obj.run(np.eye(TED_obj.proj.shape[1]),np.zeros(TED_obj.proj.shape[1]))
+        # TED_obj.run(np.eye(TED_obj.proj.shape[1]),np.zeros(TED_obj.proj.shape[1]))
        
+        # if len(sym_sort) > 1:
+            # F_sym = F[flat_sym_sort].copy()
+            # F_sym = F_sym[:,flat_sym_sort]
+            # F_sym1 = F_sym
+            # print("Sym Force Constants:")
+            # print(F_sym)
+            # # F_sym = F_sym[flat_sym_sort.argsort()].copy()
+            # # F_sym = F_sym[:,flat_sym_sort.argsort()]
+            
+            # g_sym = g_mat.G[flat_sym_sort].copy()
+            # g_sym = g_sym[:,flat_sym_sort]
+            # g_sym[np.abs(g_sym) < 1e-9] = 0
+            # print("Sym G-Matrix:")
+            # print(sym_sort)
+            # print(g_sym)
+        
+        if len(sym_sort) > 1:
+            Fbuff1 = np.array([])
+            Fbuff2 = {}
+            Gbuff1 = np.array([])
+            Gbuff2 = {}
+            for i in range(len(sym_sort)):
+                Fbuff1 = F.copy()
+                Fbuff1 = Fbuff1[sym_sort[i]]
+                Fbuff1 = np.array([Fbuff1[:,sym_sort[i]]])
+                Fbuff2[str(i)] = Fbuff1.copy()
+                Gbuff1 = g_mat.G.copy()
+                Gbuff1 = Gbuff1[sym_sort[i]]
+                Gbuff1 = np.array([Gbuff1[:,sym_sort[i]]])
+                Gbuff2[str(i)] = Gbuff1.copy()
+            Fbuff3 = Fbuff2[str(0)][0].copy()
+            Gbuff3 = Gbuff2[str(0)][0].copy()
+            for i in range(len(sym_sort)-1):
+                Fbuff3 = np.block([
+                    [Fbuff3,                                        np.zeros((len(Fbuff3),len(Fbuff2[str(i+1)][0])))],
+                    [np.zeros((len(Fbuff2[str(i+1)][0]),len(Fbuff3))), Fbuff2[str(i+1)][0]]
+                    ])
+                Gbuff3 = np.block([
+                    [Gbuff3,                                        np.zeros((len(Gbuff3),len(Gbuff2[str(i+1)][0])))],
+                    [np.zeros((len(Gbuff2[str(i+1)][0]),len(Gbuff3))), Gbuff2[str(i+1)][0]]
+                    ])
+            F = Fbuff3[flat_sym_sort_inv]
+            F = F[:,flat_sym_sort_inv]
+            g_mat.G = Gbuff3[flat_sym_sort_inv]
+            g_mat.G = g_mat.G[:,flat_sym_sort_inv]
 
         
 
         if len(sym_sort) > 1:
             F_sym = F[flat_sym_sort].copy()
             F_sym = F_sym[:,flat_sym_sort]
+            # F_sym2 = F_sym
             print("Sym Force Constants:")
             print(F_sym)
+            # print("SymDiff")
+            # print(F_sym2-F_sym1)
             # F_sym = F_sym[flat_sym_sort.argsort()].copy()
             # F_sym = F_sym[:,flat_sym_sort.argsort()]
             
@@ -464,6 +790,13 @@ class Merger(object):
         print(F.shape)
         print(F)
         
+        
+        # F_aJ = F.copy()
+        # F_aJ *= 4.3597447222071
+        # F_aJ /= 0.529177210903
+        # print("F_aJ:")
+        # print(F_aJ)
+        
         print("Initial G-Matrix:")
         g_mat.G[np.abs(g_mat.G) < 1e-9] = 0
         print(g_mat.G)
@@ -472,24 +805,48 @@ class Merger(object):
         init_GF = GFMethod(
             g_mat.G.copy(),
             F.copy(),
-            self.options.tol,
-            self.options.proj_tol,
             zmat_obj,
             TED_obj,
-            False
+            self.options,
+            # False
         )
         init_GF.run()
        
         
-        # print("TED for sym purposes: ")
+        print("TED for sym purposes: ")
         init_GF.ted.TED[np.abs(init_GF.ted.TED) < 1e-5] = 0
         print(init_GF.ted.TED)
+        ted_b = init_GF.ted.TED
         # raise RuntimeError
         
         self.ref_init = init_GF.freq
         if len(sym_sort):
             self.irreps_init,flat_sym_freqs = self.mode_symmetry_sort(init_GF.ted.TED,sym_sort,self.ref_init)
             self.ref_init = np.array(flat_sym_freqs)
+            
+            flat_sym_modes_b = [
+                x
+                for xs in self.irreps_init
+                for x in xs
+            ]
+            print(flat_sym_modes_b)
+            del_list = []
+            for i in range(len(self.irreps_init)):
+                if len(self.irreps_init[i]) == 1:
+                    del_list.append(self.irreps_init[i][0])
+            # del_list.reverse()
+            if len(del_list):
+                print(del_list)
+            del_list2 = []
+            for i in del_list:
+                print(i)
+                print(np.where(np.array(flat_sym_modes_b)==i)[0][0])
+                del_list2.append(np.where(np.array(flat_sym_modes_b)==i)[0][0])
+            flat_sym_modes_b = np.delete(np.array(flat_sym_modes_b),del_list2)
+            ted_b = ted_b.T
+            ted_b = ted_b[flat_sym_modes_b]
+            ted_b = ted_b.T
+
 
         # Now for the TED check.
         G = np.dot(np.dot(LA.inv(init_GF.L), g_mat.G), LA.inv(init_GF.L).T)
@@ -506,11 +863,11 @@ class Merger(object):
         TED_GF = GFMethod(
             G,
             F,
-            self.options.tol,
-            self.options.proj_tol,
             zmat_obj,
             TED_obj,
-            False
+            self.options,
+            # self.options.proj_tol,
+            # False
         )
         TED_GF.run()
        
@@ -534,7 +891,7 @@ class Merger(object):
         )
         s_vec.run(zmat_obj2.cartesians_init, True, proj=TED_obj.proj)
                 
-        TED_obj = TED(s_vec.proj, zmat_obj2)
+        TED_obj = TED(s_vec.proj, zmat_obj2, self.options)
                 
         g_mat = GMatrix(zmat_obj2, s_vec, self.options)
         g_mat.run()
@@ -553,6 +910,15 @@ class Merger(object):
         # check this, this seems like an unnecessary else statement.
         if not init_bool:
             f_read_obj.run()
+            # print("FC DIFF:")
+            # np.set_printoptions(edgeitems=60,linewidth=10000,precision=5)
+            # F_1[np.abs(F_1) < 5.0e-4] = 0
+            # print(F_1)
+            # F_2 = f_read_obj.fc_mat.copy()
+            # F_2[np.abs(F_2) < 5.0e-4] = 0
+            # print(F_2)
+            # print((F_2-F_1))
+            # print((F_2-F_1)*4.3597447222071/0.529177210903)
             f_conv_obj = FcConv(
                 f_read_obj.fc_mat,
                 s_vec,
@@ -560,8 +926,8 @@ class Merger(object):
                 "internal",
                 False,
                 TED_obj,
-                self.options.units,
-                False,
+                self.options,
+                # False,
             )
             f_conv_obj.run()
             F = f_conv_obj.F
@@ -585,7 +951,12 @@ class Merger(object):
         F_aJ *= 4.3597447222071
         F_aJ /= 0.529177210903
         F = np.dot(np.dot(TED_obj.proj.T,F),TED_obj.proj)
+        # F_2_int = F.copy()
         F_aJ = np.dot(np.dot(TED_obj.proj.T,F_aJ),TED_obj.proj)
+        # print(F_aJ)
+        # print("FC INT DIFF:")
+        # print((F_2_int-F_1_int))
+        # print((F_2_int-F_1_int)*4.3597447222071/0.529177210903)
         # if len(sym_sort) > 1:
             # F = F[flat_sym_sort]
             # F = F[:,flat_sym_sort]
@@ -609,8 +980,8 @@ class Merger(object):
             # F_aJ = F_aJ[:,flat_sym_sort]
             # print(F_aJ)
         F = np.dot(np.dot(inv(eig_inv).T, F), inv(eig_inv))
-        # F[np.abs(F) < 1.0e-5] = 0 
-        print(F)
+        # F[np.abs(F) < 1.0e-6] = 0 
+        # print(F)
         # F[np.abs(F) < self.options.tol] = 0
          
         # print('Testing G:')
@@ -620,11 +991,11 @@ class Merger(object):
         full_GF = GFMethod(
             G,
             F,
-            self.options.tol,
-            self.options.proj_tol,
             zmat_obj2,
             TED_obj,
-            False
+            self.options,
+            # self.options.proj_tol,
+            # False
         )
         full_GF.run()
         self.ted = full_GF.ted.TED      # TED matrix
@@ -635,11 +1006,95 @@ class Merger(object):
         print("//{:^40s}//".format(" Full Hessian TED"))
         print("////////////////////////////////////////////")
         TED_obj.run(np.dot(init_GF.L, full_GF.L), full_GF.freq, rect_print=False)
-        
+        ted_a = TED_obj.TED
+        print("Full TED:")
+        print(ted_a)
         self.reference_freq = full_GF.freq 
         if len(sym_sort):
             self.irreps_ref,flat_sym_freqs = self.mode_symmetry_sort(TED_obj.TED,sym_sort,self.reference_freq)
             self.reference_freq = np.array(flat_sym_freqs)
+            
+            print(self.irreps_ref)
+            flat_sym_modes_a = [
+                x
+                for xs in self.irreps_ref
+                for x in xs
+            ]
+            print(len(flat_sym_modes_a))
+            print(flat_sym_modes_a)
+            del_list = []
+            for i in range(len(self.irreps_ref)):
+                if len(self.irreps_ref[i]) == 1:
+                    del_list.append(self.irreps_ref[i][0])
+            # del_list.reverse()
+            if len(del_list):
+                print(del_list)
+            del_list2 = []
+            for i in del_list:
+                print(i)
+                print(np.where(np.array(flat_sym_modes_a)==i)[0][0])
+                del_list2.append(np.where(np.array(flat_sym_modes_a)==i)[0][0])
+            flat_sym_modes_a = np.delete(np.array(flat_sym_modes_a),del_list2)
+            print(len(flat_sym_modes_a))
+            print(flat_sym_modes_a)
+            # for i in del_list:
+                # print(freqs[sym_modes[i][0]])
+            ted_a = ted_a.T
+            ted_a = ted_a[flat_sym_modes_a]
+            ted_a = ted_a.T
+            print("Full TED symsorted:")
+            print(ted_a)
+            ted_diff = ted_b - ted_a
+            ted_diff[np.abs(ted_diff) < 1e-1] = 0
+            np.set_printoptions(suppress=True,linewidth=300)
+            print("TED Diff:")
+            print(np.array(ted_diff))
+            print("TED analysis")
+            print(len(flat_sym_freqs))
+            print(flat_sym_freqs)
+            print(len(full_GF.freq))
+            print(full_GF.freq)
+            # raise RuntimeError
+            # i indexes the Frequencies. j indexes the Natural internal coordinates.
+            for i in range(len(ted_diff.T)):
+                print(full_GF.freq[flat_sym_modes_a[i]])
+                print("Sym Mode number "+str(i+1))
+                print("Mode number "+str(flat_sym_modes_a[i]+1))
+                # print(full_GF.freq[i])
+                # print("Mode number "+str(i+1))
+                degen = False
+                for k in range(len(ted_diff.T)):
+                    diff = abs(full_GF.freq[flat_sym_modes_a[i]] - full_GF.freq[flat_sym_modes_a[k]])
+                    if i != k and diff < 0.2 :
+                        print("DegenModes")
+                        print(flat_sym_modes_a[i]+1,flat_sym_modes_a[k]+1)
+                        degen = True
+                for j in range(len(ted_diff)):
+                    # Write in logic here that doesn't allow degenerate modes to be listed.
+                    if np.abs(ted_diff[j,i]) > 10. and not degen:
+                        print("Natural Internal Coordinate "+str(j+1)+" mixes significantly")
+                        print(ted_diff[j,i])
+                        print(ted_diff[j])
+        else:
+            ted_diff = ted_b - ted_a
+            ted_diff[np.abs(ted_diff) < 1e-1] = 0
+            np.set_printoptions(suppress=True,linewidth=300)
+            print("TED Diff:")
+            print(np.array(ted_diff))
+            print("TED analysis")
+            print(len(full_GF.freq))
+            print(full_GF.freq)
+            for i in range(len(ted_diff.T)):
+                print(full_GF.freq[i])
+                print("Mode number "+str(i+1))
+                # print(full_GF.freq[i])
+                # print("Mode number "+str(i+1))
+                for j in range(len(ted_diff)):
+                    # Write in logic here that doesn't allow degenerate modes to be listed.
+                    if np.abs(ted_diff[j,i]) > 10.:
+                        print("Natural Internal Coordinate "+str(j+1)+" mixes significantly")
+                        print(ted_diff[j])
+
         
         m = 2 
         var = 0.95 
@@ -684,11 +1139,11 @@ class Merger(object):
         diag_GF = GFMethod(
             G,
             Fdiag,
-            self.options.tol,
-            self.options.proj_tol,
             zmat_obj2,
             TED_obj,
-            False
+            self.options,
+            # self.options.proj_tol,
+            # False
         )
         
         diag_GF.run()
@@ -731,11 +1186,11 @@ class Merger(object):
                 cma1_GF = GFMethod(
                     G,
                     temp,
-                    self.options.tol,
-                    self.options.proj_tol,
                     zmat_obj2,
                     TED_obj,
-                    False
+                    self.options,
+                    # self.options.proj_tol,
+                    # False
                 )
                 cma1_GF.run()
                 cma1_Freq = cma1_GF.freq.copy()
@@ -823,11 +1278,11 @@ class Merger(object):
                     cma2_GF = GFMethod(
                         G,
                         temp,
-                        self.options.tol,
-                        self.options.proj_tol,
                         zmat_obj2,
                         TED_obj,
-                        False
+                        self.options,
+                        # self.options.proj_tol,
+                        # False
                     )
                     cma2_GF.run()
                     cma2_Freq = cma2_GF.freq.copy()
@@ -1052,7 +1507,7 @@ class Merger(object):
                 # print(i)
                 # print(irrep)
                 # print(Sum)
-                if Sum > 90.:
+                if Sum > 80.:
                     irrep_modes.append(i)
             # print(np.array(irrep)+1)
             # print(np.array(irrep_modes)+1)
