@@ -25,14 +25,15 @@ np.set_printoptions(precision=4)
 
 # High and low levels of theory
 # Available: "CCSD_T_TZ", "CCSD_T_DZ", "B3LYP_6-31G_2df,p_"
-# h_theory = ["CCSD_T_aTZ"]
+#h_theory = ["CCSD_T_aTZ"]
+#l_theory = ["CCSD_T_aTZ"]
 # h_theory = ["B3LYP_6-31G_2df,p_"]
 h_theory = ["CCSD_T_TZ"]
 # l_theory = ["MP2_haTZ"]
 # l_theory = ["MP2_haDZ"]
 # l_theory = ["MP2_aTZ"]
 # l_theory = ["GFN2"]
-# l_theory = ["MP2_TZ"]
+l_theory = ["MP2_TZ"]
 # l_theory = ["MP4_DZ"]
 # l_theory = ["MP4_TZ"]
 # l_theory = ["MP3_TZ"]
@@ -42,7 +43,7 @@ h_theory = ["CCSD_T_TZ"]
 
 # l_theory = ["CCSD_T_DZ","MP2_TZ"]
 # l_theory = ["MP2_TZ","CCSD_T_DZ","B3LYP_6-31G_2df,p_"]
-l_theory = ["MP2_TZ"]
+#l_theory = ["MP2_TZ"]
 # l_theory = ["CCSD_T_DZ"]
 # l_theory = ["B3LYP_6-31G_2df,p_"]
 # l_theory = [
@@ -122,6 +123,7 @@ cma1_success_regexes = ["Variable memory released"]
 # coord_type = ["Nattys", "Redundant"]
 # coord_type = ["Redundant"]
 coord_type = ["Nattys"]
+#coord_type = ["SALCs"]
 
 # Specify paths to grab data from
 # Options: '/1_Closed_Shell', '/1_Linear', '/1*', '/2_Open_Shell', '/2_Linear', '/2*'
@@ -133,9 +135,13 @@ coord_type = ["Nattys"]
 # paths = ['/1*','/2*']
 # paths = ['/2*']
 # job_list = ["3.4"]
+job_list = ["1.59"]
 # job_list = ["4.10"]
 # job_list = ["2.18"]
-job_list = ["4.05"]
+#job_list = ["4.05"]
+#job_list = ["4.05"]
+#job_list = ["1.59"]
+#job_list = ["3.10"]
 # job_list = ["0.2"]
 # exclude_list = ["1.91","1.57"]
 # exclude_list = ["1.91","1.57","2.14"]
@@ -154,9 +160,10 @@ n = 0                    # Number of CMA2 corrections (n = 0 -> CMA0)
 # xi_tol = [10.0, 0.5, 0.2, 0.1, 0.05, 0.04, 0.033, 0.028, 0.0245, 0.021, 0.019, 0.017, 0.01, 0.005, 0.001, 0.0001, 1e-05, 1e-06, 1e-07, 1e-08, 1e-09]    # Xi values for MP2/TZ fig
 # xi_tol = [10.0, 0.5, 0.2, 0.1, 0.047, 0.036, 0.03, 0.025, 0.021, 0.019, 0.017, 0.01, 0.0075, 0.0062, 0.005, 0.0035, 0.0025, 0.0017, 0.001, 0.00075, 0.0005, 0.00025, 0.0001, 7.5e-05, 5e-05, 2.5e-05, 1e-05, 1e-06, 1e-07, 1e-08, 1e-09]    # Xi values for (T)/DZ fig
 # xi_tol = [10.0, 3.0, 2.0, 0.20, 0.07, 0.04, 0.03, 0.025, 0.022, 0.018, 0.01, 0.005, 0.004, 0.003, 0.0002, 0.0001, 1e-05, 1e-06, 1e-07, 1e-08, 1e-09]    # Xi values for B3LYP/6-31G(2df,p) fig
-# xi_tol = []    # Xi value for cutoff in determining CMA2 off diags
-xi_tol = [0.04]    # Xi value for cutoff in determining CMA2 off diags
-od_inds = [[19,20],[6,8]]         # Contains a list of lists, where the sublists contain off-diagonal elements to be computed in CMA-1
+xi_tol = []    # Xi value for cutoff in determining CMA2 off diags
+#xi_tol = [0.04]    # Xi value for cutoff in determining CMA2 off diags
+#od_inds = [[19,20],[6,8]]         # Contains a list of lists, where the sublists contain off-diagonal elements to be computed in CMA-1
+od_inds = []         # Contains a list of lists, where the sublists contain off-diagonal elements to be computed in CMA-1
 # cmaA = False             # Run CMA1 instead of CMA0
 cmaA = True             # Run CMA1 instead of CMA0
 csv = False               # Generate database .csv file
@@ -171,10 +178,10 @@ off_diag = 0   # Set this option for CMA0
 # off_diag = 1   # Set this option for CMA1. Additional off-diagonal elements will need to be specified using ___.
 # off_diag = 2   # Set this option for CMA2. Off-diags will be auto generated, but an aux hessian will need be specified using ___.
 deriv_level = 0         # (CMA1) if 0, compute initial hessian by singlepoints. If 1, compute initial hessian with findif of gradients
-second_order = True    # If True, read in cartesian gradient and force constant info to be converted to internal coordinates.
-# second_order = False    # If False, generate displacements to manually compute the CMA-0A internal coord force constants.
+second_order = True    # If True, read in cartesian gradient and force constant info to be converted to internal coordinates. 
+#second_order = False    # If False, generate displacements to manually compute the CMA-0A internal coord force constants.
 coord_type_init = "cartesian" # Toggle this for type of coordinate used in inital force constant computations
-# coord_type_init = "internal" # Toggle this for type of coordinate used in inital force constant computations
+#coord_type_init = "internal" # Toggle this for type of coordinate used in inital force constant computations
 
 # =====================
 # Some useful functions
@@ -354,6 +361,8 @@ def execute():
                         print('ReeeeEEEEEeEEEEEEEEEEEEeEeeeeeeeeeeeeeeeeeEEEE')
                     elif coord == "Redundant":
                         print("Catalina wine mixer " + str(i))
+                    elif coord == "SALCs":
+                        print("We're fighting the good fight")
                 
                     print()
                     print("="*50)
@@ -517,7 +526,7 @@ def execute():
                     if os.path.exists(os.getcwd() + "/" + combo[0]+"/Disps_" + combo[1] + "/templateInit.dat"):
                         #change to True if you need the displacements generated
                         execMerger.options.calc_init = True
-                    # execMerger.options.calc_init = False
+                    #execMerger.options.calc_init = False
 
                     if os.path.exists(os.getcwd() + "/" + combo[0]+"/Disps_" + combo[1] + "/DispsInit"):
                         execMerger.options.calc_init = False
@@ -581,7 +590,38 @@ def execute():
                         except:
                             pass
                         mol.get_nattys(combo)
-                
+                    elif coord == "SALCs":
+                        if second_order:
+                            print("The parameters")
+                            print(job + combo[0])
+                            print("disps")
+                            print("/DIsps_" + combo[1])
+                            try:
+                                shutil.copyfile(job + combo[0] + "/Disps_" + combo[1] + "/fc_cart.dat", job + "fc.dat")
+                                shutil.copyfile(job + combo[0] + "/Disps_" + combo[1] + "/fc_cart.grad", job + "fc.grad")
+                            except:
+                                print('Once again, the directory does not contain the sufficient files for the specified job')
+                                mol.direc_complete = False
+                                break
+                        #SALCs work from redundant coordinates, projection matrix from normal decomposition after salcs applied 
+                        try: 
+                            shutil.copyfile(job + combo[0] + "/zmat_red", job + "zmat")
+                            shutil.copyfile(job + combo[0] + "/zmat_red", job + "zmat2")
+                            shutil.copyfile(job + combo[0] + "/fc.dat", job + "fc2.dat")       
+                            #shutil.copyfile(job + combo[0] + "/zmat_cma1", job + "zmat")
+                            #shutil.copyfile(job + combo[0] + "/zmat_cma1_Final", job + "zmat2")
+                        except:
+                            print('Once again, the directory does not contain the sufficient files for the specified job')
+                            mol.direc_complete = False
+                            break 
+                        cma1_coord = "salcs"
+                        execMerger.options.man_proj = False
+                        execMerger.options.coords = coord
+                        execMerger.options.gradient_regex = cma1_gradient_regex
+                        Proj = None
+                        if 'Linear' in job:
+                            execMerger.options.coords = 'Custom'
+ 
                     else:
                         if second_order:
                             try:

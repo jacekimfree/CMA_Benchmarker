@@ -78,7 +78,7 @@ class Merger(object):
         zmat_obj.run()
 
         #Do we want to use symmetry? Default is False
-        self.symm_obj = Symmetry(zmat_obj, self.options)
+        self.symm_obj = Symmetry(zmat_obj, self.options, self.Proj)
         if self.options.symmetry:
             self.symm_obj.run()
         else:
@@ -103,7 +103,7 @@ class Merger(object):
         
         s_vec.run(zmat_obj.cartesians_init, True, proj=self.Proj, second_order=self.options.second_order)
                 
-        TED_obj = TED(s_vec.proj, zmat_obj)
+        TED_obj = TED(s_vec.proj, zmat_obj, self.options)
         print("TED PROJ:")
         print(TED_obj.proj)
 
