@@ -24,8 +24,8 @@ np.set_printoptions(precision=4)
 # =======================
 
 # High and low levels of theory
-h_theory = ["CCSD_T_aTZ"]
-l_theory = ["CCSD_T_aTZ"]
+h_theory = ["CCSD_T_TZ"]
+l_theory = ["MP2_TZ"]
 
 combos = list(product(h_theory,l_theory))
 
@@ -45,7 +45,8 @@ coord_type = ["Nattys"]
 # paths = ['/2_Open_Shell']
 
 # paths = ['/1*','/2*']
-job_list = ["3.16"]
+#job_list = ["3.16"]
+job_list = ["1.59"]
 # exclude_list = ["1.91","1.57","2.14"]
 exclude_list = []
 
@@ -545,7 +546,6 @@ def execute():
                     # Collect the data in dictionary d to add it to the database
                     # e.g. d[f"Ref {combo[0]}"] = execMerger.reference_freq
                     # d[f"CMA1 {combo[1]}"] = execMerger.Freq_redundant
-                    
                     ref_freq = execMerger.reference_freq.copy()
                     freq_indices = [i for i in range(len(ref_freq))]
                     freq_indices = np.array(freq_indices)
@@ -580,6 +580,9 @@ def execute():
                         z['Molecule'] = [f"{mol.name} ({mol.ID})"]
                         m['Molecule'] = [f"{mol.name} ({mol.ID})"]
                         custom_freq = execMerger.Freq_CMA0.copy()
+                        print("The custom_freq")
+                        print(custom_freq)
+                        print(stop)
                         d[f'Natty ({combo[1]})'] = custom_freq
                         # d[f'Natty ({combo[1]})'] = execMerger.Freq_custom
                         z[f'Natty ({combo[1]})'] = np.sum(custom_freq)/2
