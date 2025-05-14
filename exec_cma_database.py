@@ -29,9 +29,11 @@ l_theory = ["MP2_TZ"]
 
 combos = list(product(h_theory,l_theory))
 
-cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
+#cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
+cma1_energy_regexes = ["\s*!MP2\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
 cma1_gradient_regex = []
-cma1_success_regexes = ["Molpro calculation terminated"]
+#cma1_success_regexes = ["Molpro calculation terminated"]
+cma1_success_regexes = ["Variable memory released"]
 
 
 # Coordinates types to use
@@ -46,7 +48,6 @@ coord_type = ["Nattys"]
 
 # paths = ['/1*','/2*']
 #job_list = ["3.16"]
-job_list = ["1.59"]
 # exclude_list = ["1.91","1.57","2.14"]
 exclude_list = []
 
@@ -71,10 +72,12 @@ off_diag = 0   # Set this option for CMA0
 # off_diag = 2   # Set this option for CMA2. Off-diags will be auto generated, but an aux hessian will need be specified using ___.
 deriv_level = 0         # (CMA1) if 0, compute initial hessian by singlepoints. If 1, compute initial hessian with findif of gradients
 second_order = True    # If True, read in cartesian gradient and force constant info to be converted to internal coordinates.
-# second_order = False    # If False, generate displacements to manually compute the CMA-0A internal coord force constants.
+#second_order = False    # If False, generate displacements to manually compute the CMA-0A internal coord force constants.
 coord_type_init = "cartesian" # Toggle this for type of coordinate used in inital force constant computations
-# coord_type_init = "internal" # Toggle this for type of coordinate used in inital force constant computations
+#coord_type_init = "internal" # Toggle this for type of coordinate used in inital force constant computations
 
+#molsym_symmetry = True
+molsym_symmetry = False
 # =====================
 # Some useful functions
 # =====================
@@ -417,8 +420,8 @@ def execute():
                     execMerger = Merger(cma1_path= "/" + combo[0]+"/Disps_" + combo[1])
                     if os.path.exists(os.getcwd() + "/" + combo[0]+"/Disps_" + combo[1] + "/templateInit.dat"):
                         #change to True if you need the displacements generated
-                        # execMerger.options.calc_init = True
-                        execMerger.options.calc_init = False
+                        execMerger.options.calc_init = True
+                        #execMerger.options.calc_init = False
 
                     if os.path.exists(os.getcwd() + "/" + combo[0]+"/Disps_" + combo[1] + "/DispsInit"):
                         execMerger.options.calc_init = False
@@ -453,11 +456,14 @@ def execute():
                     sym_sort = np.array([])
                     if coord == "Nattys":
                         if second_order:
+                            if molsym_symmetry: 
+                                execMerger.options.molsym_symmetry = True
                             try:
                                 shutil.copyfile(job + combo[0] + "/Disps_" + combo[1] + "/fc_cart.dat", job + "fc.dat")
                                 shutil.copyfile(job + combo[0] + "/Disps_" + combo[1] + "/fc_cart.grad", job + "fc.grad")
                             except:
-                                print('Once again, the directory does not contain the sufficient files for the specified job')
+                                print("Missing files for second-order Nattys, not a deal-breaker")
+                                print(job + combo[0] + "/Disps_" + combo[1] + "/fc_cart.dat")
                                 # mol.direc_complete = False
                                 # break 
                         try: 
@@ -465,7 +471,9 @@ def execute():
                             shutil.copyfile(job + combo[0] + "/zmat", job + "zmat2")
                             shutil.copyfile(job + combo[0] + "/fc.dat", job + "fc2.dat")      
                         except:
-                            print('Once again, the directory does not contain the sufficient files for the specified job')
+                            print("Missing zmat stuff for second-order Nattys, this is a deal-breaker")
+                            print(job + combo[0] + "/zmat")
+                            print(job + combo[0] + "/fc.dat")      
                             mol.direc_complete = False
                             break 
                         cma1_coord = "nat"
@@ -580,9 +588,6 @@ def execute():
                         z['Molecule'] = [f"{mol.name} ({mol.ID})"]
                         m['Molecule'] = [f"{mol.name} ({mol.ID})"]
                         custom_freq = execMerger.Freq_CMA0.copy()
-                        print("The custom_freq")
-                        print(custom_freq)
-                        print(stop)
                         d[f'Natty ({combo[1]})'] = custom_freq
                         # d[f'Natty ({combo[1]})'] = execMerger.Freq_custom
                         z[f'Natty ({combo[1]})'] = np.sum(custom_freq)/2
