@@ -497,7 +497,7 @@ def execute():
                             print("The parameters")
                             print(job + combo[0])
                             print("disps")
-                            print("/DIsps_" + combo[1])
+                            print("/Disps_" + combo[1])
                             try:
                                 shutil.copyfile(job + combo[0] + "/Disps_" + combo[1] + "/fc_cart.dat", job + "fc.dat")
                                 shutil.copyfile(job + combo[0] + "/Disps_" + combo[1] + "/fc_cart.grad", job + "fc.grad")

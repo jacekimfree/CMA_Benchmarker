@@ -455,10 +455,10 @@ class Merger(object):
                 print("Computed Force Constants:")
                 print(fc_init.FC)
                 if self.options.second_order:
-                    if self.options.molsym_symmetry:
-                        print("Back-transform into unsymmetrized basis")
-                        bigS = self.symm_obj.CDsalcs.basis_transformation_matrix
-                        fc_init.FC = np.dot(bigS,np.dot(bigS.T,fc_init.FC))
+                    #if self.options.molsym_symmetry:
+                    #    print("Back-transform into unsymmetrized basis")
+                    #    bigS = self.symm_obj.CDsalcs.basis_transformation_matrix
+                    #    fc_init.FC = np.dot(bigS,np.dot(fc_init.FC, bigS.T))
 
                     p_array_grad = np.array([])
                     m_array_grad = np.array([])
