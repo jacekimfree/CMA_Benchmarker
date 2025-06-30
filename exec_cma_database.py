@@ -30,7 +30,7 @@ h_theory = ["CCSD_T_TZ"]
 # l_theory = ["MP2_haTZ"]
 # l_theory = ["MP2_haDZ"]
 # l_theory = ["MP2_aTZ"]
-# l_theory = ["MP2_TZ"]
+l_theory = ["MP2_TZ"]
 # l_theory = ["MP2_aDZ"]
 # l_theory = ["MP2_DZ"]
 # l_theory = ["CCSD_T_haTZ"]
@@ -38,7 +38,7 @@ h_theory = ["CCSD_T_TZ"]
 # l_theory = ["CCSD_T_aDZ"]
 # l_theory = ["CCSD_haTZ"]
 # l_theory = ["CCSD_T_TZ"]
-l_theory = ["CCSD_T_DZ"]
+#l_theory = ["CCSD_T_DZ"]
 # l_theory = [
 # # "CCSD_aTZ",
 # # "CCSD_haTZ",
@@ -57,8 +57,8 @@ l_theory = ["CCSD_T_DZ"]
 # l_theory = ["CCSD_T_DZ", "B3LYP_6-31G_2df,p_"]
 combos = list(product(h_theory,l_theory))
 
-# cma1_energy_regexes = ["MP2\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
-cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
+cma1_energy_regexes = ["MP2\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
+# cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
 # cma1_energy_regexes = [
 # # "CCSD_aTZ",
 # # "CCSD_haTZ",
@@ -112,15 +112,15 @@ coord_type = ["Nattys"]
 # paths = ['/1*','/2*']
 # job_list = ["4.31"]
 # job_list = ["1.104"]
-job_list = ["0.1"]
+job_list = ["4.01"]
 
 # Various output control statements
 n = 0                    # Number of CMA2 corrections (n = 0 -> CMA0)
 # n = 36                    # Number of CMA2 corrections (n = 0 -> CMA0)
 # n = 15                    # Number of CMA2 corrections (n = 0 -> CMA0)
 # n = 10                    # Number of CMA2 corrections (n = 0 -> CMA0)
-# cma1 = False             # Run CMA1 instead of CMA0
-cma1 = True             # Run CMA1 instead of CMA0
+cma1 = False             # Run CMA1 instead of CMA0
+# cma1 = True             # Run CMA1 instead of CMA0
 csv = False               # Generate database .csv file
 # csv = True               # Generate database .csv file
 SI = False                # Generate LaTeX SI file

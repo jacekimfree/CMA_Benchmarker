@@ -15,7 +15,7 @@ class Projection(object):
 
     def run(self):
     
-        unc = np.eye(1)
+	unc = np.eye(1)
         
         ch3_str = normalize(np.array([
         [1, 1, 1],
@@ -48,15 +48,15 @@ class Projection(object):
         [0, 1,-1,-1, 1]
         ]).T)
 
-        cc_rot = normalize(np.array([
+	cc_rot = normalize(np.array([
         [1, 1]
         ]).T)
 
-        ch3_rot = normalize(np.array([
+	ch3_rot = normalize(np.array([
         [1, 1, 1]
         ]).T)
         
-        Proj = block_diag(unc, unc, unc, unc, ch3_str, ch2_str, ch3_str, unc, cc3_ang, ch3_ang, ch2_ang, ch3_ang, cc_rot, ch3_rot, unc)
+        Proj = block_diag(unc, unc, unc, unc, ch3_str, ch2_str, ch3_str, unc, cc3_ang, ch3_ang, ch2_ang, ch3_ang, cc_rot, ch3_rot, ch3_rot, unc)
 
         self.Proj = Proj
 

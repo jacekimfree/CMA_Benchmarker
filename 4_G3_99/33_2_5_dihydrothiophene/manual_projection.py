@@ -67,13 +67,12 @@ class Projection(object):
             [0, 1-a, a-1, a-b, b-a],
         ]).T)
 
-        ch_2oop = normalize(np.array([
-            [1, 1],
-            [1, -1],
+        ch_2oop_sym = normalize(np.array([
+            [1, 1]
         ]).T)
 
         Proj = block_diag(cyc_5str, ch2_2str, ch_2str, cyc_5ang,
-                          ch2_2ang, ch_2ang, cyc_5tor, ch_2oop)
+                          ch2_2ang, ch_2ang, cyc_5tor, unc, ch_2oop_sym)
 
         self.Proj = Proj
 

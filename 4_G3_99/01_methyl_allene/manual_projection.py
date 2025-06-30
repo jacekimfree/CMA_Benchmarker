@@ -2,6 +2,7 @@ import numpy as np
 from numpy.linalg import norm
 from scipy.linalg import block_diag
 
+
 class Projection(object):
     """
     This class is used to specify the manual projection matrix
@@ -14,54 +15,93 @@ class Projection(object):
         self.options = options
 
     def run(self):
-    
-    	unc = np.eye(1)
-        
-        ch_2str = normalize(np.array([
-        [1, 1],
-        [1,-1]
+
+        # 0
+        str_c2c4 = np.eye(1)
+
+        # 1
+        str_c4c6 = np.eye(1)
+
+        # 2
+        str_c6c8 = np.eye(1)
+
+        # 3
+        str_c4h7 = np.eye(1)
+
+        # 4-5
+        str_ch2_c8 = normalize(np.array([
+            [1, 1],
+            [1, -1]
         ]).T)
-        
-        ch3_str = normalize(np.array([
-        [1, 1, 1],
-        [2,-1,-1],
-        [0, 1,-1]
+
+        # 6-8
+        str_ch3_c2 = normalize(np.array([
+            [1, 1, 1],
+            [2, -1, -1],
+            [0, 1, -1]
         ]).T)
-        
-        ch_ang = normalize(np.array([
-        [1,-1]
+
+        # 9
+        ang_c2c4c6 = np.eye(1)
+
+        # 10
+        ang_ch_c4 = normalize(np.array([
+            [1, -1]
         ]).T)
-        
-        ch2c_ang = normalize(np.array([
-    	[2,-1,-1],
-    	[0, 1,-1]
-    	]).T)
-    	
-    	ch3_ang = normalize(np.array([
-        [1, 1, 1,-1,-1,-1],
-        [2,-1,-1, 0, 0, 0],
-        [0, 1,-1, 0, 0, 0],
-        [0, 0, 0, 2,-1,-1],
-        [0, 0, 0, 0, 1,-1]
+
+        # 11-12
+        ang_ch2_c8 = normalize(np.array([
+            [2, -1, -1],
+            [0, 1, -1]
         ]).T)
-        
-        ch2_rot = normalize(np.array([
-        [1, 1]
+
+        # 13-17
+        ang_ch3_c2 = normalize(np.array([
+            [1, 1, 1, -1, -1, -1],
+            [2, -1, -1, 0, 0, 0],
+            [0, 1, -1, 0, 0, 0],
+            [0, 0, 0, 2, -1, -1],
+            [0, 0, 0, 0, 1, -1]
         ]).T)
-        
-        ch3_rot = normalize(np.array([
-        [1, 1, 1]
+
+        # 18
+        rot_ch2_c8 = normalize(np.array([
+            [1, 1]
         ]).T)
-        
-        Proj = block_diag(unc,unc,unc,unc,ch_2str,ch3_str,unc,ch_ang,ch2c_ang,ch3_ang,ch2_rot,ch3_rot,unc,unc,unc,unc)
+
+        # 19
+        rot_ch3_c2 = normalize(np.array([
+            [1, 1, 1]
+        ]).T)
+
+        # 20
+        oop_c8 = np.eye(1)
+
+        # 21
+        oop_c4 = np.eye(1)
+
+        # 22
+        linx_c4 = np.eye(1)
+
+        # 23
+        liny_c4 = np.eye(1)
+
+        Proj = block_diag(str_c2c4, str_c4c6, str_c6c8, str_c4h7, str_ch2_c8, str_ch3_c2, ang_c2c4c6,
+                          ang_ch_c4, ang_ch2_c8, ang_ch3_c2, rot_ch2_c8, rot_ch3_c2, oop_c8, oop_c4, linx_c4, liny_c4)
 
         self.Proj = Proj
 
-def normalize(mat):
-    return 1/norm(mat,axis=0)*mat
+        self.sym_sort = np.array([
+            [0, 1, 2, 3, 4, 6, 7, 9, 10, 11, 13, 14, 16, 20, 22],
+            [5, 8, 12, 15, 17, 18, 19, 21, 23]
+        ], dtype=object)
 
-if __name__=="__main__":
-    np.set_printoptions(linewidth=400, precision=2,threshold=100000)
+def normalize(mat):
+    return 1/norm(mat, axis=0)*mat
+
+
+if __name__ == "__main__":
+    np.set_printoptions(linewidth=400, precision=2, threshold=100000)
     p = Projection([])
     p.run()
     print(p.Proj)
