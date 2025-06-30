@@ -24,13 +24,15 @@ np.set_printoptions(precision=4)
 # =======================
 
 # High and low levels of theory
-h_theory = ["CCSD_T_aTZ"]
-l_theory = ["CCSD_T_aTZ"]
+h_theory = ["CCSD_T_TZ"]
+l_theory = ["MP2_TZ"]
 
 combos = list(product(h_theory,l_theory))
 
-cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
+# cma1_energy_regexes = ["\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
+cma1_energy_regexes = ["MP2\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
 cma1_gradient_regex = []
+# cma1_success_regexes = ["Variable memory released"]
 cma1_success_regexes = ["Molpro calculation terminated"]
 
 
@@ -44,7 +46,7 @@ coord_type = ["Nattys"]
 # paths = ['/2_Open_Shell']
 
 # paths = ['/1*','/2*']
-job_list = ["3.16"]
+job_list = ["4.01"]
 # exclude_list = ["1.91","1.57","2.14"]
 exclude_list = []
 
@@ -55,7 +57,7 @@ n = 0                    # Number of CMA2 corrections (n = 0 -> CMA0)
 xi_tol = [0.04]    # Xi value for cutoff in determining CMA2 off diags
 od_inds = [[16,17]]         # Contains a list of lists, where the sublists contain off-diagonal elements to be computed in CMA-1
 # cmaA = False             # Run CMA1 instead of CMA0
-cmaA = True             # Run CMA1 instead of CMA0
+cmaA = True             # Run CMA-A instead of CMA-B
 csv = False               # Generate database .csv file
 # csv = True               # Generate database .csv file
 SI = False                # Generate LaTeX SI file
