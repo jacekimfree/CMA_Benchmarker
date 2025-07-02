@@ -45,7 +45,6 @@ class Merger(object):
             "calc" : False,
             "calc_init" : False,
             "success_regex": r"Variable memory released",
-            "symmetry" : True,
             # "disp_points" : "5",
             # "reduced_disp" : True,
             # "cart_insert" : 26,
@@ -85,25 +84,13 @@ class Merger(object):
 
 
         
-        self.options = opts
-        self.options.symmetry=True
+        self.options = opts 
         rootdir = os.getcwd()
         zmat_obj = Zmat(self.options)
         zmat_obj.run()
 
         np.set_printoptions(edgeitems=60,linewidth=1000)
         
-        #Do we want to use symmetry? Default is False
-        self.symm_obj = Symmetry(self.zmat_obj, self.options)
-        if self.options.symmetry:
-            self.symm_obj.run()
-        else:
-            """
-            We won't run the symmetry code, but we'll create a dummy object to be passed as an argument.
-            #TODO: This is a hacky way to do this, but it's a quick fix for now. Maybe reincorporate symmetry as a s_vector obj?
-            """
-            self.symm_obj.dummy_obj()
-            self.symm_obj.symtext = None 
         
         # Geom = zmat_obj.cartesians_init
         # # TR = np.zeros((3*len(Geom),3))
@@ -188,9 +175,6 @@ class Merger(object):
         # print(np.dot(cart_proj.T,cart_proj))
         # raise RuntimeError
         
-        if self.options.symmetry:
-            self.symm_obj.make_proj(s_vec)
-            s_vec.proj = copy.deepcopy(self.symm_obj.salc_proj)
 
         TED_obj = TED(s_vec.proj, zmat_obj, self.options)
         print("TED PROJ:")
@@ -322,19 +306,18 @@ class Merger(object):
                     indices = np.triu_indices(ll)
                     indices = np.array(indices).T
                 init_disp = TransfDisp(
-                    s_vec.B,
+                    s_vec,
                     zmat_obj,
-                    # self.options.disp,
+                    self.options.disp,
                     eigs_init,
                     True,
-                    # self.options.disp_tol,
+                    self.options.disp_tol,
                     TED_obj,
                     self.options,
                     indices,
-                    # symm_obj=self.symm_obj
                     deriv_level = self.options.deriv_level,
                     coord_type = self.coord_type_init,
-                    # cart_proj = cart_proj
+                    cart_proj = cart_proj
                 )
                 init_disp.run()
                 # raise RuntimeError
@@ -351,13 +334,11 @@ class Merger(object):
                         prog_name_init,
                         zmat_obj,
                         init_disp,
-                        "A",
-                        # self.options.cart_insert_init,
+                        self.options.cart_insert_init,
                         init_disp.p_disp,
                         init_disp.m_disp,
                         self.options,
                         indices,
-                        None,
                         "templateInit.dat",
                         "DispsInit",
                         deriv_level = self.options.deriv_level
@@ -400,11 +381,9 @@ class Merger(object):
                     self.options,
                     eigs_init,
                     indices,
-                    None,
-                    "A",
-                    # self.options.energy_regex_init,
-                    # self.options.gradient_regex,
-                    # self.options.success_regex_init,
+                    self.options.energy_regex_init,
+                    self.options.gradient_regex,
+                    self.options.success_regex_init,
                     deriv_level = self.options.deriv_level
                 )
                 reap_obj_init.energy_regex = energy_regex
