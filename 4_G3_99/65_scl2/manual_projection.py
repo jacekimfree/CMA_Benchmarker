@@ -27,10 +27,15 @@ class Projection(object):
 
         self.Proj = Proj
 
+        self.sym_sort = np.array([
+            [0, 2],
+            [],
+            [],
+            [1],
+        ], dtype=object)
 
 def normalize(mat):
     return 1/norm(mat, axis=0)*mat
-
 
 if __name__ == "__main__":
     np.set_printoptions(linewidth=400, precision=2, threshold=100000)

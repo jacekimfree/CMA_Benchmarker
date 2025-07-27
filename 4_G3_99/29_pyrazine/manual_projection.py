@@ -53,9 +53,9 @@ class Projection(object):
 
         #17-19
         cyc_6tor = normalize(np.array([
-            [1, -1, 1, -1, 1, -1],
-            [1, 0, -1, 1, 0, -1],
-            [-1, 2, -1, -1, 2, -1],
+            [1,-1, 1,-1, 1,-1],
+            [2,-1,-1, 2,-1,-1],
+            [0, 1,-1, 0, 1,-1]
         ]).T)
 
         #20-21
@@ -74,18 +74,18 @@ class Projection(object):
                           ch_4ang, cyc_6tor, cc_2tor, ch_4oop_sym)
 
         self.Proj = Proj
-'''
+
         self.sym_sort = np.array([
-            [0,4,6,11,13],
-            [5,9,12],
-            [],
-            [],
-            [],
-            [],
-            [1,2,8],
-            [3,7,10,14]
-        ],dtype=object)
-'''
+            [0, 4, 6, 11, 13],
+            [5, 9, 12, 16],
+            [17, 21],
+            [23],
+            [18, 20],
+            [19, 22],
+            [1, 2, 8, 15],
+            [3, 7, 10, 14],
+        ], dtype=object)
+
 def normalize(mat):
     return 1/norm(mat, axis=0)*mat
 

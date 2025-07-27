@@ -46,7 +46,7 @@ coord_type = ["Nattys"]
 # paths = ['/2_Open_Shell']
 
 # paths = ['/1*','/2*']
-job_list = ["4.01"]
+job_list = ["4.65"]
 # exclude_list = ["1.91","1.57","2.14"]
 exclude_list = []
 

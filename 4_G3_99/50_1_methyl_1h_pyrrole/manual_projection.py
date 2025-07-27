@@ -20,7 +20,8 @@ class Projection(object):
 
         a, b = np.cos(144*np.pi/180), np.cos(72*np.pi/180)
         c, d = np.sin(144*np.pi/180), np.sin(72*np.pi/180)
-
+        
+        # 0-4
         cyc_5str = normalize(np.array([
             [1, 1, 1, 1, 1],
             [1, b, b, a, a],
@@ -28,32 +29,40 @@ class Projection(object):
             [1, a, a, b, b],
             [0, c, -c, -d, d],
         ]).T)
+        
+        # 5
 
+        # 6-9
         ch_2str = normalize(np.array([
             [1, 1],
             [1, -1]
         ]).T)
 
+        # 10-12
         ch3_str = normalize(np.array([
             [1, 1, 1],
             [2, -1, -1],
             [0, 1, -1]
         ]).T)
 
+        # 13-14
         cyc_5ang = normalize(np.array([
             [1,   a,   a,   b,   b],
             [0, a-b, b-a, 1-a, a-1],
         ]).T)
 
+        # 15
         cc3_ang = normalize(np.array([
             [1, -1]
         ]).T)
 
+        # 16-19
         ch_2ang = normalize(np.array([
             [1, -1, 1, -1],
             [1, -1, -1, 1]
         ]).T)
 
+        # 20-24
         ch3_ang = normalize(np.array([
             [1, 1, 1, -1, -1, -1],
             [2, -1, -1, 0, 0, 0],
@@ -62,15 +71,20 @@ class Projection(object):
             [0, 0, 0, 0, 1, -1]
         ]).T)
 
+        # 25-26
         cyc_5tor = normalize(np.array([
             [1,   b,   b,   a,   a],
             [0, 1-a, a-1, a-b, b-a],
         ]).T)
 
+        # 27
         ch3_rot = normalize(np.array([
             [1, 1, 1]
         ]).T)
 
+        # 28
+
+        # 29-32
         ch_2oop = normalize(np.array([
             [1, 1],
             [1, -1]
@@ -81,6 +95,10 @@ class Projection(object):
 
         self.Proj = Proj
 
+        self.sym_sort = np.array([
+            [0, 1, 3, 5, 6, 8, 10, 11, 13, 16, 18, 20, 21, 23, 26, 28, 29, 31],
+            [2, 4, 7, 9, 12, 14, 15, 17, 19, 22, 24, 25, 27, 30, 32],
+        ], dtype=object)
 
 def normalize(mat):
     return 1/norm(mat, axis=0)*mat

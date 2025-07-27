@@ -56,6 +56,12 @@ class Projection(object):
 
         self.Proj = Proj
 
+        self.sym_sort = np.array([
+            [0, 1, 3, 5, 9, 11, 15, 20],
+            [8, 14, 18, 23],
+            [7, 13, 17, 19, 22],
+            [2, 4, 6, 10, 12, 16, 21],
+        ], dtype=object)
 
 def normalize(mat):
     return 1/norm(mat, axis=0)*mat

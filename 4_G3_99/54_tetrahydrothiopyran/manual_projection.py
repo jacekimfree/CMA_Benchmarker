@@ -64,9 +64,9 @@ class Projection(object):
         ]).T)
 
         cyc_6tor = normalize(np.array([
-            [1, -1, 1, -1, 1, -1],
-            [1, 0, -1, 1, 0, -1],
-            [-1, 2, -1, -1, 2, -1],
+            [1,-1, 1,-1, 1,-1],
+            [2,-1,-1, 2,-1,-1],
+            [0,-1, 1, 0,-1, 1]
         ]).T)
 
         Proj = block_diag(cc_6str, ch2_2str, ch2_2str, ch2_str,

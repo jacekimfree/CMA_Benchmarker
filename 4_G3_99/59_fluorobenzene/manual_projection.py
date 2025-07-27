@@ -67,7 +67,6 @@ class Projection(object):
 
         self.Proj = Proj
 
-
 def normalize(mat):
     return 1/norm(mat, axis=0)*mat
 
