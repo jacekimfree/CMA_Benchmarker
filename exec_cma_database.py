@@ -38,7 +38,9 @@ h_theory = ["CCSD_T_TZ"]
 l_theory = ["MP2_TZ"]
 # l_theory = ["MP2_haTZ"]
 # l_theory = ["MP2_aTZ"]
+# l_theory = ["CCSD_TZ"]
 # l_theory = ["CCSD_T_DZ"]
+# l_theory = ["CCSD_T_TZ"]
 # l_theory = ["CCSD_T_haDZ"]
 # l_theory = ["CCSD_T_aDZ"]
 # l_theory = ["CCSD_T_TZ"]
@@ -53,14 +55,14 @@ combos = list(product(h_theory,l_theory))
 
 # CMA2 Stat Theories
 
-cmaA_energy_regexes = [r"!RHF STATE 1.\d Energy\s+(\-\d+\.\d+)"]
-# cmaA_energy_regexes = [r"!MP2\s*t?o?t?a?l?\s*energy\s+(\-\d+\.\d+)"]
+# cmaA_energy_regexes = [r"!RHF STATE 1.\d Energy\s+(\-\d+\.\d+)"]
+cmaA_energy_regexes = [r"!MP2\s*t?o?t?a?l?\s*energy\s+(\-\d+\.\d+)"]
+# cmaA_energy_regexes = [r"\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
 # cmaA_energy_regexes = [r"!MP2\s*t?o?t?a?l?\s*energy\s+(\-\d+\.\d+)",r"!MP2\s*t?o?t?a?l?\s*energy\s+(\-\d+\.\d+)",r"!MP2\s*t?o?t?a?l?\s*energy\s+(\-\d+\.\d+)",r"!MP2\s*t?o?t?a?l?\s*energy\s+(\-\d+\.\d+)",r"!MP2\s*t?o?t?a?l?\s*energy\s+(\-\d+\.\d+)",r"!MP2\s*t?o?t?a?l?\s*energy\s+(\-\d+\.\d+)",r"\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)",r"\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)",r"\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)",r"\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)",r"\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
 # cmaA_energy_regexes = [r"\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)",r"\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
 # cmaA_energy_regexes = ["",""]
 # cmaA_energy_regexes = ["","","","","","","","","","",""]
 # cmaA_energy_regexes = ["","","","","","","",""]
-# cmaA_energy_regexes = [r"\(T\)\s*t?o?t?a?l? energy\s+(\-\d+\.\d+)"]
 cmaA_gradient_regex = []
 cmaA_success_regexes = [r"Molpro calculation terminated"]
 # cmaA_success_regexes = [r"Molpro calculation terminated",r"Molpro calculation terminated",r"Molpro calculation terminated",r"Molpro calculation terminated",r"Molpro calculation terminated",r"Molpro calculation terminated",r"Molpro calculation terminated",r"Molpro calculation terminated",r"Molpro calculation terminated",r"Molpro calculation terminated",r"Molpro calculation terminated"]
@@ -76,17 +78,18 @@ cmaA_success_regexes = [r"Molpro calculation terminated"]
 # Available: "Nattys", "Redundant", "ZMAT" (not yet tho)
 # coord_type = ["Redundant"]
 coord_type = ["Nattys"]
-#coord_type = ["Nattys","Nattys"]
+# coord_type = ["Nattys","Nattys"]
 # coord_type = ["Nattys","Nattys","Nattys","Nattys","Nattys","Nattys","Nattys","Nattys","Nattys","Nattys","Nattys"]
 
 # Specify paths to grab data from
 # Options: '/1_Closed_Shell', '/1_Linear', '/1*', '/2_Open_Shell', '/2_Linear', '/2*'
-# paths = ['/3_Dimers']
+paths = ['/4*']
 # job_list = ["1.19"]
 # job_list = ["3.11"]
-job_list = ["4.60"]
+job_list = ["4.11"]
 # job_list = ["1.81"]
-exclude_list = []
+# exclude_list = []
+exclude_list = ["4.16"]
 # exclude_list = ["3.11","3.13","3.14","3.15","3.16"]
 # exclude_list = ["3.8","3.11","3.13","3.14","3.15","3.16"]
 # exclude_list = ["1.7"]
@@ -94,34 +97,33 @@ exclude_list = []
 
 # Various output control statements
 n = 0                    # Number of CMA2 corrections (n = 0 -> CMA0)
+
+xi_tol = []    # Xi value for cutoff in determining CMA2 off diags
 # xi_tol = [100.0,10.0,9.0,8.0,7.0,6.0,5.0,4.0,3.0,2.0,1.0,0.2,0.18,0.16,0.14,0.12,0.10,0.08,0.075,0.07,0.065,0.06,0.055,0.05,0.045,0.04,0.036,0.032,0.028,0.024,0.02,0.018,0.016,0.014,0.012,0.011,0.01,0.009,0.008,0.007,0.006,0.005,0.004,0.003,0.002,0.001,0.0]    # Xi value for cutoff in determining CMA2 off diags
 # xi_tol = [100,0.2,0.18,0.16,0.14,0.12,0.1,0.08,0.06,0.04,0.02,0.01,0.005]    # Xi value for cutoff in determining CMA2 off diags
 # xi_tol = [0.02]
 # xi_tol = [100.0,10.0,9.0,8.0,7.0,6.0,5.0,4.0,3.0,2.0,1.0,0.8,0.6,0.4,0.2,0.18,0.16,0.14,0.13,0.12,0.10,0.08,0.075,0.07,0.065,0.06,0.055,0.05,0.045,0.04,0.036,0.032,0.028,0.024,0.02,0.018,0.016,0.014,0.012,0.011,0.01,0.009,0.008,0.007,0.006,0.005,0.004,0.003,0.002,0.001,0.0]
-# xi_tol = [0.13]
+# xi_tol = [0.11]
 # xi_tol = [100.0]
-xi_tol = []    # Xi value for cutoff in determining CMA2 off diags
-#xi_tol = [0.02, 0.01, 0.005, 0.0025, 0.000125]    # Xi value for cutoff in determining CMA2 off diags
-# od_inds = [[1,2],[0,3],[3,5],[21,28]]
-# od_inds = [[0,2],[10,16],[21,28]]
-#od_inds = [[2,4],[1,3],[22,26],[0,3]]
+xi_tol = [0.30,0.29,0.28,0.27,0.26,0.25,0.24,0.23,0.22,0.21,0.20,0.19,0.18,0.17,0.16,0.15,0.14,0.13,0.12,0.11,0.1,0.09,0.08,0.07,0.06]    # Xi value for cutoff in determining CMA2 off diags
+
+omega_tol = []
+omega_tol = [300.0,200.0,100.0,20.0,10.0,5.0,1.0,0.5,0.1,0.05,0.01,0.005,0.001,0.0005,0.0001,0.00005,0.00001]    # Omega value for cutoff in determining CMA3 off diags
+
 od_inds = []
-# od_inds = [[22,26]]         # Contains a list of lists, where the sublists contain off-diagonal elements to be computed in CMA-1
-# od_inds = [[0,3],[0,5],[3,5]]
-# od_inds = [[0,3],[1,4],[21,28]]
-# od_inds = [[0,3],[1,4],[4,5],[21,28]]
+od_inds = [[32,35],[26,28],[26,33],[28,33]]         # Contains a list of lists, where the sublists contain off-diagonal elements to be computed in CMA-1
 #cmaA = False             # Run CMA_B instead of CMA_A
 cmaA = True             # Run CMA_A instead of CMA_B
 # csv = False               # Generate database .csv file
 csv = True               # Generate database .csv file
 SI = False                # Generate LaTeX SI file
 # SI = True               # Generate LaTeX SI file
-compute_all = False       # run calculations for all or a select few
-# compute_all = True       # run calculations for all or a select few
+# compute_all = False       # run calculations for all or a select few
+compute_all = True       # run calculations for all or a select few
 off_diag = 0   # Set this option for CMA0
 # off_diag = 1   # Set this option for CMA1. Additional off-diagonal elements will need to be specified using ___.
 # off_diag = 2   # Set this option for CMA2. Off-diags will be auto generated, but an aux hessian will need be specified using ___.
-# off_diag = 3   # Set this option for CMA3. Off-diags will be auto generated, but an aux hessian will need be specified using ___.
+off_diag = 3   # Set this option for CMA3. Off-diags will be auto generated, but an aux hessian will need be specified using ___.
 deriv_level = 0         # (CMA_A) if 0, compute initial hessian by singlepoints. If 1, compute initial hessian with findif of gradients
 second_order = True    # If True, read in cartesian gradient and force constant info to be converted to internal coordinates.
 # second_order = False    # If False, generate displacements to manually compute the CMA-0A internal coord force constants.
@@ -475,7 +477,7 @@ def execute():
                         execMerger.options.calc_b = False
                         execMerger.options.gen_disps_b = False
                     
-                    execMerger.options.cart_insert_b = 7
+                    execMerger.options.cart_insert_b = 9
                     if combo[1] == "B3LYP_6-31G_2df,p_":
                         execMerger.options.other_F_matrix = 'HF_6-31G_2df,p_'
                     elif combo[1] == "CCSD_T_DZ":
@@ -500,12 +502,12 @@ def execute():
                                 print("A gradient is necessary for this transformation.")
                                 raise RuntimeError
 
-                    if combo[1] == "CCSD_T_DZ":
-                        # execMerger.options.cart_insert_b = 24
-                        execMerger.options.cart_insert_b = 7
-                    elif combo[1] == "B3LYP_6-31G_2df,p_" or combo[1] == "HF_6-31G_2df,p_" or combo[1] == "df_MP2_TZ":
-                        execMerger.options.cart_insert_b = 4
-                        execMerger.options.program_b = "psi4@master"
+                    # if combo[1] == "CCSD_T_DZ":
+                    #     # execMerger.options.cart_insert_b = 24
+                    #     execMerger.options.cart_insert_b = 7
+                    # elif combo[1] == "B3LYP_6-31G_2df,p_" or combo[1] == "HF_6-31G_2df,p_" or combo[1] == "df_MP2_TZ":
+                    #     execMerger.options.cart_insert_b = 4
+                    #     execMerger.options.program_b = "psi4@master"
                     execMerger.options.coords = coord
                     execMerger.options.n_cma2 = n
                     # execMerger.options.off_diag = off_diag_bands
@@ -577,12 +579,12 @@ def execute():
                             break 
                         cmaA_coord = "red"
                         execMerger.options.man_proj = False
-                        execMerger.options.coords = coord
+                        execMerger.options.coords = "Delocalized"
                         execMerger.options.gradient_regex = cmaA_gradient_regex
                         Proj = None
                         if 'Linear' in job:
                             execMerger.options.coords = 'Custom'
-                    execMerger.run(execMerger.options,Proj,energy_regex=cmaA_energy_regexes[countt],success_regex=cmaA_success_regexes[countt],cmaA_coord=cmaA_coord, sym_sort=sym_sort, xi_tol=xi_tol, coord_type_b=coord_type_b, od_inds=od_inds, tiles=tiles, tile_type=tile_type, tile_xi=tile_xi)
+                    execMerger.run(execMerger.options,Proj,energy_regex=cmaA_energy_regexes[countt],success_regex=cmaA_success_regexes[countt],cmaA_coord=cmaA_coord, sym_sort=sym_sort, omega_tol=omega_tol, xi_tol=xi_tol, coord_type_b=coord_type_b, od_inds=od_inds, tiles=tiles, tile_type=tile_type, tile_xi=tile_xi)
                     # Collect the data in dictionary d to add it to the database
                     # e.g. d[f"Ref {combo[0]}"] = execMerger.reference_freq
                     # d[f"CMA_A {combo[1]}"] = execMerger.Freq_redundant
@@ -647,7 +649,7 @@ def execute():
                         # Turn this back on after assembling SI
                         mol.resid[f'Natty ({combo[1]})'] = freq_diff(ref_freq, custom_freq)
                         # mol.freqs[f'Natty ({combo[1]})'] = execMerger.Freq_custom
-                    if coord == "Redundant":
+                    if coord == "Redundant" and False:
                         if 'Linear' not in job:
                             red_freq = execMerger.Freq_redundant.copy()
 

@@ -48,7 +48,8 @@ class Merger(object):
             "calc": False,
             # "calc_init": False,
             "success_regex": r"Variable memory released",
-            "cluster": "sapelo",
+            "cluster": "slurm",
+            "time_limit" : "08:00:00"
             # "disp_points" : "5",
             # "reduced_disp" : True,
             # "cart_insert" : 26,
@@ -72,6 +73,7 @@ class Merger(object):
         success_regex=None,
         cmaA_coord=None,
         sym_sort=None,
+        omega_tol=[],
         xi_tol=[],
         coord_type_b="internal",
         od_inds=[],
@@ -79,6 +81,8 @@ class Merger(object):
         tile_type=[],
         tile_xi={},
     ):
+        # convert sym_sort to int if exists
+        sym_sort = [np.array(x, dtype=int) for x in sym_sort] if sym_sort is not None else []
 
         self.coord_type_b = coord_type_b
 
@@ -206,8 +210,8 @@ class Merger(object):
                 if not self.options.deriv_level_b:
                     indices = np.triu_indices(len(s_vec.proj.T))
                     indices = np.array(indices).T
-                    print("symmetric displacements:")
                     if len(sym_sort) > 1:
+                        print("symmetric displacements:")
                         sym_disps = []
                         for i in sym_sort:
                             for j in indices:
@@ -232,7 +236,9 @@ class Merger(object):
                 if self.options.second_order:
                     indices = np.triu_indices(len(zmat_obj.cartesians_b.flatten()))
                     indices = np.array(indices).T
-                print(s_vec.B)
+                print(zmat_obj.cartesians_b)
+                print(indices)
+                # print(indices.shape)
                 b_disp = TransfDisp(
                     s_vec,
                     zmat_obj,
@@ -277,7 +283,7 @@ class Merger(object):
                     for i in os.listdir(os.getcwd()):
                         disp_list.append(i)
 
-                    if self.options.cluster != "sapelo":
+                    if self.options.cluster != "slurm":
                         v_template = VulcanTemplate(
                             self.options, len(disp_list), prog_name_b, prog_b
                         )
@@ -294,14 +300,14 @@ class Merger(object):
                             self.options, len(disp_list), prog_name_b, prog_b
                         )
                         out = s_template.run()
-                        with open("optstep.sh", "w") as file:
-                            file.write(out)
-                        for z in range(0, len(disp_list)):
-                            source = os.getcwd() + "/optstep.sh"
-                            os.chdir("./" + str(z + 1))
-                            destination = os.getcwd()
-                            shutil.copy2(source, destination)
-                            os.chdir("../")
+                        # with open("optstep.sh", "w") as file:
+                        #     file.write(out)
+                        # for z in range(0, len(disp_list)):
+                        #     source = os.getcwd() + "/optstep.sh"
+                        #     os.chdir("./" + str(z + 1))
+                        #     destination = os.getcwd()
+                        #     shutil.copy2(source, destination)
+                        #     os.chdir("../")
                         sub_dir = os.getcwd()
                         print(os.getcwd())
                         sub = Submit(self.options, "B", sub_dir[:-7], prog_name_b, prog_b)
@@ -493,7 +499,29 @@ class Merger(object):
         # TED_obj.run(np.eye(TED_obj.proj.shape[1]), np.zeros(TED_obj.proj.shape[1]))
 
         # raise RuntimeError
-        # F_init = F.copy()                
+        # F_init = F.copy()     
+
+        np.set_printoptions(precision=6, linewidth=100000)
+
+        if False:
+        # if len(sym_sort) > 1:
+            print(F.shape)
+            print(len(flat_sym_sort)) 
+            print(flat_sym_sort) 
+            F_sym = F[flat_sym_sort].copy()
+            F_sym = F_sym[:, flat_sym_sort]
+            print("Sym Force Constants:")
+            print(F_sym)
+            # F_sym = F_sym[flat_sym_sort.argsort()].copy()
+            # F_sym = F_sym[:,flat_sym_sort.argsort()]
+
+            g_sym = G[flat_sym_sort].copy()
+            g_sym = g_sym[:, flat_sym_sort]
+            g_sym[np.abs(g_sym) < 1e-9] = 0
+            print("Sym G-Matrix:")
+            print(sym_sort)
+            print(g_sym)
+
         if len(sym_sort) > 1:
             Fbuff1 = np.array([])
             Gbuff1 = np.array([])
@@ -508,7 +536,6 @@ class Merger(object):
                 # sym_sort_buff = sym_sort[i].copy()
                 # print(sym_sort_buff)
                 # rase RuntimeError
-                
                 # Separate logic here to average the FC blocks of degenerate blocks
                 if len(np.shape(sym_sort[i])) > 1:
                     # sym_sort_buff = np.array(sym_sort_buff).flatten()
@@ -531,7 +558,7 @@ class Merger(object):
                     for j in range(len(sym_sort_T)):
                         Fbuff_degen[j] = F_ave
                     Fbuff1 = Fbuff_degen[0].copy()
-                    # Fbuff = Fbuff1.copy()
+                    Fbuff = Fbuff1.copy()
                     for j in range(len(sym_sort_T)-1):
                         Fbuff1 = np.block(
                             [
@@ -561,7 +588,7 @@ class Merger(object):
                     for j in range(len(sym_sort_T)):
                         Gbuff_degen[j] = G_ave
                     Gbuff1 = Gbuff_degen[0].copy()
-                    # Gbuff = Gbuff1.copy()
+                    Gbuff = Gbuff1.copy()
                     for j in range(len(sym_sort_T)-1):
                         Gbuff1 = np.block(
                             [
@@ -580,6 +607,15 @@ class Merger(object):
 
                 else:
                     Fbuff1 = F.copy()
+                    # DEBUG: check the type of each element in sym_sort[i]
+                    # print("LOOK HERE")
+                    # print(sym_sort[0])
+                    # for ele in sym_sort[0]:
+                    #     print(f"{str(ele):<15} | {type(ele)}")
+                    # print(sym_sort[1])
+                    # for ele in sym_sort[1]:
+                    #     print(f"{str(ele):<15} | {type(ele)}")
+                    # print("END")
                     Fbuff1 = Fbuff1[sym_sort[i]]
                     Fbuff1 = np.array(Fbuff1[:, sym_sort[i]])
                     # print(i)
@@ -624,12 +660,27 @@ class Merger(object):
                         ],
                     ]
                 )
-                
-            np.set_printoptions(precision=4, linewidth=350)
+
+            np.set_printoptions(precision=6, linewidth=1000000)
+
+            # DEBUG: Check if some important elements are zeroed out
+            print("Full F_B in sym_sort order:")
+            force_sym = F[flat_sym_sort].copy()
+            force_sym = force_sym[:, flat_sym_sort]
+            print(force_sym.shape)
+            print(force_sym)
+            print("Sym F_B:")
             print(sym_sort)
-            print("Full F:")
             print(Fbuff3.shape)
             print(Fbuff3)
+            diff_matrix = force_sym - Fbuff3
+            # fbuff3 = Fbuff3[flat_sym_sort_inv]
+            # fbuff3 = fbuff3[:, flat_sym_sort_inv]
+            # diff_matrix = F - fbuff3
+            print("Full F_B - Sym F_B")
+            print(sym_sort)
+            print(diff_matrix)
+
             # F = Fbuff3.copy()
             F = Fbuff3[flat_sym_sort_inv]
             F = F[:, flat_sym_sort_inv]
@@ -648,26 +699,9 @@ class Merger(object):
         # raise RuntimeError
 
 
-        if False:
-        # if len(sym_sort) > 1:
-            print(F.shape)
-            print(len(flat_sym_sort)) 
-            print(flat_sym_sort) 
-            F_sym = F[flat_sym_sort].copy()
-            F_sym = F_sym[:, flat_sym_sort]
-            print("Sym Force Constants:")
-            print(F_sym)
-            # F_sym = F_sym[flat_sym_sort.argsort()].copy()
-            # F_sym = F_sym[:,flat_sym_sort.argsort()]
+ 
 
-            g_sym = g_mat.G[flat_sym_sort].copy()
-            g_sym = g_sym[:, flat_sym_sort]
-            g_sym[np.abs(g_sym) < 1e-9] = 0
-            print("Sym G-Matrix:")
-            print(sym_sort)
-            print(g_sym)
-
-        print("Initial Force Constants:")
+        print("Initial Force Constants (F_B):")
         print(F.shape)
         # print(F[26,27])
         print(F)
@@ -887,7 +921,7 @@ class Merger(object):
         # Checking this logic, can bring back later when fixed.
         # if False:
         if len(sym_sort) > 1:
-            Fbuff1 = np.array([])
+            Fbuff1 = np.array([])   
             Gbuff1 = np.array([])
             Fbuff2 = {}
             Gbuff2 = {}
@@ -987,10 +1021,34 @@ class Merger(object):
                         ],
                     ]
                 )
-            print("Sym G")
-            print(Gbuff3)
+
+     # DEBUG: Print F_A
+        np.set_printoptions(edgeitems=60, linewidth=1000000)
+        if len(sym_sort) > 1:
+            print(F.shape)
+            print(len(flat_sym_sort)) 
+            print(flat_sym_sort) 
+            F_sym = F[flat_sym_sort].copy()
+            F_sym = F_sym[:, flat_sym_sort]
+            print("Full F_A in sym_sort order:")
+            print(F_sym)
             print("Sym F")
             print(Fbuff3)
+            print("Full F_A - Sym F_A")
+            print(F_sym - Fbuff3)
+            # F_sym = F_sym[flat_sym_sort.argsort()].copy()
+            # F_sym = F_sym[:,flat_sym_sort.argsort()]
+
+            g_sym = G[flat_sym_sort].copy()
+            g_sym = g_sym[:, flat_sym_sort]
+            g_sym[np.abs(g_sym) < 1e-9] = 0
+            print("Sym G-Matrix:")
+            print(sym_sort)
+            print(g_sym)
+
+            print("Sym G")
+            print(Gbuff3)
+            
             # raise RuntimeError
             # F = Fbuff3.copy()
             F = Fbuff3[flat_sym_sort_inv]
@@ -1003,6 +1061,7 @@ class Merger(object):
         # G[np.abs(G) < 1.0e-7] = 0
         # print(G[34])
         F = np.dot(np.dot(inv(eig_inv).T, F), inv(eig_inv))
+
         # F[np.abs(F) < 1.0e-5] = 0
         print("Normal Mode G")
         print(G)
@@ -1440,7 +1499,7 @@ class Merger(object):
                     self.Freq_cma2 = np.append(self.Freq_cma2, cma2_Freq, axis=0)
                 self.Freq_cma2 = np.reshape(self.Freq_cma2, (len(xi_tol), -1))
             elif self.options.off_diag == 3:
-                self.Freq_cma2 = np.array([])
+                self.Freq_cma3 = np.array([])
                 self.eta_num = np.array([])
                 self.eta_denom = np.array([])
                 self.total_off_diags = np.array([])
@@ -1471,64 +1530,173 @@ class Merger(object):
                         )
                         f_conv.run(grad=g_read_obj_inter.cart_grad)
                         F_inter = f_conv.F
-                        # F_inter = np.dot(
-                            # TED_obj.proj.T, np.dot(F_inter, TED_obj.proj)
-                        # )
                     
                     F_inter = np.dot(np.dot(inv(eig_inv).T, F_inter), inv(eig_inv))
                     print("F_inter:")
                     print(F_inter)
                     print("F_A:")
                     print(F)
-                    xi = F_inter * 0
                     od_inds = []
-                    self.total_off_diags_buff = (len(xi) ** 2 - len(xi)) / 2
+                    self.total_off_diags_buff = (len(F_inter) ** 2 - len(F_inter)) / 2
                     
-                    sym_sort = np.arange(0, len(TED_obj.TED))
-                    sym_sort = np.array([sym_sort])
+                    print(sym_sort)
+                    diag_sym_sort = np.arange(0, len(TED_obj.TED))
+                    diag_sym_sort = np.array([diag_sym_sort])
+                    print(diag_sym_sort)
+                    # print(len(sym_sort))
                     # print(sym_sort.T)
                     # raise RuntimeError
 
                     irreps_CMA0, freqs = self.mode_symmetry_sort(
-                        diag_TED, sym_sort.T, diag_GF.freq, percent_tol=51.0
+                        diag_TED, diag_sym_sort, diag_GF.freq, percent_tol=51.0
                     )
+                    # print("Giraffe end:")
+                    # raise RuntimeError
                    
-                    print(sym_sort)
-                    print(irreps_CMA0) 
-                    print(np.array(irreps_CMA0).flatten()) 
-                    print(freqs)
+                    # print(sym_sort)
+                    # print(irreps_CMA0) 
+                    # print(np.array(irreps_CMA0).flatten()) 
+                    # print(freqs)
                     b_ind = np.array(irreps_CMA0).flatten()
                     # raise RuntimeError
-
-                    for i in range(len(xi)):
-                        for j in range(i + 1):
-                            if i != j:
-                                a = b_ind[i]
-                                b = b_ind[j]
-                                freq_a = diag_GF.freq[a]
-                                freq_b = diag_GF.freq[b]
-                                buff = np.abs(F_inter[i, j])
-                                xi[i, j] = buff / np.sqrt(
-                                    np.abs(F_inter[i, i])
-                                    * np.abs(F_inter[j, j])
-                                )
-                                omega = 4 * xi[i, j]**2 * freq_a * freq_b
-                                omega += (freq_a - freq_b)**2
-                                omega = 0.5*np.abs(np.sqrt(omega) - np.abs(freq_a - freq_b))
-                                
-                                # print(i, j)
-                                # print("Omega diagnostic in wavenumbers?")
-                                # print(omega)
-                                if omega > 10.0:
-                                    print(i, j)
-                                    print("Omega diagnostic in wavenumbers:")
-                                    print(omega)
-                                    print("Xi diagnostic:")
-                                    print(xi[i, j])
+                    for omega_i in omega_tol:
+                        xi = F_inter * 0
+                        temp = copy.copy(Fdiag)
+                        for i in range(len(xi)):
+                            for j in range(i + 1):
+                                if i != j:
+                                    a = b_ind[i]
+                                    b = b_ind[j]
+                                    freq_a = diag_GF.freq[a]
+                                    freq_b = diag_GF.freq[b]
+                                    buff = np.abs(F_inter[i, j])
+                                    xi[i, j] = buff / np.sqrt(
+                                        np.abs(F_inter[i, i])
+                                        * np.abs(F_inter[j, j])
+                                    )
+                                    omega = 4 * xi[i, j]**2 * freq_a * freq_b
+                                    omega += (freq_a - freq_b)**2
+                                    omega = 0.5*np.abs(np.sqrt(omega) - np.abs(freq_a - freq_b))
+                                    
+                                    # print(i, j)
+                                    # print("Omega diagnostic in wavenumbers?")
+                                    # print(omega)
+                                    # if omega > 10.0:
+                                    if omega > omega_i:
+                                        print(i, j)
+                                        print("Omega diagnostic in wavenumbers:")
+                                        print(omega)
+                                        print("Xi diagnostic:")
+                                        print(xi[i, j])
+                                        od_inds.append([i,j])
+                                    
 
                                 # if xi[i, j] > xi_tol_i:
+                        print("CMA3 off-diagonal elements:")
+                        print(od_inds)
+                        print(len(od_inds))
+                        print(self.total_off_diags_buff)
+                        print("% ODs")
+                        print(len(od_inds) / self.total_off_diags_buff * 100)
+                        if len(od_inds) > self.total_off_diags_buff:
+                            raise RuntimeError
+                        print("% eta")
+                        print(len(od_inds) * 1.0 / len(self.Freq_CMA0) * 100.0)
+                        self.cma_off_diags = len(od_inds)
+                        # self.off_diags = np.append(self.off_diags,len(od_inds))
+                        self.total_off_diags = np.append(
+                            self.total_off_diags, self.total_off_diags_buff
+                        )
+                        # self.perc_off_diags = (self.cma_off_diags / self.total_off_diags) * 100
+                        self.eta_num = np.append(self.eta_num, self.cma_off_diags * 1.0)
+                        self.eta_denom = np.append(
+                            self.eta_denom, len(self.Freq_CMA0) * 1.0
+                        )
+                        # raise RuntimeError
+                        # extras = [[0,1],[0,2],[1,2]]
+                        # print('extras')
+                        # print(len(extras))
+                        # print(extras)
+                        print("temp:")
+                        print(temp)
+                        # if len(self.options.aux_F):
+                        #     if (
+                        #         os.path.exists(os.getcwd() + "/aux_fc.dat")
+                        #         and self.coord_type_b == "internal"
+                        #     ):
+                        #         f_read_obj_aux = FcRead("aux_fc.dat")
+                        #         f_read_obj_aux.run()
+                        #         F_aux = f_read_obj_aux.fc_mat
+                        #     elif (
+                        #         os.path.exists(os.getcwd() + "/aux_fc_cart.dat")
+                        #         and self.coord_type_b == "cartesian"
+                        #     ):
+                        #         f_read_obj_aux = FcRead("aux_fc_cart.dat")
+                        #         g_read_obj_aux = GrRead("aux_fc_cart.grad")
+                        #         g_read_obj_aux.run(zmat_obj2.cartesians_b)
+                        #         f_read_obj_aux.run()
+                        #         f_conv = FcConv(
+                        #             f_read_obj_aux.fc_mat,
+                        #             s_vec_b,
+                        #             zmat_obj2,
+                        #             "internal",
+                        #             False,
+                        #             TED_obj,
+                        #             self.options,
+                        #         )
+                        #         f_conv.run(grad=g_read_obj_aux.cart_grad)
+                        #         F_aux = f_conv.F
+                        #         # F_inter = np.dot(
+                        #             # TED_obj.proj.T, np.dot(F_inter, TED_obj.proj)
+                        #         # )
+                            
+                        #     F_aux = np.dot(np.dot(inv(eig_inv).T, F_aux), inv(eig_inv))
+                        #     F = F_aux
+                        for od_ind in od_inds:
+                            print(od_ind[0], od_ind[1])
+                            element = F[od_ind[0], od_ind[1]]
+                            print(element)
+                            temp[od_ind[0], od_ind[1]] = element
+                            temp[od_ind[1], od_ind[0]] = element
+                        print(temp)
+                        print(F)
+                        cma3_GF = GFMethod(
+                            G,
+                            temp,
+                            zmat_obj2,
+                            TED_obj,
+                            self.options,
+                        )
+                        cma3_GF.run()
+                        cma3_Freq = cma3_GF.freq.copy()
+
+                        # print(cma3_GF.freq)
+                        # raise RuntimeError
+
+                        print("////////////////////////////////////////////")
+                        print("//{:^40s}//".format(" CMA-3 TED"))
+                        print("////////////////////////////////////////////")
+                        TED_obj.run(
+                            # cma3_GF.L, cma3_GF.freq, rect_print=False
+                            np.dot(b_GF.L, cma3_GF.L), cma3_GF.freq, rect_print=False
+                        )
+                        
+                        if len(sym_sort):
+                            self.irreps_CMA3, flat_sym_freqs = self.mode_symmetry_sort(
+                                TED_obj.TED, sym_sort, cma3_Freq
+                            )
+                            cma3_Freq = np.array(flat_sym_freqs)
+
+                        # self.RMSD = np.append(self.RMSD,cma2_rmsd)
+                        # print("Giraffe Freq:")
+                        # print(cma3_Freq) 
+                        # print(self.reference_freq) 
+                        self.Freq_cma3 = np.append(self.Freq_cma3, cma3_Freq, axis=0)
+                        od_inds = []
+                        # print(self.Freq_cma3) 
                                     # od_inds.append([i, j])
                     # raise RuntimeError
+                    self.Freq_cma3 = np.reshape(self.Freq_cma3, (len(omega_tol), -1))
             
             else:
                 print(
@@ -1536,176 +1704,8 @@ class Merger(object):
                 )
                 print("Please enter 1, 2, or 3 for the off_diag option.")
                 raise RuntimeError
+            
 
-        # if self.options.n_cma2 > 0:
-        # self.Freq_cma2 = np.array([])
-        # # self.cma2_rmsd = np.array([])
-        # self.eta_num = np.array([])
-        # self.eta_denom = np.array([])
-        # self.total_off_diags = np.array([])
-        # for xi_tol_i in xi_tol:
-        # if self.options.off_diag:
-        # algo = Algorithm(eigs, None, self.options)
-        # algo.run()
-        # temp = np.zeros((eigs,eigs))
-        # for z, extra in enumerate(algo.indices):
-        # element = F[extra[0], extra[1]]
-        # temp[extra[0], extra[1]] = element
-        # temp[extra[1], extra[0]] = element
-        # else:
-        # # extras = n_largest(self.options.n_cma2, np.abs(copy.copy(F)))
-        # extras = []
-        # extras = [[7,8]]
-        # # print("Inter off diag indices:")
-        # # for i in range(len(Fdiag)):
-        # # for j in range(len(Fdiag)-i-1):
-        # # # print([i,j+i+1])
-        # # extras.append([i,j+i+1])
-
-        # # raise RuntimeError
-        # temp = copy.copy(Fdiag)
-        # if len(self.options.other_F_matrix) and os.path.exists(os.getcwd() + "/inter_fc.dat"):
-        # f_read_obj_inter = FcRead("inter_fc.dat")
-        # f_read_obj_inter.run()
-        # F_inter = f_read_obj_inter.fc_mat
-        # F_inter = np.dot(np.dot(inv(eig_inv).T, F_inter), inv(eig_inv))
-        # print("F_inter:")
-        # print(F_inter)
-        # print("F_A:")
-        # print(F)
-        # xi = F_inter * 0
-        # extras = []
-        # if len(sym_sort) > 1:
-        # self.total_off_diags_buff = 0
-        # for irrep in self.irreps_init:
-        # if len(irrep) > 1:
-        # for i in range(len(irrep)):
-        # for j in range(i):
-        # if i != j:
-        # a = irrep[i]
-        # b = irrep[j]
-        # buff = np.abs(F_inter[a,b])
-        # xi[a,b] = buff / np.sqrt(np.abs(F_inter[a,a])*np.abs(F_inter[b,b]))
-        # if xi[a,b] > xi_tol_i:
-        # extras.append([a,b])
-        # self.total_off_diags_buff += (len(irrep)**2 - len(irrep))/2
-        # else:
-        # self.total_off_diags_buff = (len(xi)**2 - len(xi))/2
-        # for i in range(len(xi)):
-        # for j in range(i+1):
-        # if i != j:
-        # buff = np.abs(F_inter[i,j])
-        # xi[i,j] = buff / np.sqrt(np.abs(F_inter[i,i])*np.abs(F_inter[j,j]))
-        # if xi[i,j] > xi_tol_i:
-        # extras.append([i,j])
-
-        # self.cma_off_diags = len(extras)
-        # # self.off_diags = np.append(self.off_diags,len(extras))
-        # self.total_off_diags = np.append(self.total_off_diags,self.total_off_diags_buff)
-        # # self.perc_off_diags = (self.cma_off_diags / self.total_off_diags) * 100
-        # self.eta_num = np.append(self.eta_num,self.cma_off_diags*1.0)
-        # self.eta_denom = np.append(self.eta_denom,len(self.Freq_CMA0)*1.0)
-        # # raise RuntimeError
-        # # extras = [[0,1],[0,2],[1,2]]
-        # # print('extras')
-        # # print(len(extras))
-        # # print(extras)
-        # for z, extra in enumerate(extras):
-        # element = F[extra[0], extra[1]]
-        # temp[extra[0], extra[1]] = element
-        # temp[extra[1], extra[0]] = element
-
-        # if len(self.options.other_F_matrix) and os.path.exists(os.getcwd() + "/inter_fc.dat"):
-        # pass
-        # # print(os.getcwd())
-        # # f_read_obj_inter = FcRead("inter_fc.dat")
-        # # f_read_obj_inter.run()
-        # # F_inter = f_read_obj_inter.fc_mat
-        # # F_inter = np.dot(np.dot(inv(eig_inv).T, F_inter), inv(eig_inv))
-        # # print("F_inter:")
-        # # print(F_inter)
-        # # print("F_A:")
-        # # print(F)
-        # # # raise RuntimeError
-        # # for z, extra in enumerate(extras):
-        # # element = F_inter[extra[0], extra[1]]
-        # # temp[extra[0], extra[1]] = element
-        # # temp[extra[1], extra[0]] = element
-        # else:
-        # for z, extra in enumerate(extras):
-        # element = F[extra[0], extra[1]]
-        # temp[extra[0], extra[1]] = element
-        # temp[extra[1], extra[0]] = element
-        # print('CMA2 FC matrix')
-        # print(temp)
-
-        # print('Time for some off-diags')
-        # cma2_GF = GFMethod(
-        # G,
-        # temp,
-        # self.options.tol,
-        # self.options.proj_tol,
-        # zmat_obj2,
-        # TED_obj,
-        # False
-        # )
-        # cma2_GF.run()
-        # cma2_Freq = cma2_GF.freq.copy()
-
-        # print("////////////////////////////////////////////")
-        # print("//{:^40s}//".format(" CMA-2 TED"))
-        # print("////////////////////////////////////////////")
-        # TED_obj.run(np.dot(init_GF.L, cma2_GF.L), cma2_GF.freq, rect_print=False)
-
-        # if len(sym_sort):
-        # self.irreps_CMA2,flat_sym_freqs = self.mode_symmetry_sort(TED_obj.TED,sym_sort,cma2_Freq)
-        # cma2_Freq = np.array(flat_sym_freqs)
-
-        # # self.RMSD = np.append(self.RMSD,cma2_rmsd)
-        # self.Freq_cma2 = np.append(self.Freq_cma2,cma2_Freq,axis=0)
-
-        # if not len(xi_tol):
-        # print("We entered the if")
-        # temp = copy.copy(Fdiag)
-        # extras = [[0,1],[0,2],[0,3],[1,2],[1,3],[2,3],[0,5]]
-        # print('extras')
-        # print(len(extras))
-        # print(extras)
-        # for z, extra in enumerate(extras):
-        # element = F[extra[0], extra[1]]
-        # temp[extra[0], extra[1]] = element
-        # temp[extra[1], extra[0]] = element
-        # print('CMA1 FC matrix')
-        # print(temp)
-
-        # print('Time for some off-diags')
-        # cma2_GF = GFMethod(
-        # G,
-        # temp,
-        # self.options.tol,
-        # self.options.proj_tol,
-        # zmat_obj2,
-        # TED_obj,
-        # False
-        # )
-        # cma2_GF.run()
-        # cma2_Freq = cma2_GF.freq.copy()
-
-        # print("////////////////////////////////////////////")
-        # print("//{:^40s}//".format(" CMA-2 TED"))
-        # print("////////////////////////////////////////////")
-        # TED_obj.run(np.dot(init_GF.L, cma2_GF.L), cma2_GF.freq, rect_print=False)
-
-        # if len(sym_sort):
-        # self.irreps_CMA2,flat_sym_freqs = self.mode_symmetry_sort(TED_obj.TED,sym_sort,cma2_Freq)
-        # cma2_Freq = np.array(flat_sym_freqs)
-
-        # # self.RMSD = np.append(self.RMSD,cma2_rmsd)
-        # self.Freq_cma2 = cma2_Freq
-
-        # print(self.Freq_cma2)
-        # if len(xi_tol):
-        # self.Freq_cma2 = np.reshape(self.Freq_cma2,(len(xi_tol),-1))
 
         def n_largest(n, FC):
             indexes = []
