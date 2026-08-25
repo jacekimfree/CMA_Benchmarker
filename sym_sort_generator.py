@@ -5,6 +5,8 @@ import tempfile
 import importlib.util
 import sys
 
+print(sys.executable)
+
 class Character_table(object):
     def __init__(self, point_group):
         point_group = point_group.lower()   # make it case insensitive
@@ -223,24 +225,24 @@ class Zmat(object):
                     self.cartesian_list.append(list(map(float,line.strip().split()[1:4])))
 
         """If body-fixed z is not along space-fixed z for c2v, uncomment this"""
-        coords = np.array(self.cartesian_list)
-        rotation_x_90 = np.array([
-            [1, 0, 0],
-            [0, 0, 1],
-            [0,-1, 0]
-        ])
-        rotation_y_90 = np.array([
-            [0, 0, 1],
-            [0, 1, 0],
-            [-1, 0, 0]
-        ])
-        rotation_z_90 = np.array([
-            [0, -1, 0],
-            [1,  0, 0],
-            [0,  0, 1]
-        ])
-        coords = np.dot(coords, rotation_x_90.T)
-        self.cartesian_list = coords.tolist()
+        # coords = np.array(self.cartesian_list)
+        # rotation_x_90 = np.array([
+        #     [1, 0, 0],
+        #     [0, 0, 1],
+        #     [0,-1, 0]
+        # ])
+        # rotation_y_90 = np.array([
+        #     [0, 0, 1],
+        #     [0, 1, 0],
+        #     [-1, 0, 0]
+        # ])
+        # rotation_z_90 = np.array([
+        #     [0, -1, 0],
+        #     [1,  0, 0],
+        #     [0,  0, 1]
+        # ])
+        # coords = np.dot(coords, rotation_x_90.T)
+        # self.cartesian_list = coords.tolist()
 
         return self.zmat_list, self.cartesian_list
 # print(Zmat().read_zmat("4.01"))
@@ -461,6 +463,7 @@ class Irrep(object):
                     raise ValueError(f"Could not match transformed ZMAT entry {trans_int_coord} under operation {op}")
             """ DEBUG: print P_zmat """
             # print(f"Zmat permutation matrix for operation: {op}")
+            # print(P_zmat.shape)
             # print(P_zmat)
 
             # transform projection matrix via P_zmat
@@ -518,5 +521,5 @@ class Irrep(object):
 np.set_printoptions(linewidth=np.inf)   # don't wrap
 np.set_printoptions(threshold=sys.maxsize)
 
-print(Irrep("4.68","c2v").assign_irrep())
+print(Irrep("4.81","c2h").assign_irrep())
 # print(Irrep("1.103","c2v").assign_irrep())   # testing on G2

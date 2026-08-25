@@ -84,12 +84,11 @@ coord_type = ["Nattys"]
 # Specify paths to grab data from
 # Options: '/1_Closed_Shell', '/1_Linear', '/1*', '/2_Open_Shell', '/2_Linear', '/2*'
 paths = ['/4*']
-# job_list = ["1.19"]
-# job_list = ["3.11"]
-job_list = ["4.11"]
-# job_list = ["1.81"]
+
+job_list = ["4.80"]
+# job_list = ["4.11","4.15","4.19","4.20","4.25","4.27","4.29","4.35","4.42","4.57","5.58","4.59","4.75"]
 # exclude_list = []
-exclude_list = ["4.16"]
+exclude_list = ["4.1"]
 # exclude_list = ["3.11","3.13","3.14","3.15","3.16"]
 # exclude_list = ["3.8","3.11","3.13","3.14","3.15","3.16"]
 # exclude_list = ["1.7"]
@@ -105,30 +104,31 @@ xi_tol = []    # Xi value for cutoff in determining CMA2 off diags
 # xi_tol = [100.0,10.0,9.0,8.0,7.0,6.0,5.0,4.0,3.0,2.0,1.0,0.8,0.6,0.4,0.2,0.18,0.16,0.14,0.13,0.12,0.10,0.08,0.075,0.07,0.065,0.06,0.055,0.05,0.045,0.04,0.036,0.032,0.028,0.024,0.02,0.018,0.016,0.014,0.012,0.011,0.01,0.009,0.008,0.007,0.006,0.005,0.004,0.003,0.002,0.001,0.0]
 # xi_tol = [0.11]
 # xi_tol = [100.0]
-xi_tol = [0.30,0.29,0.28,0.27,0.26,0.25,0.24,0.23,0.22,0.21,0.20,0.19,0.18,0.17,0.16,0.15,0.14,0.13,0.12,0.11,0.1,0.09,0.08,0.07,0.06]    # Xi value for cutoff in determining CMA2 off diags
+# xi_tol = [0.30,0.29,0.28,0.27,0.26,0.25,0.24,0.23,0.22,0.21,0.20,0.19,0.18,0.17,0.16,0.15,0.14,0.13,0.12,0.11,0.10,0.09,0.08,0.07,0.06,0.05,0.04,0.03,0.02,0.01]    # Xi value for cutoff in determining CMA2 off diags
+xi_tol = [0.04]
 
 omega_tol = []
 omega_tol = [300.0,200.0,100.0,20.0,10.0,5.0,1.0,0.5,0.1,0.05,0.01,0.005,0.001,0.0005,0.0001,0.00005,0.00001]    # Omega value for cutoff in determining CMA3 off diags
 
 od_inds = []
-od_inds = [[32,35],[26,28],[26,33],[28,33]]         # Contains a list of lists, where the sublists contain off-diagonal elements to be computed in CMA-1
+od_inds = [[20,27]]         # Contains a list of lists, where the sublists contain off-diagonal elements to be computed in CMA-1
 #cmaA = False             # Run CMA_B instead of CMA_A
 cmaA = True             # Run CMA_A instead of CMA_B
-# csv = False               # Generate database .csv file
-csv = True               # Generate database .csv file
+csv = False               # Generate database .csv file
+# csv = True               # Generate database .csv file
 SI = False                # Generate LaTeX SI file
 # SI = True               # Generate LaTeX SI file
-# compute_all = False       # run calculations for all or a select few
-compute_all = True       # run calculations for all or a select few
+compute_all = False       # run calculations for all or a select few
+# compute_all = True       # run calculations for all or a select few
 off_diag = 0   # Set this option for CMA0
 # off_diag = 1   # Set this option for CMA1. Additional off-diagonal elements will need to be specified using ___.
 # off_diag = 2   # Set this option for CMA2. Off-diags will be auto generated, but an aux hessian will need be specified using ___.
-off_diag = 3   # Set this option for CMA3. Off-diags will be auto generated, but an aux hessian will need be specified using ___.
+# off_diag = 3   # Set this option for CMA3. Off-diags will be auto generated, but an aux hessian will need be specified using ___.
 deriv_level = 0         # (CMA_A) if 0, compute initial hessian by singlepoints. If 1, compute initial hessian with findif of gradients
-second_order = True    # If True, read in cartesian gradient and force constant info to be converted to internal coordinates.
-# second_order = False    # If False, generate displacements to manually compute the CMA-0A internal coord force constants.
-coord_type_b = "cartesian" # Toggle this for type of coordinate used in inital force constant computations
-# coord_type_b = "internal" # Toggle this for type of coordinate used in inital force constant computations
+# second_order = True    # If True, read in cartesian gradient and force constant info to be converted to internal coordinates.
+second_order = False    # If False, generate displacements to manually compute the CMA-0A internal coord force constants.
+# coord_type_b = "cartesian" # Toggle this for type of coordinate used in inital force constant computations
+coord_type_b = "internal" # Toggle this for type of coordinate used in inital force constant computations
 
 # =====================
 # Some useful functions
